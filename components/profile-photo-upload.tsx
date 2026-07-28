@@ -33,7 +33,6 @@ type ProfilePhotoUploadProps = {
   hasExistingPersona: boolean;
 };
 
-const PROFILE_PHOTO_FILE_NAME = "profile.webp";
 const IS_DEVELOPMENT = process.env.NODE_ENV === "development";
 
 type StorageUploadError = {
@@ -244,7 +243,8 @@ export default function ProfilePhotoUpload({
       return;
     }
 
-    const objectPath = `${user.id}/${PROFILE_PHOTO_FILE_NAME}`;
+    const uploadedFileName = processedPhoto.fileName;
+    const objectPath = `${user.id}/${uploadedFileName}`;
 
     if (IS_DEVELOPMENT) {
       console.info("[profile-photo] Storage 업로드 시작", {
@@ -286,7 +286,7 @@ export default function ProfilePhotoUpload({
     }
 
     const oldPaths = PROFILE_PHOTO_FILE_NAMES.filter(
-      (candidate) => candidate !== PROFILE_PHOTO_FILE_NAME,
+      (candidate) => candidate !== uploadedFileName,
     ).map((candidate) => `${user.id}/${candidate}`);
 
     const { error: cleanupError } = await supabase.storage
