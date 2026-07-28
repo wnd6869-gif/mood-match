@@ -80,7 +80,7 @@ Vercel Preview Deployment를 테스트할 때만 추가합니다.
   확인합니다.
 - 새 Supabase 프로젝트라면 `profiles.sql` → `profile-photos.sql` →
   `personas.sql` → `visual-archetypes.sql` → `public-chat-profile.sql` →
-  `conversation-requests.sql` → `direct-chat.sql` →
+  `conversation-requests.sql` → `direct-chat.sql` → `group-chat.sql` →
   `safety-moderation.sql` → `admin.sql` 순서로 SQL Editor에서 실행합니다.
 - Storage의 `profile-photos` 버킷이 private인지 확인합니다.
 - Realtime의 `public.messages` publication 등록 여부를 확인합니다.

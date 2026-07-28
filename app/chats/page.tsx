@@ -28,7 +28,7 @@ export default async function ChatsPage() {
   }
 
   const { data, error } = await supabase.rpc(
-    "get_my_direct_conversations",
+    "get_my_conversations",
   );
   const conversations = Array.isArray(data)
     ? data
@@ -41,14 +41,22 @@ export default async function ChatsPage() {
   return (
     <AppShell>
       <header className="pt-2">
-        <p className="text-sm font-semibold text-coral-600">
-          1:1 채팅
-        </p>
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-sm font-semibold text-coral-600">
+            이어지는 대화
+          </p>
+          <Link
+            href="/chats/new-group"
+            className="inline-flex min-h-10 cursor-pointer items-center rounded-xl bg-coral-50 px-3 text-sm font-bold text-coral-700 transition-colors hover:bg-coral-100"
+          >
+            + 단체방
+          </Link>
+        </div>
         <h1 className="mt-2 text-3xl font-bold leading-tight tracking-tight text-neutral-900">
           이어서 이야기해요
         </h1>
         <p className="mt-3 text-sm leading-6 text-neutral-600">
-          서로 인사를 받아 대화가 열린 채팅만 표시돼요.
+          1:1 대화와 오래 이어갈 소규모 단체방을 모아볼 수 있어요.
         </p>
       </header>
 
@@ -57,7 +65,7 @@ export default async function ChatsPage() {
           role="alert"
           className="mt-5 rounded-2xl bg-amber-50 px-4 py-3 text-sm leading-5 text-amber-800"
         >
-          채팅 목록을 불러오지 못했어요. direct-chat.sql 실행 여부를
+          채팅 목록을 불러오지 못했어요. group-chat.sql 실행 여부를
           확인해주세요.
         </p>
       )}
@@ -74,8 +82,16 @@ export default async function ChatsPage() {
             마음이 맞는 캐릭터에게 대화를 신청해보세요.
           </p>
           <ActionLink
-            href="/discover"
+            href="/chats/new-group"
             className="mt-6"
+            ariaLabel="새 소규모 단체방 만들기"
+          >
+            단체방 만들기
+          </ActionLink>
+          <ActionLink
+            href="/discover"
+            variant="secondary"
+            className="mt-3"
             ariaLabel="대화할 캐릭터 둘러보기"
           >
             캐릭터 둘러보기
@@ -91,16 +107,23 @@ export default async function ChatsPage() {
             >
               <div className="flex items-start gap-3">
                 <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-coral-50 to-neutral-100 text-lg text-coral-600">
-                  ✦
+                  {conversation.conversationType === "group"
+                    ? "☁"
+                    : "✦"}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <h2 className="truncate text-base font-bold text-neutral-900">
-                        {conversation.otherPublicNickname}
+                        {conversation.conversationType === "group"
+                          ? (conversation.conversationTitle ??
+                            "이름 없는 단체방")
+                          : conversation.otherPublicNickname}
                       </h2>
                       <p className="mt-0.5 truncate text-xs font-semibold text-coral-600">
-                        {conversation.otherPersonaTitle}
+                        {conversation.conversationType === "group"
+                          ? `${conversation.memberCount}명 · 소규모 단체방`
+                          : conversation.otherPersonaTitle}
                       </p>
                     </div>
                     <time
@@ -148,20 +171,21 @@ export default async function ChatsPage() {
                     )}
                   </div>
 
-                  {conversation.otherMoodKeywords.length > 0 && (
-                    <div className="mt-3 flex gap-1.5 overflow-hidden">
-                      {conversation.otherMoodKeywords
-                        .slice(0, 3)
-                        .map((keyword) => (
-                          <span
-                            key={keyword}
-                            className="shrink-0 rounded-full bg-neutral-100 px-2.5 py-1 text-[0.68rem] font-semibold text-neutral-500"
-                          >
-                            {keyword}
-                          </span>
-                        ))}
-                    </div>
-                  )}
+                  {conversation.conversationType === "direct" &&
+                    conversation.otherMoodKeywords.length > 0 && (
+                      <div className="mt-3 flex gap-1.5 overflow-hidden">
+                        {conversation.otherMoodKeywords
+                          .slice(0, 3)
+                          .map((keyword) => (
+                            <span
+                              key={keyword}
+                              className="shrink-0 rounded-full bg-neutral-100 px-2.5 py-1 text-[0.68rem] font-semibold text-neutral-500"
+                            >
+                              {keyword}
+                            </span>
+                          ))}
+                      </div>
+                    )}
                 </div>
               </div>
             </Link>
