@@ -39,6 +39,54 @@ export const CHARACTER_AVATARS = {
     textClass: "text-coral-700",
     ringClass: "ring-coral-200",
   },
+  capybara: {
+    label: "카피바라",
+    src: "/characters/capybara.webp",
+    accent: "sage",
+    surfaceClass: "bg-sage-100",
+    textClass: "text-sage-700",
+    ringClass: "ring-[#bcc7a3]",
+  },
+  raccoon: {
+    label: "라쿤",
+    src: "/characters/raccoon.webp",
+    accent: "coral",
+    surfaceClass: "bg-coral-50",
+    textClass: "text-coral-700",
+    ringClass: "ring-coral-200",
+  },
+  meerkat: {
+    label: "미어캣",
+    src: "/characters/meerkat.webp",
+    accent: "orange",
+    surfaceClass: "bg-orange-100",
+    textClass: "text-orange-700",
+    ringClass: "ring-[#f5c47b]",
+  },
+  penguin: {
+    label: "펭귄",
+    src: "/characters/penguin.webp",
+    accent: "lilac",
+    surfaceClass: "bg-lilac-100",
+    textClass: "text-lilac-600",
+    ringClass: "ring-[#cbbaf5]",
+  },
+  owl: {
+    label: "부엉이",
+    src: "/characters/owl.webp",
+    accent: "sage",
+    surfaceClass: "bg-sage-100",
+    textClass: "text-sage-700",
+    ringClass: "ring-[#bcc7a3]",
+  },
+  alpaca: {
+    label: "알파카",
+    src: "/characters/alpaca.webp",
+    accent: "sky",
+    surfaceClass: "bg-[#e6f4fb]",
+    textClass: "text-[#47768d]",
+    ringClass: "ring-[#b8dce9]",
+  },
 } as const;
 
 export type CharacterAvatarKey = keyof typeof CHARACTER_AVATARS;
@@ -49,11 +97,17 @@ type AnimalType = {
 };
 
 const ANIMAL_KEYWORDS: Record<CharacterAvatarKey, readonly string[]> = {
-  otter: ["수달", "펭귄", "햄스터", "토끼", "곰"],
+  otter: ["수달", "햄스터", "토끼", "곰"],
   cat: ["고양이"],
   dog: ["강아지", "리트리버", "셰퍼드", "진돗개", "개"],
   deer: ["사슴"],
   fox: ["여우", "늑대"],
+  capybara: ["카피바라"],
+  raccoon: ["라쿤", "너구리"],
+  meerkat: ["미어캣"],
+  penguin: ["펭귄"],
+  owl: ["부엉이", "올빼미"],
+  alpaca: ["알파카", "라마"],
 };
 
 export function getCharacterAvatarKey(
