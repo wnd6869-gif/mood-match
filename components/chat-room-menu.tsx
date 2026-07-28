@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ReportDialog } from "@/components/safety-actions";
-import type { DirectConversationContext } from "@/lib/chat";
+import type { ConversationContext } from "@/lib/chat";
 
 type ApiResponse = {
   error?: string;
@@ -29,7 +29,7 @@ async function readApiResponse(response: Response) {
 export default function ChatRoomMenu({
   context,
 }: {
-  context: DirectConversationContext;
+  context: ConversationContext;
 }) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -88,6 +88,7 @@ export default function ChatRoomMenu({
   async function handleBlock() {
     if (
       isSubmitting ||
+      !context.otherUserId ||
       !window.confirm(
         "차단하면 서로의 공개 프로필이 보이지 않고, 새로운 대화 걸기와 메시지 전송이 제한돼요.",
       )
@@ -136,12 +137,39 @@ export default function ChatRoomMenu({
 
       {isOpen && (
         <div className="absolute right-0 top-12 z-30 w-60 rounded-2xl border border-neutral-200 bg-white p-2 shadow-xl">
-          <Link
-            href={`/discover/${context.otherUserId}`}
-            className="flex min-h-11 cursor-pointer items-center rounded-xl px-3 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-50"
-          >
-            상대 공개 프로필 보기
-          </Link>
+          {context.conversationType === "group" ? (
+            <div className="mb-2 border-b border-neutral-100 px-3 pb-3 pt-2">
+              <p className="text-xs font-bold text-neutral-500">
+                참여 멤버 {context.members.length}명
+              </p>
+              <div className="mt-2 space-y-2">
+                {context.members.map((member) => (
+                  <div
+                    key={member.userId}
+                    className="flex items-center justify-between gap-2 text-sm"
+                  >
+                    <span className="truncate font-semibold text-neutral-700">
+                      {member.publicNickname}
+                    </span>
+                    {member.role === "owner" && (
+                      <span className="shrink-0 rounded-full bg-coral-50 px-2 py-0.5 text-[0.65rem] font-bold text-coral-700">
+                        방장
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            context.otherUserId && (
+              <Link
+                href={`/discover/${context.otherUserId}`}
+                className="flex min-h-11 cursor-pointer items-center rounded-xl px-3 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-50"
+              >
+                상대 공개 프로필 보기
+              </Link>
+            )
+          )}
           <button
             type="button"
             disabled={isSubmitting}
@@ -158,32 +186,38 @@ export default function ChatRoomMenu({
           >
             채팅방 숨기기
           </button>
-          <button
-            type="button"
-            disabled={isSubmitting}
-            onClick={() => {
-              setShowReport(true);
-              setIsOpen(false);
-            }}
-            className="flex min-h-11 w-full cursor-pointer items-center rounded-xl px-3 text-left text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            신고하기
-          </button>
-          <button
-            type="button"
-            disabled={isSubmitting}
-            onClick={handleBlock}
-            className="flex min-h-11 w-full cursor-pointer items-center rounded-xl px-3 text-left text-sm font-semibold text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            차단하기
-          </button>
+          {context.conversationType === "direct" && (
+            <>
+              <button
+                type="button"
+                disabled={isSubmitting}
+                onClick={() => {
+                  setShowReport(true);
+                  setIsOpen(false);
+                }}
+                className="flex min-h-11 w-full cursor-pointer items-center rounded-xl px-3 text-left text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                신고하기
+              </button>
+              <button
+                type="button"
+                disabled={isSubmitting}
+                onClick={handleBlock}
+                className="flex min-h-11 w-full cursor-pointer items-center rounded-xl px-3 text-left text-sm font-semibold text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                차단하기
+              </button>
+            </>
+          )}
           <button
             type="button"
             disabled={isSubmitting}
             onClick={() => {
               if (
                 window.confirm(
-                  "채팅방을 나가면 다시 메시지를 보낼 수 없어요. 나갈까요?",
+                  context.conversationType === "group"
+                    ? "방을 나가도 다른 멤버의 대화와 방은 계속 유지돼요. 나갈까요?"
+                    : "채팅방을 나가면 다시 메시지를 보낼 수 없어요. 나갈까요?",
                 )
               ) {
                 updateSetting("leave");
@@ -203,8 +237,12 @@ export default function ChatRoomMenu({
       )}
 
       <ReportDialog
-        isOpen={showReport}
-        targetUserId={context.otherUserId}
+        isOpen={
+          showReport &&
+          context.conversationType === "direct" &&
+          Boolean(context.otherUserId)
+        }
+        targetUserId={context.otherUserId ?? ""}
         conversationId={context.conversationId}
         onClose={() => setShowReport(false)}
         onSuccess={setFeedback}

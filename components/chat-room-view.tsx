@@ -15,13 +15,13 @@ import {
   formatMessageTime,
   getChatMessageFromRecord,
   type ChatMessage,
-  type DirectConversationContext,
+  type ConversationContext,
 } from "@/lib/chat";
 import { createClient } from "@/lib/supabase/client";
 
 type ChatRoomViewProps = {
   currentUserId: string;
-  context: DirectConversationContext;
+  context: ConversationContext;
   initialMessages: ChatMessage[];
 };
 
@@ -56,9 +56,10 @@ export default function ChatRoomView({
   const [errorMessage, setErrorMessage] = useState<string | null>(
     null,
   );
-  const [reportedMessageId, setReportedMessageId] = useState<
-    string | null
-  >(null);
+  const [reportedMessage, setReportedMessage] = useState<{
+    messageId: string;
+    senderId: string;
+  } | null>(null);
   const [safetyFeedback, setSafetyFeedback] = useState<string | null>(
     null,
   );
@@ -95,7 +96,7 @@ export default function ChatRoomView({
     // Postgres Changes is sufficient for the MVP. For larger concurrent
     // audiences, move message fan-out to private Broadcast channels.
     const channel = supabase
-      .channel(`direct-chat:${context.conversationId}`)
+      .channel(`chat:${context.conversationId}`)
       .on(
         "postgres_changes",
         {
@@ -167,6 +168,22 @@ export default function ChatRoomView({
     markRead,
     supabase,
   ]);
+
+  const membersById = useMemo(
+    () =>
+      new Map(
+        context.members.map((member) => [member.userId, member]),
+      ),
+    [context.members],
+  );
+  const roomTitle =
+    context.conversationType === "group"
+      ? (context.conversationTitle ?? "이름 없는 단체방")
+      : context.otherPublicNickname;
+  const roomSubtitle =
+    context.conversationType === "group"
+      ? `${context.members.length}명 · 소규모 단체방`
+      : context.otherPersonaTitle;
 
   function handleScroll() {
     const container = scrollContainerRef.current;
@@ -260,10 +277,10 @@ export default function ChatRoomView({
         />
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-base font-bold text-neutral-900">
-            {context.otherPublicNickname}
+            {roomTitle}
           </h1>
           <p className="truncate text-xs font-semibold text-coral-600">
-            {context.otherPersonaTitle}
+            {roomSubtitle}
           </p>
         </div>
         <ChatRoomMenu context={context} />
@@ -323,6 +340,7 @@ export default function ChatRoomView({
             }
 
             const isMine = message.senderId === currentUserId;
+            const sender = membersById.get(message.senderId);
 
             return (
               <div
@@ -330,7 +348,10 @@ export default function ChatRoomView({
                 onContextMenu={(event) => {
                   if (!isMine && !message.deletedAt) {
                     event.preventDefault();
-                    setReportedMessageId(message.id);
+                    setReportedMessage({
+                      messageId: message.id,
+                      senderId: message.senderId,
+                    });
                   }
                 }}
                 className={`flex items-end gap-2 ${
@@ -338,9 +359,16 @@ export default function ChatRoomView({
                 }`}
               >
                 {!isMine && (
-                  <span className="mb-1 flex size-7 shrink-0 items-center justify-center rounded-full bg-coral-50 text-xs text-coral-600">
-                    ✦
-                  </span>
+                  <div className="mb-1 flex shrink-0 flex-col items-center gap-1">
+                    <span className="flex size-7 items-center justify-center rounded-full bg-coral-50 text-xs text-coral-600">
+                      ✦
+                    </span>
+                    {context.conversationType === "group" && (
+                      <span className="max-w-16 truncate text-[0.6rem] font-semibold text-neutral-500">
+                        {sender?.publicNickname ?? "멤버"}
+                      </span>
+                    )}
+                  </div>
                 )}
                 {isMine && (
                   <time
@@ -373,7 +401,12 @@ export default function ChatRoomView({
                       type="button"
                       disabled={Boolean(message.deletedAt)}
                       aria-label="이 메시지 신고하기"
-                      onClick={() => setReportedMessageId(message.id)}
+                      onClick={() =>
+                        setReportedMessage({
+                          messageId: message.id,
+                          senderId: message.senderId,
+                        })
+                      }
                       className="flex size-7 cursor-pointer items-center justify-center rounded-full text-base text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-600 disabled:cursor-not-allowed disabled:opacity-30"
                     >
                       <span aria-hidden="true">⋯</span>
@@ -450,11 +483,15 @@ export default function ChatRoomView({
       </div>
 
       <ReportDialog
-        isOpen={reportedMessageId !== null}
-        targetUserId={context.otherUserId}
+        isOpen={reportedMessage !== null}
+        targetUserId={
+          reportedMessage?.senderId ??
+          context.otherUserId ??
+          currentUserId
+        }
         conversationId={context.conversationId}
-        messageId={reportedMessageId ?? undefined}
-        onClose={() => setReportedMessageId(null)}
+        messageId={reportedMessage?.messageId}
+        onClose={() => setReportedMessage(null)}
         onSuccess={setSafetyFeedback}
       />
     </AppShell>

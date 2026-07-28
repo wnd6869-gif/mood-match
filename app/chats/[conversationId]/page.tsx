@@ -2,7 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import ChatRoomView from "@/components/chat-room-view";
 import {
   getChatMessageFromRecord,
-  getDirectConversationContextFromRecord,
+  getConversationContextFromRecord,
   type ChatMessage,
 } from "@/lib/chat";
 import { createClient } from "@/lib/supabase/server";
@@ -38,10 +38,10 @@ export default async function ChatRoomPage({
   }
 
   const { data: contextData } = await supabase.rpc(
-    "get_direct_conversation_context",
+    "get_conversation_context",
     { target_conversation_id: conversationId },
   );
-  const context = getDirectConversationContextFromRecord(
+  const context = getConversationContextFromRecord(
     Array.isArray(contextData) ? contextData[0] : contextData,
   );
 

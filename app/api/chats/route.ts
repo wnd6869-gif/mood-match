@@ -11,6 +11,8 @@ type ChatRequestBody = {
   requestId?: unknown;
   conversationId?: unknown;
   message?: unknown;
+  groupTitle?: unknown;
+  memberIds?: unknown;
   setting?: unknown;
   targetUserId?: unknown;
   reason?: unknown;
@@ -66,8 +68,35 @@ function rpcErrorResponse(message: string | undefined) {
 
   if (message === "other_member_left") {
     return jsonResponse(
-      { error: "상대가 채팅방을 나가 메시지를 보낼 수 없어요." },
+      { error: "대화할 다른 멤버가 없어 메시지를 보낼 수 없어요." },
       409,
+    );
+  }
+
+  if (message === "invalid_group_title") {
+    return jsonResponse(
+      { error: "방 이름은 2자 이상 30자 이하로 입력해주세요." },
+      400,
+    );
+  }
+
+  if (message === "invalid_group_size") {
+    return jsonResponse(
+      { error: "단체방에는 나를 포함해 3명 이상 6명 이하가 필요해요." },
+      400,
+    );
+  }
+
+  if (
+    message === "invalid_group_members" ||
+    message === "blocked_group_members"
+  ) {
+    return jsonResponse(
+      {
+        error:
+          "선택한 멤버로 단체방을 만들 수 없어요. 연결 상태와 단체방 선호를 확인해주세요.",
+      },
+      403,
     );
   }
 
@@ -180,6 +209,61 @@ export async function POST(request: Request) {
 
     if (unhideError) {
       return rpcErrorResponse(unhideError.message);
+    }
+
+    return jsonResponse({ conversationId: data });
+  }
+
+  if (body.action === "create-group") {
+    const groupTitle =
+      typeof body.groupTitle === "string"
+        ? body.groupTitle.trim()
+        : "";
+    const memberIds = Array.isArray(body.memberIds)
+      ? Array.from(
+          new Set(
+            body.memberIds.filter(
+              (memberId): memberId is string =>
+                isUuid(memberId) && memberId !== user.id,
+            ),
+          ),
+        )
+      : [];
+
+    if (groupTitle.length < 2 || groupTitle.length > 30) {
+      return jsonResponse(
+        { error: "방 이름은 2자 이상 30자 이하로 입력해주세요." },
+        400,
+      );
+    }
+
+    if (memberIds.length < 2 || memberIds.length > 5) {
+      return jsonResponse(
+        {
+          error:
+            "단체방에는 나를 포함해 3명 이상 6명 이하가 필요해요.",
+        },
+        400,
+      );
+    }
+
+    const { data, error } = await supabase.rpc(
+      "create_group_conversation",
+      {
+        room_title: groupTitle,
+        member_ids: memberIds,
+      },
+    );
+
+    if (error) {
+      return rpcErrorResponse(error.message);
+    }
+
+    if (typeof data !== "string") {
+      return jsonResponse(
+        { error: "생성한 단체방을 확인하지 못했어요." },
+        500,
+      );
     }
 
     return jsonResponse({ conversationId: data });
