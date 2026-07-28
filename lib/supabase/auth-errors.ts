@@ -31,6 +31,10 @@ export function getKoreanAuthError(message: string) {
     return "현재 이메일 회원가입이 비활성화되어 있어요.";
   }
 
+  if (normalizedMessage.includes("required_legal_consent_missing")) {
+    return "필수 약관 동의 정보를 확인하지 못했어요. 약관을 다시 확인해주세요.";
+  }
+
   if (
     normalizedMessage.includes("failed to fetch") ||
     normalizedMessage.includes("network")

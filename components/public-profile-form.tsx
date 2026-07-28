@@ -53,6 +53,8 @@ export default function PublicProfileForm({
   const [photoVisibility, setPhotoVisibility] =
     useState<PhotoVisibility>(initialSettings.photo_visibility);
   const [isPublic, setIsPublic] = useState(initialSettings.is_public);
+  const [publicDisclosureConfirmed, setPublicDisclosureConfirmed] =
+    useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(
     initialLoadFailed
@@ -90,6 +92,15 @@ export default function PublicProfileForm({
 
     if (isPublic && !persona) {
       setErrorMessage("공개 프로필을 활성화하려면 AI 캐릭터가 필요해요.");
+      return;
+    }
+
+    if (
+      !initialSettings.is_public &&
+      isPublic &&
+      !publicDisclosureConfirmed
+    ) {
+      setErrorMessage("공개되는 정보 안내를 확인하고 동의해주세요.");
       return;
     }
 
@@ -359,7 +370,17 @@ export default function PublicProfileForm({
             aria-checked={isPublic}
             aria-label="공개 프로필 활성화"
             disabled={isSubmitting || !persona}
-            onClick={() => setIsPublic((current) => !current)}
+            onClick={() =>
+              setIsPublic((current) => {
+                const nextValue = !current;
+
+                if (!nextValue) {
+                  setPublicDisclosureConfirmed(false);
+                }
+
+                return nextValue;
+              })
+            }
             className={`relative h-8 w-14 shrink-0 cursor-pointer rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 ${
               isPublic ? "bg-coral-500" : "bg-neutral-300"
             }`}
@@ -372,10 +393,29 @@ export default function PublicProfileForm({
           </button>
         </div>
         <p className="mt-4 rounded-2xl bg-coral-50 px-4 py-3 text-xs leading-5 text-coral-800">
-          저장 전 확인: 공개를 켜면 닉네임, AI 캐릭터와 선택한 대화
-          설정이 다른 로그인 사용자에게 보여요. 이메일과 생년월일 원본은
-          공개되지 않아요. 대화 설정까지 완료한 뒤 공개 목록에 반영돼요.
+          공개를 켜면 공개 닉네임·소개, AI 캐릭터 카드와 분석 결과,
+          선택한 나이 또는 연령대, 사진 공개 범위, 대화 목적·분위기·주제·
+          속도·선호 인원·활동 시간대가 다른 로그인 사용자에게 보일 수
+          있어요. 이메일, 생년월일 원본과 출생시간은 공개되지 않아요.
         </p>
+        {!initialSettings.is_public && isPublic && (
+          <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-2xl border border-coral-200 bg-white px-4 py-3 text-sm leading-5 text-neutral-700">
+            <input
+              type="checkbox"
+              checked={publicDisclosureConfirmed}
+              disabled={isSubmitting}
+              onChange={(event) =>
+                setPublicDisclosureConfirmed(event.target.checked)
+              }
+              className="mt-0.5 size-5 shrink-0 cursor-pointer rounded border-neutral-300 accent-coral-500 disabled:cursor-not-allowed"
+            />
+            <span>
+              <strong className="text-coral-700">[필수]</strong> 위 정보가
+              공개 설정에 따라 다른 사용자에게 노출될 수 있음을
+              확인했습니다.
+            </span>
+          </label>
+        )}
       </section>
 
       {errorMessage && (
@@ -398,7 +438,12 @@ export default function PublicProfileForm({
 
       <ActionButton
         type="submit"
-        disabled={isSubmitting}
+        disabled={
+          isSubmitting ||
+          (!initialSettings.is_public &&
+            isPublic &&
+            !publicDisclosureConfirmed)
+        }
         aria-label="공개 캐릭터 프로필 저장하기"
       >
         {isSubmitting ? "저장 중..." : "공개 프로필 저장하기"}

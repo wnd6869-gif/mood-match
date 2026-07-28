@@ -398,6 +398,25 @@ export default function ProfilePhotoUpload({
         </p>
       </header>
 
+      <section className="mt-6 rounded-3xl border border-coral-100 bg-coral-50/70 p-5">
+        <h2 className="text-sm font-bold text-neutral-900">
+          사진 이용 안내
+        </h2>
+        <ul className="mt-3 list-disc space-y-1.5 pl-5 text-xs leading-5 text-neutral-600 marker:text-coral-500">
+          <li>사진은 AI 동물 페르소나 분석을 위해 OpenAI API로 전송돼요.</li>
+          <li>저장된 원본 사진은 기본적으로 비공개예요.</li>
+          <li>
+            사용자가 공개 프로필에서 사진 공개 범위를 직접 켠 경우에만
+            다른 로그인 사용자에게 표시될 수 있어요.
+          </li>
+          <li>저장된 사진은 이 화면에서 언제든 삭제할 수 있어요.</li>
+          <li>
+            계정 삭제 요청을 처리할 때 Storage에 저장된 사진도 함께 삭제
+            대상에 포함돼요.
+          </li>
+        </ul>
+      </section>
+
       <div className="mt-7">
         <input
           id="persona-image"
@@ -524,7 +543,8 @@ export default function ProfilePhotoUpload({
       </ActionButton>
 
       <p className="mt-3 text-center text-xs leading-5 text-neutral-400">
-        사진은 비공개로 저장되며 화면에는 짧은 시간만 유효한 주소를 사용해요.
+        사진은 비공개 Storage에 저장되며 화면에는 짧은 시간만 유효한
+        주소를 사용해요.
       </p>
     </AppShell>
   );

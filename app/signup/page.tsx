@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import { ActionButton, ActionLink } from "@/components/action";
 import AppShell from "@/components/app-shell";
 import AuthField from "@/components/auth-field";
 import BackLink from "@/components/back-link";
+import { PRIVACY_VERSION, TERMS_VERSION } from "@/lib/legal";
 import { getKoreanAuthError } from "@/lib/supabase/auth-errors";
 import { createClient } from "@/lib/supabase/client";
 
@@ -14,6 +16,9 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const [termsAgreed, setTermsAgreed] = useState(false);
+  const [privacyAgreed, setPrivacyAgreed] = useState(false);
+  const [marketingAgreed, setMarketingAgreed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -38,6 +43,11 @@ export default function SignupPage() {
       return;
     }
 
+    if (!termsAgreed || !privacyAgreed) {
+      setErrorMessage("필수 약관에 모두 동의해주세요.");
+      return;
+    }
+
     const supabase = createClient();
 
     if (!supabase) {
@@ -52,6 +62,13 @@ export default function SignupPage() {
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/confirm`,
+        data: {
+          terms_version: TERMS_VERSION,
+          privacy_version: PRIVACY_VERSION,
+          terms_agreed: true,
+          privacy_agreed: true,
+          marketing_agreed: marketingAgreed,
+        },
       },
     });
 
@@ -129,6 +146,45 @@ export default function SignupPage() {
           onChange={(event) => setPasswordConfirmation(event.target.value)}
         />
 
+        <fieldset
+          disabled={isSubmitting}
+          className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4"
+        >
+          <legend className="px-1 text-sm font-bold text-neutral-900">
+            약관 동의
+          </legend>
+          <div className="mt-2 space-y-3">
+            <ConsentCheckbox
+              id="terms-agreement"
+              checked={termsAgreed}
+              onChange={setTermsAgreed}
+              required
+              label="이용약관 동의"
+              href="/terms"
+            />
+            <ConsentCheckbox
+              id="privacy-agreement"
+              checked={privacyAgreed}
+              onChange={setPrivacyAgreed}
+              required
+              label="개인정보처리방침 확인 및 동의"
+              href="/privacy"
+            />
+            <div className="border-t border-neutral-200 pt-3">
+              <ConsentCheckbox
+                id="marketing-agreement"
+                checked={marketingAgreed}
+                onChange={setMarketingAgreed}
+                label="서비스 소식 및 이벤트 수신 동의"
+              />
+            </div>
+          </div>
+          <p className="mt-3 text-xs leading-5 text-neutral-500">
+            선택 동의는 거부해도 가입할 수 있어요. 필수 약관에 동의하면 만
+            14세 이상임을 확인하는 것으로 처리됩니다.
+          </p>
+        </fieldset>
+
         {errorMessage && (
           <p
             role="alert"
@@ -148,7 +204,7 @@ export default function SignupPage() {
 
         <ActionButton
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !termsAgreed || !privacyAgreed}
           aria-label="입력한 이메일과 비밀번호로 회원가입하기"
         >
           {isSubmitting ? "가입 중..." : "회원가입"}
@@ -165,5 +221,57 @@ export default function SignupPage() {
         </ActionLink>
       </div>
     </AppShell>
+  );
+}
+
+function ConsentCheckbox({
+  id,
+  checked,
+  onChange,
+  label,
+  href,
+  required = false,
+}: {
+  id: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  label: string;
+  href?: string;
+  required?: boolean;
+}) {
+  return (
+    <div className="flex items-start gap-3">
+      <input
+        id={id}
+        type="checkbox"
+        checked={checked}
+        required={required}
+        onChange={(event) => onChange(event.target.checked)}
+        className="mt-0.5 size-5 shrink-0 cursor-pointer rounded border-neutral-300 accent-coral-500 disabled:cursor-not-allowed"
+      />
+      <div className="min-w-0 flex-1 text-sm leading-5">
+        <label htmlFor={id} className="cursor-pointer text-neutral-700">
+          <span
+            className={`mr-1 font-bold ${
+              required ? "text-coral-700" : "text-neutral-500"
+            }`}
+          >
+            [{required ? "필수" : "선택"}]
+          </span>
+          {label}
+        </label>
+        {href && (
+          <Link
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-2 inline-block font-semibold text-neutral-500 underline underline-offset-2 hover:text-neutral-900"
+            aria-label={`${label} 전문을 새 탭에서 확인`}
+          >
+            전문 보기
+          </Link>
+        )}
+      </div>
+    </div>
   );
 }
