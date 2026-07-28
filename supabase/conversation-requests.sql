@@ -601,22 +601,8 @@ revoke all on function public.get_my_conversation_requests() from anon;
 grant execute on function public.get_my_conversation_requests()
 to authenticated;
 
--- The bucket remains private. Only photos explicitly marked public can be
--- selected by another authenticated user for a short-lived signed URL.
--- "mutual" deliberately receives no cross-user Storage access until mutual
--- consent has a dedicated database model.
+-- The bucket remains private. Cross-user access is deliberately absent here.
+-- photo-reveal-consents.sql adds narrowly scoped access after both users
+-- consent inside an accepted 1:1 conversation.
 drop policy if exists "Authenticated users can view public profile photos"
 on storage.objects;
-create policy "Authenticated users can view public profile photos"
-on storage.objects
-for select
-to authenticated
-using (
-  bucket_id = 'profile-photos'
-  and exists (
-    select 1
-    from public.get_public_chat_profiles(null::uuid) as photo_owner
-    where photo_owner.user_id::text = (storage.foldername(name))[1]
-      and photo_owner.photo_visibility = 'public'
-  )
-);

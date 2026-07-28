@@ -17,6 +17,14 @@
   --color-coral-500: #e76f61;
   --color-coral-600: #cf5c50;
   --color-coral-700: #a8473e;
+  --color-lilac-100: #eee7ff;
+  --color-lilac-600: #6c54a3;
+  --color-mint-100: #dff7ed;
+  --color-mint-700: #28755f;
+  --color-orange-100: #fff0d9;
+  --color-orange-700: #9b5a18;
+  --color-sage-100: #e9eddf;
+  --color-sage-700: #64704c;
 }
 
 body {

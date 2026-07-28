@@ -82,7 +82,7 @@ begin
   ) then
     alter table public.profiles
       add constraint profiles_photo_visibility_valid
-      check (photo_visibility in ('persona_only', 'mutual', 'public'));
+      check (photo_visibility in ('persona_only', 'mutual'));
   end if;
 
   if not exists (

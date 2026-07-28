@@ -16,11 +16,6 @@ export const PHOTO_VISIBILITY_OPTIONS = [
     description:
       "1:1 채팅에서 두 사람이 각각 동의한 뒤에만 서로 공개해요.",
   },
-  {
-    value: "public",
-    label: "처음부터 실제 사진 공개",
-    description: "공개 프로필에서 실제 사진이 바로 보여요.",
-  },
 ] as const;
 
 export const CONVERSATION_GOAL_OPTIONS = [

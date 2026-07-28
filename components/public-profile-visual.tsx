@@ -1,3 +1,4 @@
+import CharacterAvatar from "@/components/character-avatar";
 import StoredImagePreview from "@/components/stored-image-preview";
 import type { PhotoVisibility } from "@/lib/public-chat-profile";
 
@@ -5,6 +6,7 @@ type PublicProfileVisualProps = {
   personaTitle: string;
   photoVisibility: PhotoVisibility;
   photoUrl: string | null;
+  animalTypes?: readonly { name: string; score?: number }[];
   compact?: boolean;
 };
 
@@ -12,16 +14,14 @@ export default function PublicProfileVisual({
   personaTitle,
   photoVisibility,
   photoUrl,
+  animalTypes = [],
   compact = false,
 }: PublicProfileVisualProps) {
   const sizeClasses = compact
     ? "aspect-[16/10]"
     : "aspect-[4/3]";
 
-  if (
-    photoVisibility === "public" ||
-    (photoVisibility === "mutual" && photoUrl)
-  ) {
+  if (photoVisibility === "mutual" && photoUrl) {
     return (
       <StoredImagePreview
         src={photoUrl}
@@ -31,41 +31,18 @@ export default function PublicProfileVisual({
     );
   }
 
-  if (photoVisibility === "mutual") {
-    return (
-      <div
-        role="img"
-        aria-label="서로 동의하면 실제 사진이 공개되는 프로필"
-        className={`relative flex ${sizeClasses} items-center justify-center overflow-hidden bg-gradient-to-br from-neutral-200 via-coral-50 to-neutral-100 px-6 text-center`}
-      >
-        <div className="absolute left-1/2 top-1/2 size-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-neutral-300/70 blur-xl" />
-        <div className="relative">
-          <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-white/90 text-xl shadow-sm">
-            🔒
-          </span>
-          <p className="mt-3 text-xs font-bold text-neutral-700">
-            서로 동의하면 실제 사진 공개
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div
-      role="img"
-      aria-label={`${personaTitle} AI 캐릭터 카드`}
-      className={`flex ${sizeClasses} flex-col items-center justify-center bg-gradient-to-br from-coral-50 via-white to-neutral-100 px-6 text-center`}
-    >
-      <span className="flex size-12 items-center justify-center rounded-full bg-white text-xl shadow-sm">
-        ✦
-      </span>
-      <p className="mt-3 text-[0.65rem] font-bold tracking-[0.16em] text-coral-600">
-        AI PERSONA
-      </p>
-      <p className="mt-1 line-clamp-2 text-lg font-bold text-neutral-900">
-        {personaTitle}
-      </p>
+    <div className={`relative ${sizeClasses}`}>
+      <CharacterAvatar
+        animalTypes={animalTypes}
+        personaTitle={personaTitle}
+        className="absolute inset-0"
+      />
+      {photoVisibility === "mutual" && (
+        <span className="absolute bottom-3 right-3 rounded-full bg-neutral-950/70 px-3 py-1.5 text-[0.65rem] font-bold text-white backdrop-blur-sm">
+          🔒 서로 동의 시 실제 사진
+        </span>
+      )}
     </div>
   );
 }

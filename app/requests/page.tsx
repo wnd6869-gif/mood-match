@@ -75,7 +75,7 @@ export default async function RequestsPage({
         initialItems={items}
         initialTab={initialTab}
       />
-      <MobileNav current="requests" />
+      <MobileNav current="home" />
     </AppShell>
   );
 }

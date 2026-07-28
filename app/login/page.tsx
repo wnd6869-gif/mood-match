@@ -6,6 +6,7 @@ import { ActionButton, ActionLink } from "@/components/action";
 import AppShell from "@/components/app-shell";
 import AuthField from "@/components/auth-field";
 import BackLink from "@/components/back-link";
+import { getSafeNextPath } from "@/lib/safe-navigation";
 import { getKoreanAuthError } from "@/lib/supabase/auth-errors";
 import { createClient } from "@/lib/supabase/client";
 
@@ -44,8 +45,12 @@ export default function LoginPage() {
       return;
     }
 
+    const nextPath = getSafeNextPath(
+      new URLSearchParams(window.location.search).get("next"),
+    );
+
     setIsSubmitting(false);
-    router.replace("/mypage");
+    router.replace(nextPath);
     router.refresh();
   }
 
@@ -114,7 +119,7 @@ export default function LoginPage() {
 
         <div className="mt-4">
           <ActionLink
-            href="/signup"
+            href="/signup?next=/upload"
             variant="secondary"
             ariaLabel="새 이메일 계정 만들기"
           >

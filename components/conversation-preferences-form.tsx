@@ -25,6 +25,7 @@ type ConversationPreferencesFormProps = {
   userId: string;
   initialPreferences: ConversationPreferences;
   initialLoadFailed?: boolean;
+  successPath?: string;
 };
 
 type MultiChoiceSectionProps<T extends string> = {
@@ -87,6 +88,7 @@ export default function ConversationPreferencesForm({
   userId,
   initialPreferences,
   initialLoadFailed = false,
+  successPath = "/home",
 }: ConversationPreferencesFormProps) {
   const router = useRouter();
   const [goal, setGoal] = useState<ConversationGoal | null>(
@@ -227,7 +229,7 @@ export default function ConversationPreferencesForm({
 
     setSuccessMessage("대화 분위기 설정을 저장했어요.");
     window.setTimeout(() => {
-      router.replace("/mypage");
+      router.replace(successPath);
       router.refresh();
     }, 650);
   }
@@ -344,7 +346,11 @@ export default function ConversationPreferencesForm({
         disabled={!isComplete || isSubmitting}
         aria-label="선택한 대화 분위기 설정 저장하기"
       >
-        {isSubmitting ? "저장 중..." : "대화 설정 저장하기"}
+        {isSubmitting
+          ? "저장 중..."
+          : successPath === "/match-preview"
+            ? "저장하고 실제 추천 보기"
+            : "대화 설정 저장하기"}
       </ActionButton>
       {!isComplete && (
         <p className="text-center text-xs leading-5 text-neutral-400">

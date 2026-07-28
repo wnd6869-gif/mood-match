@@ -61,7 +61,7 @@ export default function SignupPage() {
       email: email.trim(),
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/confirm`,
+        emailRedirectTo: `${window.location.origin}/auth/confirm?next=/onboarding/profile`,
         data: {
           terms_version: TERMS_VERSION,
           privacy_version: PRIVACY_VERSION,
@@ -80,7 +80,7 @@ export default function SignupPage() {
 
     if (data.session) {
       setIsSubmitting(false);
-      router.replace("/mypage");
+      router.replace("/onboarding/profile");
       router.refresh();
       return;
     }
@@ -213,7 +213,7 @@ export default function SignupPage() {
 
       <div className="mt-4">
         <ActionLink
-          href="/login"
+          href="/login?next=/upload"
           variant="secondary"
           ariaLabel="기존 계정으로 로그인하기"
         >
