@@ -18,7 +18,10 @@ export default function PublicProfileVisual({
     ? "aspect-[16/10]"
     : "aspect-[4/3]";
 
-  if (photoVisibility === "public") {
+  if (
+    photoVisibility === "public" ||
+    (photoVisibility === "mutual" && photoUrl)
+  ) {
     return (
       <StoredImagePreview
         src={photoUrl}

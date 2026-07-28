@@ -10,6 +10,7 @@ import {
 import AppShell from "@/components/app-shell";
 import BackLink from "@/components/back-link";
 import ChatRoomMenu from "@/components/chat-room-menu";
+import MutualPhotoReveal from "@/components/mutual-photo-reveal";
 import { ReportDialog } from "@/components/safety-actions";
 import {
   formatMessageTime,
@@ -17,12 +18,15 @@ import {
   type ChatMessage,
   type ConversationContext,
 } from "@/lib/chat";
+import type { PhotoRevealStatus } from "@/lib/photo-reveal";
 import { createClient } from "@/lib/supabase/client";
 
 type ChatRoomViewProps = {
   currentUserId: string;
   context: ConversationContext;
   initialMessages: ChatMessage[];
+  initialPhotoRevealStatus: PhotoRevealStatus | null;
+  initialOtherPhotoUrl: string | null;
 };
 
 type ChatApiResponse = {
@@ -48,6 +52,8 @@ export default function ChatRoomView({
   currentUserId,
   context,
   initialMessages,
+  initialPhotoRevealStatus,
+  initialOtherPhotoUrl,
 }: ChatRoomViewProps) {
   const supabase = useMemo(() => createClient(), []);
   const [messages, setMessages] = useState(initialMessages);
@@ -304,16 +310,25 @@ export default function ChatRoomView({
         </p>
       )}
 
+      {context.conversationType === "direct" && (
+        <MutualPhotoReveal
+          conversationId={context.conversationId}
+          otherNickname={context.otherPublicNickname}
+          initialStatus={initialPhotoRevealStatus}
+          initialPhotoUrl={initialOtherPhotoUrl}
+        />
+      )}
+
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        className="mt-3 flex min-h-0 flex-1 overscroll-contain overflow-y-auto rounded-3xl bg-white px-3 py-4 shadow-sm"
+        className="mt-3 flex min-h-0 flex-1 flex-col overscroll-contain overflow-y-auto rounded-3xl bg-white px-3 py-4 shadow-sm"
         aria-live="polite"
       >
         <p className="mb-5 text-center text-[0.68rem] leading-5 text-neutral-400">
           최근 메시지 50개를 표시하고 있어요.
         </p>
-        <div className="space-y-3">
+        <div className="w-full space-y-3">
           {messages.length === 0 && (
             <div className="py-16 text-center">
               <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-coral-50 text-xl">

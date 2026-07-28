@@ -314,6 +314,8 @@ declare
   v_sender_id uuid;
   v_receiver_id uuid;
   v_conversation_id uuid;
+  v_intro_message text;
+  v_first_message public.messages;
 begin
   if v_user_id is null then
     raise exception using
@@ -327,10 +329,12 @@ begin
 
   select
     conversation_request.sender_id,
-    conversation_request.receiver_id
+    conversation_request.receiver_id,
+    conversation_request.message
   into
     v_sender_id,
-    v_receiver_id
+    v_receiver_id,
+    v_intro_message
   from public.conversation_requests as conversation_request
   where conversation_request.id = request_id
     and conversation_request.status = 'accepted'
@@ -407,6 +411,36 @@ begin
   values
     (v_conversation_id, v_sender_id, now()),
     (v_conversation_id, v_receiver_id, now());
+
+  if v_intro_message is not null then
+    insert into public.messages (
+      conversation_id,
+      sender_id,
+      message_type,
+      body
+    )
+    values (
+      v_conversation_id,
+      v_sender_id,
+      'text',
+      v_intro_message
+    )
+    returning * into v_first_message;
+
+    update public.conversations
+    set
+      last_message_at = v_first_message.created_at,
+      last_message_preview = left(
+        pg_catalog.regexp_replace(v_intro_message, '\s+', ' ', 'g'),
+        80
+      )
+    where id = v_conversation_id;
+
+    update public.conversation_members
+    set last_read_at = v_first_message.created_at
+    where conversation_id = v_conversation_id
+      and user_id = v_sender_id;
+  end if;
 
   return v_conversation_id;
 end;

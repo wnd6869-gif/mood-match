@@ -8,7 +8,6 @@ import StoredImagePreview from "@/components/stored-image-preview";
 import type { PersonaAnalysisResult } from "@/lib/persona-analysis";
 import {
   AGE_VISIBILITY_OPTIONS,
-  getPublicNicknameError,
   PHOTO_VISIBILITY_OPTIONS,
   type AgeVisibility,
   type PhotoVisibility,
@@ -28,7 +27,7 @@ const PHOTO_GUIDANCE: Record<PhotoVisibility, string> = {
   persona_only:
     "다른 사용자에게는 실제 사진 대신 AI 캐릭터 카드가 보여요.",
   mutual:
-    "다른 사용자에게는 흐린 사진만 보이고, 서로 동의한 경우에만 실제 사진을 공개할 수 있어요.",
+    "다른 사용자에게는 흐린 안내만 보이고, 1:1 채팅에서 두 사람 모두 ‘나도 동의’를 누른 뒤에만 실제 사진을 서로 볼 수 있어요. 한 명이 철회하면 즉시 다시 숨겨져요.",
   public:
     "공개 프로필을 보는 로그인 사용자에게 실제 사진이 처음부터 보여요.",
 };
@@ -41,9 +40,7 @@ export default function PublicProfileForm({
   initialLoadFailed = false,
 }: PublicProfileFormProps) {
   const router = useRouter();
-  const [publicNickname, setPublicNickname] = useState(
-    initialSettings.public_nickname ?? "",
-  );
+  const personaIdentity = initialSettings.public_nickname;
   const [publicBio, setPublicBio] = useState(
     initialSettings.public_bio ?? "",
   );
@@ -75,11 +72,10 @@ export default function PublicProfileForm({
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    const normalizedNickname = publicNickname.trim();
-    const nicknameError = getPublicNicknameError(normalizedNickname);
-
-    if (nicknameError) {
-      setErrorMessage(nicknameError);
+    if (!personaIdentity) {
+      setErrorMessage(
+        "AI 기본 ID를 확인하지 못했어요. 캐릭터 분석을 다시 확인해주세요.",
+      );
       return;
     }
 
@@ -127,7 +123,6 @@ export default function PublicProfileForm({
     const { error } = await supabase
       .from("profiles")
       .update({
-        public_nickname: normalizedNickname,
         public_bio: normalizedBio || null,
         age_visibility: ageVisibility,
         photo_visibility: photoVisibility,
@@ -219,7 +214,7 @@ export default function PublicProfileForm({
         ) : (
           <div className="mt-4">
             <p className="text-sm leading-6 text-neutral-600">
-              사진 분석을 완료하면 AI 캐릭터와 추천 닉네임을 불러올 수 있어요.
+              사진 분석을 완료하면 AI 캐릭터와 기본 ID를 만들 수 있어요.
             </p>
             <ActionLink
               href="/upload"
@@ -234,53 +229,17 @@ export default function PublicProfileForm({
       </section>
 
       <section className="rounded-3xl border border-neutral-200/80 bg-white p-5 shadow-sm">
-        <label htmlFor="public-nickname" className="block">
-          <span className="text-sm font-bold text-neutral-900">
-            공개 닉네임
-          </span>
-          <span className="mt-1 block text-xs leading-5 text-neutral-500">
-            다른 사용자에게 보이는 캐릭터 이름이에요.
-          </span>
-          <input
-            id="public-nickname"
-            type="text"
-            autoComplete="nickname"
-            minLength={2}
-            maxLength={20}
-            required
-            disabled={isSubmitting}
-            value={publicNickname}
-            onChange={(event) => setPublicNickname(event.target.value)}
-            placeholder="2~20자로 입력해주세요"
-            className="mt-3 min-h-14 w-full rounded-2xl border border-neutral-200 bg-white px-4 text-base text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 hover:border-neutral-300 focus:border-coral-400 focus:ring-2 focus:ring-coral-100 disabled:cursor-not-allowed disabled:bg-neutral-100"
-          />
-        </label>
-
-        {persona?.nicknameCandidates.length ? (
-          <div className="mt-4">
-            <p className="text-xs font-semibold text-neutral-500">
-              AI 추천 닉네임
-            </p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {persona.nicknameCandidates.map((candidate) => (
-                <button
-                  key={candidate}
-                  type="button"
-                  disabled={isSubmitting}
-                  aria-pressed={publicNickname === candidate}
-                  onClick={() => setPublicNickname(candidate)}
-                  className={`min-h-10 cursor-pointer rounded-full border px-3.5 py-2 text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-coral-400 disabled:cursor-not-allowed disabled:opacity-50 ${
-                    publicNickname === candidate
-                      ? "border-coral-400 bg-coral-50 text-coral-700"
-                      : "border-neutral-200 bg-white text-neutral-600 hover:border-neutral-300"
-                  }`}
-                >
-                  {candidate}
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : null}
+        <div className="rounded-2xl border border-coral-100 bg-coral-50 px-4 py-4">
+          <p className="text-xs font-bold text-coral-700">내 기본 ID</p>
+          <p className="mt-1.5 text-lg font-bold text-neutral-900">
+            {personaIdentity ? `@${personaIdentity}` : "ID 생성 대기 중"}
+          </p>
+          <p className="mt-2 text-xs leading-5 text-neutral-600">
+            AI 캐릭터 분석 직후 자동으로 정해지는 중복 없는 계정 ID예요.
+            공개 프로필을 켜도 이 ID를 그대로 사용하며, 이 화면에서 별도
+            닉네임으로 바꾸지 않아요.
+          </p>
+        </div>
 
         <label htmlFor="public-bio" className="mt-5 block">
           <span className="flex items-center justify-between gap-3">
@@ -393,7 +352,7 @@ export default function PublicProfileForm({
           </button>
         </div>
         <p className="mt-4 rounded-2xl bg-coral-50 px-4 py-3 text-xs leading-5 text-coral-800">
-          공개를 켜면 공개 닉네임·소개, AI 캐릭터 카드와 분석 결과,
+          공개를 켜면 기본 ID·공개 소개, AI 캐릭터 카드와 분석 결과,
           선택한 나이 또는 연령대, 사진 공개 범위, 대화 목적·분위기·주제·
           속도·선호 인원·활동 시간대가 다른 로그인 사용자에게 보일 수
           있어요. 이메일, 생년월일 원본과 출생시간은 공개되지 않아요.
@@ -440,6 +399,7 @@ export default function PublicProfileForm({
         type="submit"
         disabled={
           isSubmitting ||
+          !personaIdentity ||
           (!initialSettings.is_public &&
             isPublic &&
             !publicDisclosureConfirmed)

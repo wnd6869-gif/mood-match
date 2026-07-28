@@ -5,6 +5,10 @@ import {
   getConversationContextFromRecord,
   type ChatMessage,
 } from "@/lib/chat";
+import {
+  getPhotoRevealStatusFromRecord,
+} from "@/lib/photo-reveal";
+import { createProfilePhotoSignedUrl } from "@/lib/supabase/profile-photo";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -70,12 +74,29 @@ export default async function ChatRoomPage({
         )
         .reverse()
     : [];
+  const { data: photoRevealData } =
+    context.conversationType === "direct"
+      ? await supabase.rpc("get_photo_reveal_status", {
+          target_conversation_id: conversationId,
+        })
+      : { data: null };
+  const photoRevealStatus =
+    getPhotoRevealStatusFromRecord(photoRevealData);
+  const otherPhotoUrl =
+    photoRevealStatus?.revealed === true
+      ? await createProfilePhotoSignedUrl(
+          supabase,
+          photoRevealStatus.otherUserId,
+        )
+      : null;
 
   return (
     <ChatRoomView
       currentUserId={user.id}
       context={context}
       initialMessages={initialMessages}
+      initialPhotoRevealStatus={photoRevealStatus}
+      initialOtherPhotoUrl={otherPhotoUrl}
     />
   );
 }

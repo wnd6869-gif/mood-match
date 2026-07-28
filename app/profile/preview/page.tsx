@@ -240,7 +240,7 @@ export default async function PublicProfilePreviewPage() {
           <div className="p-5">
             <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-2xl font-bold tracking-tight text-neutral-900">
-                {profile.public_nickname ?? "공개 닉네임 미설정"}
+                {profile.public_nickname ?? "기본 ID 생성 대기 중"}
               </h2>
               {ageDisplay && (
                 <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-semibold text-neutral-500">

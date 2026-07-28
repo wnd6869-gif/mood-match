@@ -13,7 +13,8 @@ export const PHOTO_VISIBILITY_OPTIONS = [
   {
     value: "mutual",
     label: "서로 동의하면 실제 사진 공개",
-    description: "처음에는 흐리게 보이고 서로 동의한 뒤 공개해요.",
+    description:
+      "1:1 채팅에서 두 사람이 각각 동의한 뒤에만 서로 공개해요.",
   },
   {
     value: "public",

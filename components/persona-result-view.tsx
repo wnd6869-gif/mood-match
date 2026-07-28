@@ -14,12 +14,14 @@ type PersonaResultViewProps = {
   photoUrl: string | null;
   userId: string;
   serverResult: PersonaAnalysisResult | null;
+  personaIdentity: string | null;
 };
 
 export default function PersonaResultView({
   photoUrl,
   userId,
   serverResult,
+  personaIdentity,
 }: PersonaResultViewProps) {
   const { personaAnalysis } = usePrototypeData();
   const result =
@@ -161,21 +163,18 @@ export default function PersonaResultView({
           </div>
         </article>
 
-        <article className="rounded-3xl border border-neutral-200/80 bg-white p-5 shadow-sm">
-          <h2 className="text-base font-bold text-neutral-900">추천 아이디</h2>
-          <div className="mt-4 space-y-2.5">
-            {result.nicknameCandidates.map((nickname) => (
-              <div
-                key={nickname}
-                className="flex min-w-0 items-center gap-3 rounded-2xl bg-neutral-50 px-4 py-3"
-              >
-                <span className="shrink-0 text-sm text-coral-500">@</span>
-                <span className="min-w-0 truncate text-sm font-semibold text-neutral-800">
-                  {nickname}
-                </span>
-              </div>
-            ))}
-          </div>
+        <article className="rounded-3xl border border-coral-100 bg-coral-50 p-5 shadow-sm">
+          <p className="text-xs font-bold text-coral-700">
+            AI가 만든 내 기본 ID
+          </p>
+          <h2 className="mt-2 break-words text-2xl font-bold text-neutral-900">
+            @{personaIdentity ?? result.nicknameCandidates[0]}
+          </h2>
+          <p className="mt-3 text-sm leading-6 text-neutral-600">
+            두 가지 분위기와 대표 동물상을 조합해 자동으로 정했어요.
+            다른 계정과 겹치지 않도록 확인하며, 공개 프로필에서도 같은
+            ID를 사용해요.
+          </p>
         </article>
       </div>
 

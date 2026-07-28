@@ -38,9 +38,9 @@ export const SAFE_PERSONA_RESULT: PersonaAnalysisResult = {
   personaDescription:
     "사진에서는 차분하고 단정한 인상이 먼저 느껴지고, 편안한 장난기도 은은하게 전해져요.",
   nicknameCandidates: [
-    "퇴근한셰퍼드",
-    "조용한늑대",
-    "안경쓴수달",
+    "차분한 든든한 셰퍼드",
+    "조용한 다정한 늑대",
+    "포근한 유쾌한 수달",
   ],
   visualTraits: {
     friendly: 68,
@@ -63,6 +63,19 @@ function isKoreanText(value: unknown, maxLength: number): value is string {
 
 function hasUniqueValues(values: string[]) {
   return new Set(values).size === values.length;
+}
+
+function isPersonaIdentityCandidate(value: unknown): value is string {
+  if (!isKoreanText(value, 20)) {
+    return false;
+  }
+
+  const words = value.trim().split(/\s+/);
+
+  return (
+    words.length === 3 &&
+    words.every((word) => /^[가-힣]{1,8}$/.test(word))
+  );
 }
 
 export function parsePersonaAnalysisResult(
@@ -130,9 +143,7 @@ export function parsePersonaAnalysisResult(
     !isKoreanText(candidate.personaDescription, 240) ||
     !Array.isArray(candidate.nicknameCandidates) ||
     candidate.nicknameCandidates.length !== 3 ||
-    !candidate.nicknameCandidates.every((item) =>
-      isKoreanText(item, 30),
-    )
+    !candidate.nicknameCandidates.every(isPersonaIdentityCandidate)
   ) {
     return null;
   }

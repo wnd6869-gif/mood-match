@@ -108,7 +108,7 @@ export default async function DiscoverPage({
   const photoEntries = await Promise.all(
     profiles.map(async (profile) => [
       profile.userId,
-      profile.photo_visibility === "public"
+      profile.photo_visibility !== "persona_only"
         ? await createProfilePhotoSignedUrl(
             supabase,
             profile.userId,

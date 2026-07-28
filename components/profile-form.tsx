@@ -152,16 +152,20 @@ export default function ProfileForm({
     >
       <AuthField
         id="profile-nickname"
-        label="닉네임"
+        label="가입 정보용 이름 (비공개)"
         type="text"
         autoComplete="nickname"
         maxLength={30}
-        placeholder="사용할 닉네임을 입력해주세요"
+        placeholder="본인 확인용 이름을 입력해주세요"
         value={nickname}
         disabled={isSubmitting}
         required
         onChange={(event) => setNickname(event.target.value)}
       />
+      <p className="-mt-3 rounded-2xl bg-neutral-50 px-4 py-3 text-xs leading-5 text-neutral-600">
+        이 이름은 생년월일 같은 기본 정보와 함께 비공개로 보관돼요. 다른
+        사용자에게 보이는 기본 ID는 사진 분석 후 AI가 별도로 만들어요.
+      </p>
 
       <AuthField
         id="profile-birth-date"
