@@ -4,6 +4,9 @@ import {
   type CharacterAvatarKey,
   CHARACTER_AVATARS,
 } from "@/lib/character-avatar";
+import ComposedCharacter from "@/components/composed-character";
+import type { CharacterComposition } from "@/lib/character/character-types";
+import { mapAvatarInputToCharacter } from "@/lib/character/character-mapper";
 
 type CharacterAvatarProps = {
   animalTypes?: readonly { name: string; score?: number }[];
@@ -13,6 +16,7 @@ type CharacterAvatarProps = {
   priority?: boolean;
   className?: string;
   imageClassName?: string;
+  composition?: CharacterComposition;
 };
 
 export default function CharacterAvatar({
@@ -23,7 +27,27 @@ export default function CharacterAvatar({
   priority = false,
   className = "",
   imageClassName = "",
+  composition,
 }: CharacterAvatarProps) {
+  if (composition) {
+    return (
+      <ComposedCharacter
+        composition={composition}
+        alt={alt ?? `${personaTitle || "AI"} 동물 캐릭터`}
+        className={className}
+      />
+    );
+  }
+
+  if (!avatarKey) {
+    return (
+      <ComposedCharacter
+        composition={mapAvatarInputToCharacter(animalTypes, personaTitle)}
+        alt={alt ?? `${personaTitle || "AI"} 동물 캐릭터`}
+        className={className}
+      />
+    );
+  }
   const avatar = avatarKey
     ? { key: avatarKey, ...CHARACTER_AVATARS[avatarKey] }
     : getCharacterAvatar(animalTypes, personaTitle);

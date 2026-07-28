@@ -9,6 +9,7 @@ import ReanalyzeButton from "@/components/reanalyze-button";
 import StepProgress from "@/components/step-progress";
 import usePrototypeData from "@/hooks/use-prototype-data";
 import type { PersonaAnalysisResult } from "@/lib/persona-analysis";
+import { mapAnalysisToCharacter } from "@/lib/character/character-mapper";
 
 type PersonaResultViewProps = {
   userId: string;
@@ -81,6 +82,8 @@ export default function PersonaResultView({
     );
   }
 
+  const characterComposition = mapAnalysisToCharacter(result, userId);
+
   return (
     <AppShell>
       <BackLink
@@ -95,6 +98,7 @@ export default function PersonaResultView({
           animalTypes={result.animalTypes}
           personaTitle={result.personaTitle}
           priority
+          composition={characterComposition}
           className="aspect-square w-full"
         />
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-neutral-950/90 via-neutral-950/45 to-transparent px-6 pb-6 pt-20">
