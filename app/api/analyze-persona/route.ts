@@ -453,7 +453,7 @@ export async function POST(request: Request) {
       return jsonResponse(
         {
           error:
-            "오늘 가능한 재분석 3회를 모두 사용했어요. 내일 다시 시도해주세요.",
+            "오늘 가능한 재분석 1회를 모두 사용했어요. 내일 다시 시도해주세요.",
         },
         429,
       );
