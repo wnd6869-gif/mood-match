@@ -163,6 +163,8 @@ const PERSONA_INSTRUCTIONS = `
 - personaTitle은 가장 높은 동물상을 포함한 짧은 "~형" 제목입니다.
 - personaDescription은 사진에서 느껴지는 인상임을 분명히 하는 1~2문장입니다.
 - nicknameCandidates는 서로 다른 재치 있는 한글 아이디 3개이며 개인정보를 포함하지 않습니다.
+- 각 아이디는 반드시 "형용사 형용사 동물명"의 정확히 세 단어로 만들고, 형용사 두 개가 모두 사진의 분위기와 어울려야 합니다. 예: "차분한 다정한 수달".
+- 각 아이디는 공백을 포함해 20자 이하이며 특수문자·숫자를 사용하지 않습니다.
 - visualTraits는 사진에서 보이는 인상만 바탕으로 friendly, cute, calm, playful, stylish, reliable을 각각 독립적으로 평가한 0~100 정수입니다. 합계를 100으로 맞추지 않습니다.
 `.trim();
 

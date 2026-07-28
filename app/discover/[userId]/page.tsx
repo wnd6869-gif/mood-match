@@ -117,7 +117,7 @@ export default async function DiscoverProfilePage({
 
   const isOwnProfile = profile.userId === user.id;
   const photoUrl =
-    profile.photo_visibility === "public"
+    profile.photo_visibility !== "persona_only"
       ? await createProfilePhotoSignedUrl(supabase, profile.userId)
       : null;
   const goalLabel = findOptionLabel(

@@ -78,8 +78,13 @@ export default async function PublicProfilePage() {
           다른 사람에게 보일 나
         </h1>
         <p className="mt-3 text-sm leading-6 text-neutral-600">
-          AI 캐릭터를 중심으로 공개할 정보와 범위를 정해주세요.
+          기본 ID는 계정의 고정 이름이고, 공개 프로필은 그 ID와 함께 어떤
+          정보를 다른 사용자에게 보여줄지 정하는 별도 설정이에요.
         </p>
+        <div className="mt-4 rounded-2xl bg-coral-50 px-4 py-3 text-xs leading-5 text-coral-800">
+          공개 프로필을 켜거나 꺼도 기본 ID는 유지되며, 공개될 때는 기본
+          ID와 동일한 이름이 표시돼요.
+        </div>
       </header>
 
       {!baseProfileResponse.data ? (

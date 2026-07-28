@@ -121,7 +121,9 @@ export default async function MyPage() {
         <section className="mt-4 rounded-3xl border border-neutral-200/80 bg-white p-5 shadow-sm">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-xs font-semibold text-neutral-400">내 프로필</p>
+              <p className="text-xs font-semibold text-neutral-400">
+                가입 기본 정보 · 비공개
+              </p>
               <h2 className="mt-2 text-lg font-bold text-neutral-900">
                 {profile?.nickname ?? "아직 작성된 프로필이 없어요"}
               </h2>
@@ -211,6 +213,20 @@ export default async function MyPage() {
 
           {persona ? (
             <>
+              <div className="mt-4 rounded-2xl border border-coral-100 bg-coral-50 px-4 py-3">
+                <p className="text-xs font-bold text-coral-700">
+                  내 기본 ID
+                </p>
+                <p className="mt-1 text-base font-bold text-neutral-900">
+                  {publicSettings?.public_nickname
+                    ? `@${publicSettings.public_nickname}`
+                    : "ID 생성 대기 중"}
+                </p>
+                <p className="mt-1 text-xs leading-5 text-neutral-600">
+                  AI 분석으로 자동 생성된 계정 이름이며 공개 프로필에서도
+                  동일하게 사용돼요.
+                </p>
+              </div>
               <p className="mt-3 text-sm leading-6 text-neutral-600">
                 {persona.personaDescription}
               </p>
@@ -261,7 +277,7 @@ export default async function MyPage() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-xs font-semibold text-neutral-400">
-                공개 캐릭터 프로필
+                공개 캐릭터 프로필 · 노출 설정
               </p>
               <h2 className="mt-2 text-lg font-bold text-neutral-900">
                 {publicSettings?.public_nickname ??
@@ -354,6 +370,14 @@ export default async function MyPage() {
                 </ActionLink>
               </div>
             </>
+          )}
+
+          {persona && (
+            <p className="mt-4 rounded-2xl bg-neutral-50 px-4 py-3 text-xs leading-5 text-neutral-600">
+              기본 ID는 계정에 항상 유지돼요. 공개 프로필은 이 ID와 AI
+              캐릭터·소개·대화 취향을 다른 사용자에게 보여줄지 정하는
+              별도 설정이에요.
+            </p>
           )}
         </section>
 

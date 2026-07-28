@@ -1,7 +1,11 @@
 import {
   getChatMessageFromRecord,
 } from "@/lib/chat";
+import {
+  getPhotoRevealStatusFromRecord,
+} from "@/lib/photo-reveal";
 import { isReportReason } from "@/lib/safety";
+import { createProfilePhotoSignedUrl } from "@/lib/supabase/profile-photo";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -18,6 +22,7 @@ type ChatRequestBody = {
   reason?: unknown;
   details?: unknown;
   messageId?: unknown;
+  consent?: unknown;
 };
 
 const UUID_PATTERN =
@@ -111,6 +116,21 @@ function rpcErrorResponse(message: string | undefined) {
     return jsonResponse(
       { error: "메시지는 1000자 이하로 입력해주세요." },
       400,
+    );
+  }
+
+  if (
+    message === "direct_conversation_required" ||
+    message === "mutual_photo_setting_required"
+  ) {
+    return jsonResponse(
+      {
+        error:
+          message === "mutual_photo_setting_required"
+            ? "두 사람 모두 사진 공개 범위를 ‘서로 동의하면 공개’로 설정해야 해요."
+            : "1:1 채팅방에서만 사진 공개에 동의할 수 있어요.",
+      },
+      409,
     );
   }
 
@@ -321,6 +341,57 @@ export async function POST(request: Request) {
     }
 
     return jsonResponse({ message: messageRecord });
+  }
+
+  if (
+    body.action === "photo-status" ||
+    body.action === "photo-consent"
+  ) {
+    if (
+      body.action === "photo-consent" &&
+      typeof body.consent !== "boolean"
+    ) {
+      return jsonResponse(
+        { error: "사진 공개 동의 값이 올바르지 않아요." },
+        400,
+      );
+    }
+
+    const { data, error } = await supabase.rpc(
+      body.action === "photo-consent"
+        ? "set_photo_reveal_consent"
+        : "get_photo_reveal_status",
+      body.action === "photo-consent"
+        ? {
+            target_conversation_id: body.conversationId,
+            next_consented: body.consent,
+          }
+        : {
+            target_conversation_id: body.conversationId,
+          },
+    );
+
+    if (error) {
+      return rpcErrorResponse(error.message);
+    }
+
+    const status = getPhotoRevealStatusFromRecord(data);
+
+    if (!status) {
+      return jsonResponse(
+        { error: "사진 공개 동의 상태를 확인하지 못했어요." },
+        500,
+      );
+    }
+
+    const photoUrl = status.revealed
+      ? await createProfilePhotoSignedUrl(
+          supabase,
+          status.otherUserId,
+        )
+      : null;
+
+    return jsonResponse({ status, photoUrl });
   }
 
   if (body.action === "setting") {
