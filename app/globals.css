@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fafafa;
+  --foreground: #171717;
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --color-coral-50: #fff6f3;
+  --color-coral-100: #feece7;
+  --color-coral-200: #fbd8d0;
+  --color-coral-400: #ef8a7e;
+  --color-coral-500: #e76f61;
+  --color-coral-600: #cf5c50;
+  --color-coral-700: #a8473e;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+button,
+a,
+label {
+  -webkit-tap-highlight-color: transparent;
+}
