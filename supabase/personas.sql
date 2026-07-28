@@ -180,7 +180,7 @@ begin
       and requested_at >= v_day_start
       and requested_at < v_day_end;
 
-    if v_force_count >= 3 then
+    if v_force_count >= 1 then
       return pg_catalog.jsonb_build_object(
         'status',
         'rate_limited',
@@ -207,8 +207,8 @@ begin
     v_log_id,
     'remaining',
     case
-      when v_is_reanalysis then 2 - coalesce(v_force_count, 0)
-      else 3
+      when v_is_reanalysis then 0
+      else 1
     end
   );
 end;
