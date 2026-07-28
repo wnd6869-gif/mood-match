@@ -18,7 +18,7 @@ import {
 } from "@/lib/prototype-storage";
 
 const ANALYSIS_STEPS = [
-  "사진의 인상과 분위기를 살펴보는 중",
+  "한 명의 얼굴과 눈·코·입을 확인하는 중",
   "어울리는 동물상을 찾는 중",
   "나만의 AI 캐릭터를 만드는 중",
 ] as const;
@@ -29,6 +29,16 @@ type AnalyzingViewProps = {
 };
 
 type AnalysisStatus = "loading" | "error";
+
+class AnalysisRequestError extends Error {
+  code: string | null;
+
+  constructor(message: string, code: string | null = null) {
+    super(message);
+    this.name = "AnalysisRequestError";
+    this.code = code;
+  }
+}
 
 export default function AnalyzingView({
   photoUrl,
@@ -41,6 +51,7 @@ export default function AnalyzingView({
   const [currentStep, setCurrentStep] = useState(0);
   const [status, setStatus] = useState<AnalysisStatus>("loading");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
 
   const runAnalysis = useCallback(async (force = false) => {
     if (isRequestingRef.current) {
@@ -51,6 +62,7 @@ export default function AnalyzingView({
     setStatus("loading");
     setCurrentStep(0);
     setErrorMessage(null);
+    setErrorCode(null);
 
     try {
       const response = await fetch("/api/analyze-persona", {
@@ -64,6 +76,7 @@ export default function AnalyzingView({
       const payload = (await response.json().catch(() => null)) as {
         result?: unknown;
         error?: string;
+        code?: string;
       } | null;
 
       if (response.status === 401) {
@@ -73,9 +86,10 @@ export default function AnalyzingView({
       }
 
       if (!response.ok) {
-        throw new Error(
+        throw new AnalysisRequestError(
           payload?.error ??
             "사진을 분석하지 못했어요. 잠시 후 다시 시도해주세요.",
+          payload?.code ?? null,
         );
       }
 
@@ -97,6 +111,9 @@ export default function AnalyzingView({
       router.refresh();
     } catch (error) {
       setStatus("error");
+      setErrorCode(
+        error instanceof AnalysisRequestError ? error.code : null,
+      );
       setErrorMessage(
         error instanceof Error
           ? error.message
@@ -233,15 +250,17 @@ export default function AnalyzingView({
               {errorMessage}
             </p>
             <div className="mt-5 space-y-3">
-              <ActionButton
-                onClick={() => {
-                  prepareForNewPersonaAnalysis();
-                  void runAnalysis(forceRef.current);
-                }}
-                aria-label="사진 분석 다시 시도하기"
-              >
-                다시 시도하기
-              </ActionButton>
+              {errorCode !== "photo_requirements_not_met" && (
+                <ActionButton
+                  onClick={() => {
+                    prepareForNewPersonaAnalysis();
+                    void runAnalysis(forceRef.current);
+                  }}
+                  aria-label="사진 분석 다시 시도하기"
+                >
+                  다시 시도하기
+                </ActionButton>
+              )}
               <ActionLink
                 href="/upload"
                 variant="secondary"

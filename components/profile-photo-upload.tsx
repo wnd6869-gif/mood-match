@@ -393,10 +393,25 @@ export default function ProfilePhotoUpload({
           사진을 선택해주세요
         </h1>
         <p className="mt-3 text-sm leading-6 text-neutral-600">
-          얼굴이 선명하게 보이는 사진일수록 분위기를 더 자연스럽게 표현할 수
+          한 명의 얼굴과 두 눈·코·입이 모두 선명하게 보이는 사진만 분석할 수
           있어요.
         </p>
       </header>
+
+      <section className="mt-6 rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm">
+        <h2 className="text-sm font-bold text-neutral-900">
+          분석 가능한 사진
+        </h2>
+        <ul className="mt-3 list-disc space-y-1.5 pl-5 text-xs leading-5 text-neutral-600 marker:text-coral-500">
+          <li>사진에는 한 사람만 나와야 해요.</li>
+          <li>얼굴이 충분히 크고 밝으며 초점이 선명해야 해요.</li>
+          <li>정면 또는 준정면에서 두 눈·코·입이 모두 보여야 해요.</li>
+          <li>
+            선글라스, 마스크, 손, 머리카락 등으로 얼굴이 가려진 사진은
+            분석할 수 없어요.
+          </li>
+        </ul>
+      </section>
 
       <section className="mt-6 rounded-3xl border border-coral-100 bg-coral-50/70 p-5">
         <h2 className="text-sm font-bold text-neutral-900">

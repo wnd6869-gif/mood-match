@@ -240,6 +240,28 @@ begin
 end;
 $$;
 
+create or replace function public.cancel_persona_analysis(
+  p_log_id uuid
+)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_user_id uuid := auth.uid();
+begin
+  if v_user_id is null then
+    raise exception 'Authentication required';
+  end if;
+
+  delete from public.persona_analysis_logs
+  where id = p_log_id
+    and user_id = v_user_id
+    and status = 'started';
+end;
+$$;
+
 revoke all on function public.claim_persona_analysis(boolean) from public;
 revoke all on function public.claim_persona_analysis(boolean) from anon;
 grant execute on function public.claim_persona_analysis(boolean)
@@ -250,4 +272,9 @@ from public;
 revoke all on function public.complete_persona_analysis(uuid, boolean)
 from anon;
 grant execute on function public.complete_persona_analysis(uuid, boolean)
+to authenticated;
+
+revoke all on function public.cancel_persona_analysis(uuid) from public;
+revoke all on function public.cancel_persona_analysis(uuid) from anon;
+grant execute on function public.cancel_persona_analysis(uuid)
 to authenticated;
