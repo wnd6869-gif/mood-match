@@ -41,7 +41,7 @@ git push -u origin main
 
 ## 3. Vercel 환경변수
 
-필요한 환경변수는 아래 세 개뿐입니다.
+서비스 실행에 필요한 환경변수는 아래 세 개입니다.
 
 ```text
 NEXT_PUBLIC_SUPABASE_URL
@@ -51,6 +51,20 @@ OPENAI_API_KEY
 
 `OPENAI_API_KEY`에는 `NEXT_PUBLIC_` 접두사를 붙이지 않습니다. 환경변수를
 변경한 뒤에는 새 Deployment를 만들어야 변경값이 반영됩니다.
+
+법적 문서에 표시할 아래 공개 환경변수도 베타 공개 전에 실제 정보로
+설정합니다. 값이 없으면 화면에 `운영자가 확정해야 함`으로 표시됩니다.
+
+```text
+NEXT_PUBLIC_SERVICE_NAME
+NEXT_PUBLIC_LEGAL_BUSINESS_NAME
+NEXT_PUBLIC_LEGAL_REPRESENTATIVE
+NEXT_PUBLIC_LEGAL_ADDRESS
+NEXT_PUBLIC_LEGAL_CONTACT_EMAIL
+NEXT_PUBLIC_LEGAL_PRIVACY_OFFICER
+```
+
+이 값들은 이용자에게 공개되는 정보이므로 비밀값을 넣지 않습니다.
 
 ## 4. Supabase Auth URL 설정
 
@@ -81,12 +95,18 @@ Vercel Preview Deployment를 테스트할 때만 추가합니다.
 - 새 Supabase 프로젝트라면 `profiles.sql` → `profile-photos.sql` →
   `personas.sql` → `visual-archetypes.sql` → `public-chat-profile.sql` →
   `conversation-requests.sql` → `direct-chat.sql` → `group-chat.sql` →
-  `safety-moderation.sql` → `admin.sql` 순서로 SQL Editor에서 실행합니다.
+  `safety-moderation.sql` → `admin.sql` → `legal-consents.sql` 순서로 SQL
+  Editor에서 실행합니다.
 - Storage의 `profile-photos` 버킷이 private인지 확인합니다.
 - Realtime의 `public.messages` publication 등록 여부를 확인합니다.
   `direct-chat.sql`이 이 등록을 수행합니다.
 - 최초 관리자는 `admin.sql` 상단의 주석 예시처럼 `admin_users`에 사용자
   UUID를 수동 등록합니다.
+- `legal-consents.sql`의 약관 버전이 `lib/legal.ts`와 일치하는지 확인하고,
+  기존 이용자에게는 별도의 재동의 절차를 마련합니다.
+- Supabase 프로젝트 리전, Vercel 실행·로그 리전, OpenAI 데이터 보존
+  설정을 확인한 뒤 개인정보처리방침의 TODO 문구를 실제 계약 정보로
+  교체합니다.
 - 브라우저나 Vercel 환경변수에 service-role 또는 Supabase secret key를
   추가하지 않습니다.
 

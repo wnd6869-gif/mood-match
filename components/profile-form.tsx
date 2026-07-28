@@ -19,6 +19,23 @@ type ProfileFormProps = {
 const SELECT_CLASSES =
   "mt-2 min-h-14 w-full cursor-pointer rounded-2xl border border-neutral-200 bg-white px-4 text-base text-neutral-900 outline-none transition-colors hover:border-neutral-300 focus:border-coral-400 focus:ring-2 focus:ring-coral-100 disabled:cursor-not-allowed disabled:bg-neutral-100";
 
+function isAtLeastFourteen(birthDate: string) {
+  const parsed = new Date(`${birthDate}T00:00:00`);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return false;
+  }
+
+  const today = new Date();
+  const threshold = new Date(
+    today.getFullYear() - 14,
+    today.getMonth(),
+    today.getDate(),
+  );
+
+  return parsed <= threshold;
+}
+
 export default function ProfileForm({
   initialProfile,
   initialLoadFailed = false,
@@ -56,6 +73,11 @@ export default function ProfileForm({
 
     if (!nickname.trim() || !birthDate || !gender || !preferredGender) {
       setErrorMessage("필수 항목을 모두 입력해주세요.");
+      return;
+    }
+
+    if (!isAtLeastFourteen(birthDate)) {
+      setErrorMessage("만 14세 이상만 서비스를 이용할 수 있어요.");
       return;
     }
 
@@ -110,6 +132,8 @@ export default function ProfileForm({
         );
       } else if (error.code === "42501") {
         setErrorMessage("프로필 저장 권한을 확인해주세요.");
+      } else if (error.message.includes("minimum_age_required")) {
+        setErrorMessage("만 14세 이상만 서비스를 이용할 수 있어요.");
       } else {
         setErrorMessage("프로필을 저장하지 못했어요. 잠시 후 다시 시도해주세요.");
       }

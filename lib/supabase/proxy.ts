@@ -44,6 +44,8 @@ export async function updateSession(request: NextRequest) {
     pathname === "/restricted" ||
     pathname === "/login" ||
     pathname === "/signup" ||
+    pathname === "/terms" ||
+    pathname === "/privacy" ||
     pathname.startsWith("/auth/") ||
     pathname.startsWith("/api/") ||
     pathname.startsWith("/admin");
