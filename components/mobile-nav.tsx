@@ -4,12 +4,12 @@ type MobileNavItem = {
   href: string;
   label: string;
   icon: string;
-  key: "discover" | "requests" | "chats" | "mypage";
+  key: "home" | "discover" | "chats" | "mypage";
 };
 
 const ITEMS: MobileNavItem[] = [
+  { href: "/home", label: "홈", icon: "⌂", key: "home" },
   { href: "/discover", label: "둘러보기", icon: "◌", key: "discover" },
-  { href: "/requests", label: "요청", icon: "↔", key: "requests" },
   { href: "/chats", label: "채팅", icon: "▢", key: "chats" },
   { href: "/mypage", label: "마이", icon: "○", key: "mypage" },
 ];

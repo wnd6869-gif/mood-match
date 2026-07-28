@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ActionLink } from "@/components/action";
 import AppShell from "@/components/app-shell";
+import CharacterAvatar from "@/components/character-avatar";
 import MobileNav from "@/components/mobile-nav";
 import {
   formatChatListTime,
@@ -106,11 +107,16 @@ export default async function ChatsPage() {
               className="block cursor-pointer rounded-3xl border border-neutral-200/80 bg-white p-4 shadow-sm transition-all hover:border-neutral-300 hover:shadow-md active:scale-[0.99]"
             >
               <div className="flex items-start gap-3">
-                <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-coral-50 to-neutral-100 text-lg text-coral-600">
-                  {conversation.conversationType === "group"
-                    ? "☁"
-                    : "✦"}
-                </div>
+                {conversation.conversationType === "direct" ? (
+                  <CharacterAvatar
+                    personaTitle={conversation.otherPersonaTitle}
+                    className="size-14 shrink-0 rounded-2xl"
+                  />
+                ) : (
+                  <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-mint-100 text-lg text-mint-700">
+                    ☁
+                  </div>
+                )}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">

@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { ActionLink } from "@/components/action";
 import AppShell from "@/components/app-shell";
 import BackLink from "@/components/back-link";
-import StoredImagePreview from "@/components/stored-image-preview";
+import PublicProfileVisual from "@/components/public-profile-visual";
 import {
   getPersonaResultFromRecord,
   PERSONA_SELECT_COLUMNS,
@@ -22,7 +22,6 @@ import {
   hasCompleteConversationPreferences,
   PUBLIC_CHAT_PROFILE_SELECT_COLUMNS,
 } from "@/lib/public-chat-profile";
-import { createProfilePhotoSignedUrl } from "@/lib/supabase/profile-photo";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -94,12 +93,6 @@ export default async function PublicProfilePreviewPage() {
   const persona = getPersonaResultFromRecord(
     personaResponse.data as PersonaRecord | null,
   );
-  const shouldLoadPhoto =
-    profile.photo_visibility === "mutual" ||
-    profile.photo_visibility === "public";
-  const photoUrl = shouldLoadPhoto
-    ? await createProfilePhotoSignedUrl(supabase, user.id)
-    : null;
   const ageDisplay = getAgeDisplay(
     birthDate,
     profile.age_visibility,
@@ -198,44 +191,12 @@ export default async function PublicProfilePreviewPage() {
         </section>
       ) : (
         <article className="mt-6 overflow-hidden rounded-[2rem] border border-neutral-200/80 bg-white shadow-sm">
-          <div className="relative">
-            {profile.photo_visibility === "persona_only" ? (
-              <div
-                role="img"
-                aria-label={`${persona.personaTitle} AI 캐릭터 카드`}
-                className="flex aspect-[4/3] flex-col items-center justify-center bg-gradient-to-br from-coral-50 via-white to-neutral-100 px-8 text-center"
-              >
-                <span className="flex size-16 items-center justify-center rounded-full bg-white text-2xl shadow-sm">
-                  ✦
-                </span>
-                <p className="mt-4 text-xs font-semibold tracking-wide text-coral-600">
-                  AI PERSONA
-                </p>
-                <p className="mt-1 text-xl font-bold text-neutral-900">
-                  {persona.personaTitle}
-                </p>
-              </div>
-            ) : profile.photo_visibility === "mutual" ? (
-              <div className="relative overflow-hidden">
-                <StoredImagePreview
-                  src={photoUrl}
-                  alt="상호 동의 전 흐리게 표시된 프로필 사진"
-                  className="rounded-none border-0 [&_img]:scale-110 [&_img]:blur-lg"
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-neutral-900/20 px-6 text-center">
-                  <span className="rounded-full bg-white/90 px-4 py-2 text-xs font-bold text-neutral-800 shadow-sm backdrop-blur">
-                    서로 동의하면 실제 사진 공개
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <StoredImagePreview
-                src={photoUrl}
-                alt="공개 프로필 사진"
-                className="rounded-none border-0"
-              />
-            )}
-          </div>
+          <PublicProfileVisual
+            personaTitle={persona.personaTitle}
+            animalTypes={persona.animalTypes}
+            photoVisibility={profile.photo_visibility}
+            photoUrl={null}
+          />
 
           <div className="p-5">
             <div className="flex flex-wrap items-center gap-2">

@@ -3,22 +3,20 @@
 import { ActionLink } from "@/components/action";
 import AppShell from "@/components/app-shell";
 import BackLink from "@/components/back-link";
+import CharacterAvatar from "@/components/character-avatar";
 import ResetFlowButton from "@/components/reset-flow-button";
 import ReanalyzeButton from "@/components/reanalyze-button";
 import StepProgress from "@/components/step-progress";
-import StoredImagePreview from "@/components/stored-image-preview";
 import usePrototypeData from "@/hooks/use-prototype-data";
 import type { PersonaAnalysisResult } from "@/lib/persona-analysis";
 
 type PersonaResultViewProps = {
-  photoUrl: string | null;
   userId: string;
   serverResult: PersonaAnalysisResult | null;
   personaIdentity: string | null;
 };
 
 export default function PersonaResultView({
-  photoUrl,
   userId,
   serverResult,
   personaIdentity,
@@ -92,23 +90,29 @@ export default function PersonaResultView({
       />
       <StepProgress current={3} total={5} label="캐릭터 결과" />
 
-      <header className="mt-7">
-        <p className="text-sm font-semibold text-coral-600">
-          사진에서 느껴진 나의 캐릭터
-        </p>
-        <h1 className="mt-2 text-3xl font-bold leading-tight tracking-tight text-neutral-900">
-          {result.personaTitle}
-        </h1>
-        <p className="mt-3 text-sm leading-6 text-neutral-600">
-          {result.personaDescription}
-        </p>
-      </header>
+      <section className="relative mt-7 overflow-hidden rounded-[2.25rem] bg-neutral-900 text-white shadow-[0_22px_55px_rgba(23,23,23,0.16)]">
+        <CharacterAvatar
+          animalTypes={result.animalTypes}
+          personaTitle={result.personaTitle}
+          priority
+          className="aspect-square w-full"
+        />
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-neutral-950/90 via-neutral-950/45 to-transparent px-6 pb-6 pt-20">
+          <p className="text-xs font-bold tracking-[0.15em] text-white/75">
+            MY ANIMAL CHARACTER
+          </p>
+          <h1 className="mt-2 text-3xl font-bold leading-tight tracking-tight">
+            {result.personaTitle}
+          </h1>
+          <p className="mt-2 text-sm leading-6 text-white/80">
+            @{personaIdentity ?? result.nicknameCandidates[0]}
+          </p>
+        </div>
+      </section>
 
-      <StoredImagePreview
-        src={photoUrl}
-        variant="card"
-        className="mt-7 shadow-sm"
-      />
+      <p className="mt-5 rounded-3xl bg-white px-5 py-4 text-sm leading-6 text-neutral-600 shadow-sm">
+        {result.personaDescription}
+      </p>
 
       <div className="mt-4 space-y-4">
         <article className="rounded-3xl border border-neutral-200/80 bg-white p-5 shadow-sm">
@@ -181,9 +185,9 @@ export default function PersonaResultView({
       <div className="mt-6 space-y-3">
         <ActionLink
           href="/ideal"
-          ariaLabel="관심 가는 캐릭터 분위기 선택 화면으로 이동하기"
+          ariaLabel="관심 스타일과 대화 취향 설정으로 이동하기"
         >
-          관심 스타일 골라보기
+          관심 스타일 설정하고 추천받기
         </ActionLink>
         <ReanalyzeButton />
         <ActionLink
@@ -197,7 +201,7 @@ export default function PersonaResultView({
       </div>
 
       <p className="mt-4 text-center text-xs leading-5 text-neutral-400">
-        사진에서 느껴지는 인상을 AI가 가볍게 표현한 결과예요.
+        실제 얼굴 대신 이 동물 캐릭터가 프로필의 기본 이미지로 보여요.
       </p>
     </AppShell>
   );

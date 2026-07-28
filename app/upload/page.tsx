@@ -17,18 +17,30 @@ export default async function UploadPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect("/login?next=/upload");
   }
 
-  const initialPhotoUrl = await createProfilePhotoSignedUrl(
-    supabase,
-    user.id,
-  );
-  const { data: existingPersona } = await supabase
-    .from("personas")
-    .select("user_id")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const [
+    { data: baseProfile },
+    initialPhotoUrl,
+    { data: existingPersona },
+  ] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("id")
+      .eq("id", user.id)
+      .maybeSingle(),
+    createProfilePhotoSignedUrl(supabase, user.id),
+    supabase
+      .from("personas")
+      .select("user_id")
+      .eq("user_id", user.id)
+      .maybeSingle(),
+  ]);
+
+  if (!baseProfile) {
+    redirect("/onboarding/profile");
+  }
 
   return (
     <ProfilePhotoUpload

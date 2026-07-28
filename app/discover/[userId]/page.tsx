@@ -156,6 +156,7 @@ export default async function DiscoverProfilePage({
       <article className="mt-5 overflow-hidden rounded-[2rem] border border-neutral-200/80 bg-white shadow-sm">
         <PublicProfileVisual
           personaTitle={profile.personaTitle}
+          animalTypes={profile.animalTypes}
           photoVisibility={profile.photo_visibility}
           photoUrl={photoUrl}
         />

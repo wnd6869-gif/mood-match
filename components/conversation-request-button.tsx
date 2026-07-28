@@ -16,6 +16,7 @@ type ConversationRequestButtonProps = {
   preferredGroupSize: PreferredGroupSize | null;
   requestStatus: ConversationRequestStatus | null;
   requestDirection: ConversationRequestDirection | null;
+  compact?: boolean;
 };
 
 type ApiResponse = {
@@ -30,6 +31,7 @@ export default function ConversationRequestButton({
   preferredGroupSize,
   requestStatus,
   requestDirection,
+  compact = false,
 }: ConversationRequestButtonProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -147,7 +149,7 @@ export default function ConversationRequestButton({
         }}
         aria-label={`${targetNickname}님에게 가볍게 대화 걸기`}
       >
-        대화 걸기
+        {compact ? "대화 요청" : "대화 걸기"}
       </ActionButton>
 
       {feedback && !isOpen && (

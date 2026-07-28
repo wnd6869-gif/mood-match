@@ -260,19 +260,6 @@ as $$
     photo_owner_id = (select auth.uid())::text
     or exists (
       select 1
-      from public.discover_available_chat_profiles(
-        null::uuid,
-        null::text,
-        null::text,
-        null::text,
-        false,
-        null::text
-      ) as public_profile
-      where public_profile.user_id::text = photo_owner_id
-        and public_profile.photo_visibility = 'public'
-    )
-    or exists (
-      select 1
       from public.conversations as direct_conversation
       inner join public.conversation_members as own_membership
         on own_membership.conversation_id = direct_conversation.id

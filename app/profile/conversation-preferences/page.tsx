@@ -8,11 +8,16 @@ import {
   getPublicChatProfileFromRecord,
   PUBLIC_CHAT_PROFILE_SELECT_COLUMNS,
 } from "@/lib/public-chat-profile";
+import { getSafeNextPath } from "@/lib/safe-navigation";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function ConversationPreferencesPage() {
+export default async function ConversationPreferencesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string | string[] }>;
+}) {
   const supabase = await createClient();
 
   if (!supabase) {
@@ -44,6 +49,11 @@ export default async function ConversationPreferencesPage() {
       id: user.id,
       ...DEFAULT_PUBLIC_CHAT_PROFILE,
     };
+  const query = await searchParams;
+  const requestedNext = Array.isArray(query.next)
+    ? query.next[0]
+    : query.next;
+  const successPath = getSafeNextPath(requestedNext, "/home");
 
   return (
     <AppShell>
@@ -93,6 +103,7 @@ export default async function ConversationPreferencesPage() {
             available_time_slots: settings.available_time_slots,
           }}
           initialLoadFailed={Boolean(settingsResponse.error)}
+          successPath={successPath}
         />
       )}
     </AppShell>

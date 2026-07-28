@@ -1,26 +1,34 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import AppShell from "@/components/app-shell";
+import CharacterAvatar from "@/components/character-avatar";
+import ConversationRequestButton from "@/components/conversation-request-button";
+import DiscoverFilterSheet from "@/components/discover-filter-sheet";
 import MobileNav from "@/components/mobile-nav";
-import PublicProfileVisual from "@/components/public-profile-visual";
 import {
   getDiscoverableProfileFromRecord,
   type DiscoverableProfile,
 } from "@/lib/conversation-request";
 import {
+  calculateRecommendationScore,
+  getMatchPreferenceFromRecord,
+} from "@/lib/match-preference";
+import {
   AVAILABLE_TIME_OPTIONS,
   CONVERSATION_GOAL_OPTIONS,
-  CONVERSATION_MOOD_OPTIONS,
   CONVERSATION_TOPIC_OPTIONS,
   findOptionLabel,
-  GROUP_SIZE_OPTIONS,
+  getPublicChatProfileFromRecord,
+  PUBLIC_CHAT_PROFILE_SELECT_COLUMNS,
 } from "@/lib/public-chat-profile";
-import { createProfilePhotoSignedUrl } from "@/lib/supabase/profile-photo";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
+type DiscoverTab = "recommended" | "new" | "available";
+
 type DiscoverSearchParams = {
+  tab?: string | string[];
   goal?: string | string[];
   mood?: string | string[];
   topic?: string | string[];
@@ -28,34 +36,29 @@ type DiscoverSearchParams = {
   oneToOne?: string | string[];
 };
 
+const TABS: { value: DiscoverTab; label: string }[] = [
+  { value: "recommended", label: "추천" },
+  { value: "new", label: "새로 가입" },
+  { value: "available", label: "지금 대화 가능" },
+];
+
 function firstValue(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
 
-function ActiveRequestBadge({
-  profile,
-}: {
-  profile: DiscoverableProfile;
-}) {
-  if (profile.requestStatus === "accepted") {
-    return (
-      <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-        대화 연결됨
-      </span>
-    );
-  }
+function getCurrentTimeSlot() {
+  const hour = Number(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Seoul",
+      hour: "2-digit",
+      hourCycle: "h23",
+    }).format(new Date()),
+  );
 
-  if (profile.requestStatus === "pending") {
-    return (
-      <span className="rounded-full bg-coral-50 px-3 py-1 text-xs font-semibold text-coral-700">
-        {profile.requestDirection === "received"
-          ? "상대가 신청했어요"
-          : "신청 보냄"}
-      </span>
-    );
-  }
-
-  return null;
+  if (hour < 10) return "morning";
+  if (hour < 17) return "daytime";
+  if (hour < 22) return "evening";
+  return "late_night";
 }
 
 export default async function DiscoverPage({
@@ -66,7 +69,7 @@ export default async function DiscoverPage({
   const supabase = await createClient();
 
   if (!supabase) {
-    redirect("/login");
+    redirect("/login?next=/discover");
   }
 
   const {
@@ -74,49 +77,88 @@ export default async function DiscoverPage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect("/login?next=/discover");
   }
 
   const query = await searchParams;
+  const requestedTab = firstValue(query.tab);
+  const tab: DiscoverTab = TABS.some(
+    (item) => item.value === requestedTab,
+  )
+    ? (requestedTab as DiscoverTab)
+    : "recommended";
   const goal = firstValue(query.goal) || null;
   const mood = firstValue(query.mood) || null;
   const topic = firstValue(query.topic) || null;
-  const timeSlot = firstValue(query.time) || null;
+  const requestedTime = firstValue(query.time) || null;
+  const timeSlot =
+    requestedTime ?? (tab === "available" ? getCurrentTimeSlot() : null);
   const oneToOneOnly = firstValue(query.oneToOne) === "true";
   const hasFilters = Boolean(
-    goal || mood || topic || timeSlot || oneToOneOnly,
+    goal || mood || topic || requestedTime || oneToOneOnly,
   );
-  const { data, error } = await supabase.rpc(
-    "discover_available_chat_profiles",
-    {
-      p_target_user_id: null,
-      p_goal: goal,
-      p_mood: mood,
-      p_topic: topic,
-      p_one_to_one_only: oneToOneOnly,
-      p_time_slot: timeSlot,
-    },
+  const [profilesResponse, matchResponse, settingsResponse] =
+    await Promise.all([
+      supabase.rpc("discover_available_chat_profiles", {
+        p_target_user_id: null,
+        p_goal: goal,
+        p_mood: mood,
+        p_topic: topic,
+        p_one_to_one_only: oneToOneOnly,
+        p_time_slot: timeSlot,
+      }),
+      supabase
+        .from("match_preferences")
+        .select(
+          "user_id, visual_archetype, preferred_animal, created_at, updated_at",
+        )
+        .eq("user_id", user.id)
+        .maybeSingle(),
+      supabase
+        .from("profiles")
+        .select(PUBLIC_CHAT_PROFILE_SELECT_COLUMNS)
+        .eq("id", user.id)
+        .maybeSingle(),
+    ]);
+  const matchPreference = getMatchPreferenceFromRecord(
+    matchResponse.data,
   );
-  const profiles = Array.isArray(data)
-    ? data
+  const ownSettings = getPublicChatProfileFromRecord(
+    settingsResponse.data,
+  );
+  const profiles = Array.isArray(profilesResponse.data)
+    ? profilesResponse.data
         .map(getDiscoverableProfileFromRecord)
         .filter(
           (profile): profile is DiscoverableProfile =>
             profile !== null,
         )
     : [];
-  const photoEntries = await Promise.all(
-    profiles.map(async (profile) => [
-      profile.userId,
-      profile.photo_visibility !== "persona_only"
-        ? await createProfilePhotoSignedUrl(
-            supabase,
-            profile.userId,
-          )
+  const scoredProfiles = profiles.map((profile) => ({
+    profile,
+    score:
+      matchPreference && ownSettings
+        ? calculateRecommendationScore({
+            candidate: profile,
+            matchPreference,
+            conversationPreferences: {
+              conversation_goal: ownSettings.conversation_goal,
+              conversation_moods: ownSettings.conversation_moods,
+              conversation_topics: ownSettings.conversation_topics,
+              conversation_pace: ownSettings.conversation_pace,
+              preferred_group_size: ownSettings.preferred_group_size,
+              available_time_slots: ownSettings.available_time_slots,
+            },
+          })
         : null,
-    ] as const),
-  );
-  const photoUrls = new Map(photoEntries);
+  }));
+
+  if (tab === "recommended") {
+    scoredProfiles.sort(
+      (left, right) =>
+        (right.score?.total ?? 0) - (left.score?.total ?? 0),
+    );
+  }
 
   return (
     <AppShell>
@@ -125,155 +167,74 @@ export default async function DiscoverPage({
           캐릭터 둘러보기
         </p>
         <h1 className="mt-2 text-3xl font-bold leading-tight tracking-tight text-neutral-900">
-          오늘은 누구와 이야기할까요?
+          먼저 캐릭터부터
+          <br />
+          가볍게 만나보세요
         </h1>
-        <p className="mt-3 text-sm leading-6 text-neutral-600">
-          이런 캐릭터는 어때요? 분위기와 대화 취향을 보고 편하게 인사를
-          건네보세요.
-        </p>
       </header>
 
-      <form
-        method="get"
-        className="mt-6 rounded-3xl border border-neutral-200/80 bg-white p-4 shadow-sm"
-      >
-        <div className="grid grid-cols-2 gap-2.5">
-          <label className="block">
-            <span className="sr-only">대화 목표 필터</span>
-            <select
-              name="goal"
-              defaultValue={goal ?? ""}
-              className="min-h-12 w-full cursor-pointer rounded-xl border border-neutral-200 bg-white px-3 text-sm font-medium text-neutral-700 outline-none focus:border-coral-400"
-            >
-              <option value="">대화 목표 전체</option>
-              {CONVERSATION_GOAL_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block">
-            <span className="sr-only">대화 분위기 필터</span>
-            <select
-              name="mood"
-              defaultValue={mood ?? ""}
-              className="min-h-12 w-full cursor-pointer rounded-xl border border-neutral-200 bg-white px-3 text-sm font-medium text-neutral-700 outline-none focus:border-coral-400"
-            >
-              <option value="">분위기 전체</option>
-              {CONVERSATION_MOOD_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block">
-            <span className="sr-only">관심 주제 필터</span>
-            <select
-              name="topic"
-              defaultValue={topic ?? ""}
-              className="min-h-12 w-full cursor-pointer rounded-xl border border-neutral-200 bg-white px-3 text-sm font-medium text-neutral-700 outline-none focus:border-coral-400"
-            >
-              <option value="">관심 주제 전체</option>
-              {CONVERSATION_TOPIC_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block">
-            <span className="sr-only">접속 시간 필터</span>
-            <select
-              name="time"
-              defaultValue={timeSlot ?? ""}
-              className="min-h-12 w-full cursor-pointer rounded-xl border border-neutral-200 bg-white px-3 text-sm font-medium text-neutral-700 outline-none focus:border-coral-400"
-            >
-              <option value="">접속 시간 전체</option>
-              {AVAILABLE_TIME_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-
-        <label className="mt-3 flex min-h-11 cursor-pointer items-center gap-3 rounded-xl bg-neutral-50 px-3 text-sm font-semibold text-neutral-700">
-          <input
-            type="checkbox"
-            name="oneToOne"
-            value="true"
-            defaultChecked={oneToOneOnly}
-            className="size-5 cursor-pointer rounded border-neutral-300 accent-coral-500"
-          />
-          1:1 대화 가능한 사람만 보기
-        </label>
-
-        <div className="mt-3 grid grid-cols-2 gap-2.5">
-          {hasFilters ? (
-            <Link
-              href="/discover"
-              className="flex min-h-12 cursor-pointer items-center justify-center rounded-xl border border-neutral-200 text-sm font-semibold text-neutral-600 transition-colors hover:bg-neutral-50"
-            >
-              초기화
-            </Link>
-          ) : (
-            <span className="flex min-h-12 items-center justify-center rounded-xl bg-neutral-50 text-xs text-neutral-400">
-              필터를 골라보세요
-            </span>
-          )}
-          <button
-            type="submit"
-            className="min-h-12 cursor-pointer rounded-xl bg-neutral-900 px-4 text-sm font-semibold text-white transition-all hover:bg-neutral-800 active:scale-[0.98]"
+      <div className="mt-6 flex items-center gap-2 overflow-x-auto pb-1">
+        {TABS.map((item) => (
+          <Link
+            key={item.value}
+            href={`/discover?tab=${item.value}`}
+            aria-current={tab === item.value ? "page" : undefined}
+            className={`shrink-0 rounded-full px-4 py-2.5 text-sm font-bold transition-colors ${
+              tab === item.value
+                ? "bg-neutral-900 text-white"
+                : "border border-neutral-200 bg-white text-neutral-500"
+            }`}
           >
-            조건 적용
-          </button>
-        </div>
-      </form>
+            {item.label}
+          </Link>
+        ))}
+        <DiscoverFilterSheet
+          tab={tab}
+          initialValues={{
+            goal,
+            mood,
+            topic,
+            time: requestedTime,
+            oneToOneOnly,
+          }}
+          hasFilters={hasFilters}
+        />
+      </div>
+      {tab === "recommended" && matchPreference && ownSettings && (
+        <p className="mt-3 text-xs leading-5 text-neutral-400">
+          추천 점수는 대화 취향 60%와 캐릭터 분위기 40%를 기준으로
+          계산해요.
+        </p>
+      )}
 
-      {error && (
+      {profilesResponse.error && (
         <p
           role="alert"
           className="mt-5 rounded-2xl bg-amber-50 px-4 py-3 text-sm leading-5 text-amber-800"
         >
-          공개 프로필을 불러오지 못했어요.
-          direct-chat.sql 실행 여부를 확인해주세요.
+          공개 캐릭터를 불러오지 못했어요. 추천 SQL 적용 상태를
+          확인해주세요.
         </p>
       )}
 
-      {profiles.length === 0 ? (
-        <section className="mt-5 rounded-3xl border border-neutral-200/80 bg-white px-5 py-12 text-center shadow-sm">
+      {scoredProfiles.length === 0 ? (
+        <section className="mt-6 rounded-[2rem] bg-white px-5 py-12 text-center shadow-sm">
           <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-coral-50 text-2xl">
             ◌
           </span>
           <h2 className="mt-5 text-xl font-bold text-neutral-900">
-            {hasFilters
-              ? "조건에 맞는 대화 상대가 없어요."
-              : "아직 공개된 캐릭터가 없어요."}
+            지금 보여드릴 캐릭터가 없어요.
           </h2>
           <p className="mt-2 text-sm leading-6 text-neutral-500">
-            {hasFilters
-              ? "필터를 조금 넓혀서 다시 찾아보세요."
-              : "새로운 캐릭터가 공개되면 이곳에서 만날 수 있어요."}
+            필터를 넓히거나 잠시 뒤 다시 둘러봐주세요.
           </p>
         </section>
       ) : (
-        <div className="mt-5 space-y-5">
-          {profiles.map((profile) => {
+        <div className="mt-6 grid grid-cols-2 gap-3">
+          {scoredProfiles.map(({ profile, score }) => {
             const goalLabel = findOptionLabel(
               profile.conversation_goal,
               CONVERSATION_GOAL_OPTIONS,
-            );
-            const groupLabel = findOptionLabel(
-              profile.preferred_group_size,
-              GROUP_SIZE_OPTIONS,
-            );
-            const moodLabels = profile.conversation_moods.map(
-              (value) =>
-                findOptionLabel(value, CONVERSATION_MOOD_OPTIONS) ??
-                value,
             );
             const topicLabels = profile.conversation_topics
               .slice(0, 3)
@@ -284,123 +245,61 @@ export default async function DiscoverPage({
                     CONVERSATION_TOPIC_OPTIONS,
                   ) ?? value,
               );
-            const timeLabels = profile.available_time_slots.map(
-              (value) =>
-                findOptionLabel(value, AVAILABLE_TIME_OPTIONS) ??
-                value,
-            );
+            const timeLabels = profile.available_time_slots
+              .slice(0, 2)
+              .map(
+                (value) =>
+                  findOptionLabel(value, AVAILABLE_TIME_OPTIONS) ??
+                  value,
+              );
 
             return (
               <article
                 key={profile.userId}
-                className="overflow-hidden rounded-[2rem] border border-neutral-200/80 bg-white shadow-sm"
+                className="min-w-0 overflow-hidden rounded-[1.6rem] bg-white shadow-[0_10px_28px_rgba(23,23,23,0.07)]"
               >
-                <PublicProfileVisual
-                  personaTitle={profile.personaTitle}
-                  photoVisibility={profile.photo_visibility}
-                  photoUrl={photoUrls.get(profile.userId) ?? null}
-                  compact
-                />
-                <div className="p-5">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h2 className="truncate text-xl font-bold text-neutral-900">
-                          {profile.public_nickname}
-                        </h2>
-                        {profile.ageDisplay && (
-                          <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-semibold text-neutral-500">
-                            {profile.ageDisplay}
-                          </span>
-                        )}
-                      </div>
-                      <p className="mt-1 text-sm font-semibold text-coral-600">
-                        {profile.personaTitle}
-                      </p>
-                    </div>
-                    <ActiveRequestBadge profile={profile} />
-                  </div>
-
-                  <p className="mt-3 line-clamp-2 text-sm leading-6 text-neutral-600">
-                    {profile.personaDescription}
-                  </p>
-
-                  <div className="mt-4 grid grid-cols-3 gap-2">
-                    {profile.animalTypes.slice(0, 3).map((animal) => (
-                      <div
-                        key={animal.name}
-                        className="rounded-xl bg-neutral-50 px-2 py-2.5 text-center"
-                      >
-                        <p className="truncate text-xs font-semibold text-neutral-600">
-                          {animal.name}
-                        </p>
-                        <p className="mt-1 text-xs font-bold text-neutral-900">
-                          {animal.score}%
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {profile.moodKeywords.slice(0, 4).map((keyword) => (
-                      <span
-                        key={keyword}
-                        className="rounded-full bg-coral-50 px-3 py-1.5 text-xs font-semibold text-coral-700"
-                      >
-                        {keyword}
-                      </span>
-                    ))}
-                  </div>
-
-                  <dl className="mt-4 space-y-2.5 rounded-2xl bg-neutral-50 px-4 py-3 text-xs">
-                    <div className="flex gap-3">
-                      <dt className="w-16 shrink-0 font-semibold text-neutral-400">
-                        대화 목표
-                      </dt>
-                      <dd className="font-semibold text-neutral-700">
-                        {goalLabel}
-                      </dd>
-                    </div>
-                    <div className="flex gap-3">
-                      <dt className="w-16 shrink-0 font-semibold text-neutral-400">
-                        분위기
-                      </dt>
-                      <dd className="font-semibold text-neutral-700">
-                        {moodLabels.join(" · ")}
-                      </dd>
-                    </div>
-                    <div className="flex gap-3">
-                      <dt className="w-16 shrink-0 font-semibold text-neutral-400">
-                        관심사
-                      </dt>
-                      <dd className="font-semibold text-neutral-700">
-                        {topicLabels.join(" · ")}
-                      </dd>
-                    </div>
-                    <div className="flex gap-3">
-                      <dt className="w-16 shrink-0 font-semibold text-neutral-400">
-                        대화 형태
-                      </dt>
-                      <dd className="font-semibold text-neutral-700">
-                        {groupLabel}
-                      </dd>
-                    </div>
-                    <div className="flex gap-3">
-                      <dt className="w-16 shrink-0 font-semibold text-neutral-400">
-                        접속 시간
-                      </dt>
-                      <dd className="font-semibold text-neutral-700">
-                        {timeLabels.join(" · ")}
-                      </dd>
-                    </div>
-                  </dl>
-
-                  <Link
-                    href={`/discover/${profile.userId}`}
-                    className="mt-5 flex min-h-12 w-full cursor-pointer items-center justify-center rounded-xl bg-neutral-900 px-4 text-sm font-semibold text-white transition-all hover:bg-neutral-800 active:scale-[0.98]"
-                  >
-                    프로필 자세히 보기
+                <Link href={`/discover/${profile.userId}`}>
+                  <CharacterAvatar
+                    animalTypes={profile.animalTypes}
+                    personaTitle={profile.personaTitle}
+                    className="aspect-square"
+                  />
+                </Link>
+                <div className="p-3.5">
+                  {score && tab === "recommended" && (
+                    <span className="inline-flex rounded-full bg-[#eef7f2] px-2.5 py-1 text-[0.65rem] font-bold text-[#35705a]">
+                      추천 {score.total}%
+                    </span>
+                  )}
+                  <Link href={`/discover/${profile.userId}`}>
+                    <h2 className="mt-2 truncate text-sm font-bold text-neutral-900">
+                      @{profile.public_nickname}
+                    </h2>
+                    <p className="mt-1 line-clamp-2 text-xs font-semibold leading-5 text-coral-600">
+                      {profile.personaTitle}
+                    </p>
                   </Link>
+                  <p className="mt-2 line-clamp-2 text-xs leading-5 text-neutral-500">
+                    {goalLabel}
+                  </p>
+                  <p className="mt-2 line-clamp-2 text-[0.68rem] leading-5 text-neutral-400">
+                    {topicLabels.join(" · ")}
+                  </p>
+                  <p className="mt-1 truncate text-[0.68rem] text-neutral-400">
+                    {timeLabels.length > 0
+                      ? `${timeLabels.join(" · ")} 접속`
+                      : "접속 시간 미설정"}
+                  </p>
+                  <div className="mt-3">
+                    <ConversationRequestButton
+                      targetUserId={profile.userId}
+                      targetNickname={profile.public_nickname}
+                      preferredGroupSize={profile.preferred_group_size}
+                      requestStatus={profile.requestStatus}
+                      requestDirection={profile.requestDirection}
+                      compact
+                    />
+                  </div>
                 </div>
               </article>
             );

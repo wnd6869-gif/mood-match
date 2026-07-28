@@ -14,6 +14,8 @@ import { createClient } from "@/lib/supabase/client";
 type ProfileFormProps = {
   initialProfile: Profile | null;
   initialLoadFailed?: boolean;
+  successPath?: string;
+  submitLabel?: string;
 };
 
 const SELECT_CLASSES =
@@ -39,6 +41,8 @@ function isAtLeastFourteen(birthDate: string) {
 export default function ProfileForm({
   initialProfile,
   initialLoadFailed = false,
+  successPath = "/mypage",
+  submitLabel,
 }: ProfileFormProps) {
   const router = useRouter();
   const [nickname, setNickname] = useState(initialProfile?.nickname ?? "");
@@ -141,7 +145,7 @@ export default function ProfileForm({
       return;
     }
 
-    router.replace("/mypage");
+    router.replace(successPath);
     router.refresh();
   }
 
@@ -263,7 +267,10 @@ export default function ProfileForm({
         disabled={isSubmitting}
         aria-label="입력한 프로필 저장하기"
       >
-        {isSubmitting ? "저장 중..." : initialProfile ? "프로필 수정하기" : "프로필 저장하기"}
+        {isSubmitting
+          ? "저장 중..."
+          : submitLabel ??
+            (initialProfile ? "프로필 수정하기" : "프로필 저장하기")}
       </ActionButton>
     </form>
   );

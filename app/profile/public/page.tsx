@@ -13,7 +13,6 @@ import {
   getPublicChatProfileFromRecord,
   PUBLIC_CHAT_PROFILE_SELECT_COLUMNS,
 } from "@/lib/public-chat-profile";
-import { createProfilePhotoSignedUrl } from "@/lib/supabase/profile-photo";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -33,7 +32,7 @@ export default async function PublicProfilePage() {
     redirect("/login");
   }
 
-  const [baseProfileResponse, settingsResponse, personaResponse, photoUrl] =
+  const [baseProfileResponse, settingsResponse, personaResponse] =
     await Promise.all([
       supabase
         .from("profiles")
@@ -50,7 +49,6 @@ export default async function PublicProfilePage() {
         .select(PERSONA_SELECT_COLUMNS)
         .eq("user_id", user.id)
         .maybeSingle(),
-      createProfilePhotoSignedUrl(supabase, user.id),
     ]);
 
   const persona = getPersonaResultFromRecord(
@@ -108,7 +106,6 @@ export default async function PublicProfilePage() {
           userId={user.id}
           initialSettings={initialSettings}
           persona={persona}
-          photoUrl={photoUrl}
           initialLoadFailed={Boolean(settingsResponse.error)}
         />
       )}

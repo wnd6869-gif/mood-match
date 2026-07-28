@@ -864,8 +864,8 @@ $$;
 revoke all on function public.get_my_reports() from public, anon;
 grant execute on function public.get_my_reports() to authenticated;
 
--- Keep public profile photos unavailable across either direction of a block
--- and for users whose moderation status is not operational.
+-- Preserve the mutual-consent photo rule. can_view_profile_photo also checks
+-- block and moderation state before allowing cross-user access.
 drop policy if exists "Authenticated users can view public profile photos"
 on storage.objects;
 create policy "Authenticated users can view public profile photos"
@@ -874,19 +874,7 @@ for select
 to authenticated
 using (
   bucket_id = 'profile-photos'
-  and exists (
-    select 1
-    from public.discover_available_chat_profiles(
-      null::uuid,
-      null::text,
-      null::text,
-      null::text,
-      false,
-      null::text
-    ) as photo_owner
-    where photo_owner.user_id::text = (storage.foldername(name))[1]
-      and photo_owner.photo_visibility = 'public'
-  )
+  and public.can_view_profile_photo((storage.foldername(name))[1])
 );
 
 -- TODO(admin): build moderation administration only behind separate server

@@ -5,7 +5,6 @@ import {
   PERSONA_SELECT_COLUMNS,
   type PersonaRecord,
 } from "@/lib/persona-record";
-import { createProfilePhotoSignedUrl } from "@/lib/supabase/profile-photo";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -25,10 +24,6 @@ export default async function ResultPage() {
     redirect("/login");
   }
 
-  const photoUrl = await createProfilePhotoSignedUrl(
-    supabase,
-    user.id,
-  );
   const [{ data }, { data: profileData }] = await Promise.all([
     supabase
       .from("personas")
@@ -47,7 +42,6 @@ export default async function ResultPage() {
 
   return (
     <PersonaResultView
-      photoUrl={photoUrl}
       userId={user.id}
       serverResult={serverResult}
       personaIdentity={

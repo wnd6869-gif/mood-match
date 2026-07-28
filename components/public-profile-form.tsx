@@ -3,8 +3,8 @@
 import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import { ActionButton, ActionLink } from "@/components/action";
+import CharacterAvatar from "@/components/character-avatar";
 import ChoiceCard from "@/components/choice-card";
-import StoredImagePreview from "@/components/stored-image-preview";
 import type { PersonaAnalysisResult } from "@/lib/persona-analysis";
 import {
   AGE_VISIBILITY_OPTIONS,
@@ -19,7 +19,6 @@ type PublicProfileFormProps = {
   userId: string;
   initialSettings: PublicChatProfile;
   persona: PersonaAnalysisResult | null;
-  photoUrl: string | null;
   initialLoadFailed?: boolean;
 };
 
@@ -28,15 +27,12 @@ const PHOTO_GUIDANCE: Record<PhotoVisibility, string> = {
     "다른 사용자에게는 실제 사진 대신 AI 캐릭터 카드가 보여요.",
   mutual:
     "다른 사용자에게는 흐린 안내만 보이고, 1:1 채팅에서 두 사람 모두 ‘나도 동의’를 누른 뒤에만 실제 사진을 서로 볼 수 있어요. 한 명이 철회하면 즉시 다시 숨겨져요.",
-  public:
-    "공개 프로필을 보는 로그인 사용자에게 실제 사진이 처음부터 보여요.",
 };
 
 export default function PublicProfileForm({
   userId,
   initialSettings,
   persona,
-  photoUrl,
   initialLoadFailed = false,
 }: PublicProfileFormProps) {
   const router = useRouter();
@@ -181,9 +177,10 @@ export default function PublicProfileForm({
             <p className="mt-3 text-sm leading-6 text-neutral-600">
               {persona.personaDescription}
             </p>
-            <StoredImagePreview
-              src={photoUrl}
-              className="mt-5 shadow-sm"
+            <CharacterAvatar
+              animalTypes={persona.animalTypes}
+              personaTitle={persona.personaTitle}
+              className="mt-5 aspect-square rounded-[2rem] shadow-sm"
             />
             <div className="mt-4 grid grid-cols-3 gap-2">
               {persona.animalTypes.slice(0, 3).map((animal) => (
@@ -270,8 +267,9 @@ export default function PublicProfileForm({
       </section>
 
       <fieldset
+        id="photo-visibility"
         disabled={isSubmitting}
-        className="rounded-3xl border border-neutral-200/80 bg-white p-5 shadow-sm"
+        className="scroll-mt-6 rounded-3xl border border-neutral-200/80 bg-white p-5 shadow-sm"
       >
         <legend className="px-1 text-sm font-bold text-neutral-900">
           나이 공개 범위
