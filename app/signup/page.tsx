@@ -84,7 +84,7 @@ export default function SignupPage() {
           회원가입
         </h1>
         <p className="mt-3 text-sm leading-6 text-neutral-600">
-          이메일로 간단히 계정을 만들고 매칭 여정을 이어가세요.
+          이메일로 간단히 계정을 만들고 캐릭터와 대화를 이어가세요.
         </p>
       </header>
 

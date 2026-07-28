@@ -140,7 +140,7 @@ export default function RequestsManager({
               : "text-neutral-500"
           }`}
         >
-          받은 요청 {receivedCount}
+          받은 인사 {receivedCount}
         </button>
         <button
           type="button"
@@ -153,7 +153,7 @@ export default function RequestsManager({
               : "text-neutral-500"
           }`}
         >
-          보낸 요청 {sentCount}
+          보낸 인사 {sentCount}
         </button>
       </div>
 
@@ -173,8 +173,8 @@ export default function RequestsManager({
           </span>
           <h2 className="mt-4 text-lg font-bold text-neutral-900">
             {tab === "received"
-              ? "아직 받은 대화 신청이 없어요"
-              : "아직 보낸 대화 신청이 없어요"}
+              ? "아직 받은 인사가 없어요"
+              : "아직 보낸 인사가 없어요"}
           </h2>
           <p className="mt-2 text-sm leading-6 text-neutral-500">
             캐릭터를 둘러보고 편하게 대화를 시작해보세요.
@@ -216,12 +216,12 @@ export default function RequestsManager({
                   >
                     {item.status === "pending"
                       ? tab === "received"
-                        ? "답변 필요"
+                        ? "확인 필요"
                         : "대기 중"
                       : item.status === "accepted"
-                        ? "수락됨"
+                        ? "대화 열림"
                         : item.status === "declined"
-                          ? "연결 안 됨"
+                          ? "이번에는 패스"
                           : "취소됨"}
                   </span>
                 </div>
@@ -259,7 +259,7 @@ export default function RequestsManager({
                     >
                       {isProcessing
                         ? "채팅방 여는 중..."
-                        : "채팅 시작하기"}
+                        : "열린 대화로 이동"}
                     </ActionButton>
                   </div>
                 )}
@@ -277,7 +277,7 @@ export default function RequestsManager({
                         )
                       }
                     >
-                      {isProcessing ? "처리 중..." : "거절"}
+                      {isProcessing ? "처리 중..." : "다음에"}
                     </ActionButton>
                     <ActionButton
                       disabled={Boolean(processingId)}
@@ -289,7 +289,7 @@ export default function RequestsManager({
                         )
                       }
                     >
-                      {isProcessing ? "처리 중..." : "수락"}
+                      {isProcessing ? "처리 중..." : "대화 열기"}
                     </ActionButton>
                   </div>
                 )}
@@ -303,7 +303,7 @@ export default function RequestsManager({
                         mutateRequest(item.requestId, "cancel")
                       }
                     >
-                      {isProcessing ? "취소 중..." : "신청 취소"}
+                      {isProcessing ? "취소 중..." : "보낸 인사 취소"}
                     </ActionButton>
                   </div>
                 )}

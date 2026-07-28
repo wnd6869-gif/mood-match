@@ -48,7 +48,7 @@ export default async function ChatsPage() {
           이어서 이야기해요
         </h1>
         <p className="mt-3 text-sm leading-6 text-neutral-600">
-          수락한 대화 신청에서 시작된 채팅만 표시돼요.
+          서로 인사를 받아 대화가 열린 채팅만 표시돼요.
         </p>
       </header>
 

@@ -70,7 +70,7 @@ export function getChatListItemFromRecord(
     otherPersonaTitle:
       typeof record.other_persona_title === "string"
         ? record.other_persona_title
-        : "페르소나 정보 없음",
+        : "캐릭터 정보 없음",
     otherMoodKeywords: parseStringArray(record.other_mood_keywords),
     createdAt: record.created_at,
     lastMessageAt:
@@ -117,7 +117,7 @@ export function getDirectConversationContextFromRecord(
     otherPersonaTitle:
       typeof record.other_persona_title === "string"
         ? record.other_persona_title
-        : "페르소나 정보 없음",
+        : "캐릭터 정보 없음",
     isMuted: record.is_muted === true,
     isHidden: record.is_hidden === true,
     isBlocked: record.is_blocked === true,

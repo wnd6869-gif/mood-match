@@ -215,7 +215,7 @@ export default async function DiscoverProfilePage({
 
           <section className="mt-6 border-t border-neutral-100 pt-5">
             <h2 className="text-xs font-bold text-neutral-400">
-              페르소나 분위기
+              캐릭터 분위기
             </h2>
             <div className="mt-3">
               <TagList values={profile.moodKeywords} />

@@ -78,7 +78,7 @@ export function getBlockedUserFromRecord(
     personaTitle:
       typeof record.persona_title === "string"
         ? record.persona_title
-        : "페르소나 정보 없음",
+        : "캐릭터 정보 없음",
     blockedAt: record.blocked_at,
   };
 }

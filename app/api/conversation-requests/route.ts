@@ -28,7 +28,7 @@ function jsonResponse(
 function getRpcErrorResponse(message: string | undefined) {
   if (message === "self_request") {
     return jsonResponse(
-      { error: "자기 자신에게는 대화를 신청할 수 없어요." },
+      { error: "자기 자신에게는 대화를 걸 수 없어요." },
       400,
     );
   }
@@ -36,7 +36,7 @@ function getRpcErrorResponse(message: string | undefined) {
   if (message === "already_pending") {
     return jsonResponse(
       {
-        error: "이미 대화를 신청했어요. 보낸 요청에서 상태를 확인해주세요.",
+        error: "이미 인사를 보냈어요. 보낸 인사에서 상태를 확인해주세요.",
         code: "already_pending",
       },
       409,
@@ -46,7 +46,7 @@ function getRpcErrorResponse(message: string | undefined) {
   if (message === "reverse_pending") {
     return jsonResponse(
       {
-        error: "상대가 이미 대화를 신청했어요.",
+        error: "상대가 먼저 인사를 보냈어요.",
         code: "reverse_pending",
       },
       409,
@@ -55,7 +55,7 @@ function getRpcErrorResponse(message: string | undefined) {
 
   if (message === "already_connected") {
     return jsonResponse(
-      { error: "이미 대화가 연결된 사용자예요.", code: "accepted" },
+      { error: "이미 대화가 열려 있는 사용자예요.", code: "accepted" },
       409,
     );
   }
@@ -77,7 +77,7 @@ function getRpcErrorResponse(message: string | undefined) {
         error:
           message === "target_not_one_to_one"
             ? "상대가 현재 1:1 대화를 받지 않아요."
-            : "현재 대화를 신청할 수 없는 프로필이에요.",
+            : "현재 대화를 걸 수 없는 프로필이에요.",
       },
       403,
     );
@@ -85,7 +85,7 @@ function getRpcErrorResponse(message: string | undefined) {
 
   if (message === "message_too_long") {
     return jsonResponse(
-      { error: "신청 메시지는 120자 이하로 입력해주세요." },
+      { error: "첫 인사는 120자 이하로 입력해주세요." },
       400,
     );
   }
@@ -129,7 +129,7 @@ export async function POST(request: Request) {
 
   if (userError || !user) {
     return jsonResponse(
-      { error: "로그인 후 대화 요청을 이용해주세요." },
+      { error: "로그인 후 대화 걸기를 이용해주세요." },
       401,
     );
   }
@@ -155,7 +155,7 @@ export async function POST(request: Request) {
 
     if (body.targetUserId === user.id) {
       return jsonResponse(
-        { error: "자기 자신에게는 대화를 신청할 수 없어요." },
+        { error: "자기 자신에게는 대화를 걸 수 없어요." },
         400,
       );
     }
@@ -166,7 +166,7 @@ export async function POST(request: Request) {
       typeof body.message !== "string"
     ) {
       return jsonResponse(
-        { error: "신청 메시지 형식이 올바르지 않아요." },
+        { error: "첫 인사 형식이 올바르지 않아요." },
         400,
       );
     }
@@ -176,7 +176,7 @@ export async function POST(request: Request) {
 
     if (message.length > 120) {
       return jsonResponse(
-        { error: "신청 메시지는 120자 이하로 입력해주세요." },
+        { error: "첫 인사는 120자 이하로 입력해주세요." },
         400,
       );
     }
@@ -194,7 +194,7 @@ export async function POST(request: Request) {
     }
 
     return jsonResponse({
-      message: "대화 신청을 보냈어요.",
+      message: "가볍게 인사를 보냈어요.",
       requestId: data,
     });
   }
@@ -235,8 +235,8 @@ export async function POST(request: Request) {
     return jsonResponse({
       message:
         body.response === "accepted"
-          ? "대화 신청을 수락했어요."
-          : "대화 신청을 거절했어요.",
+          ? "대화가 열렸어요."
+          : "이번 인사는 넘겼어요.",
     });
   }
 
@@ -250,7 +250,7 @@ export async function POST(request: Request) {
       return getRpcErrorResponse(error.message);
     }
 
-    return jsonResponse({ message: "대화 신청을 취소했어요." });
+    return jsonResponse({ message: "보낸 인사를 취소했어요." });
   }
 
   return jsonResponse({ error: "지원하지 않는 요청이에요." }, 400);

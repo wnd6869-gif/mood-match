@@ -227,7 +227,7 @@ export default async function AdminUsersPage({
               <article className="rounded-2xl border border-neutral-200 bg-white p-5">
                 <h4 className="font-bold">프로필 요약</h4>
                 <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-                  <Detail label="페르소나" value={asString(detailUser.personaTitle, "없음")} />
+                  <Detail label="AI 캐릭터" value={asString(detailUser.personaTitle, "없음")} />
                   <Detail label="공개 상태" value={detailUser.isPublic === true ? "공개" : "비공개"} />
                   <Detail label="성별" value={asString(detailUser.gender, "미입력")} />
                   <Detail label="선호 성별" value={asString(detailUser.preferredGender, "미입력")} />

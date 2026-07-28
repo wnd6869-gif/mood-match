@@ -128,7 +128,8 @@ export default async function DiscoverPage({
           오늘은 누구와 이야기할까요?
         </h1>
         <p className="mt-3 text-sm leading-6 text-neutral-600">
-          공개된 AI 페르소나와 대화 취향을 보고 편하게 인사를 건네보세요.
+          이런 캐릭터는 어때요? 분위기와 대화 취향을 보고 편하게 인사를
+          건네보세요.
         </p>
       </header>
 

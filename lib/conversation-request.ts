@@ -179,7 +179,7 @@ export function getConversationRequestListItemFromRecord(
     otherPersonaTitle:
       typeof record.other_persona_title === "string"
         ? record.other_persona_title
-        : "페르소나 정보 없음",
+        : "캐릭터 정보 없음",
     message:
       typeof record.message === "string" ? record.message : null,
     status: record.status,
@@ -202,14 +202,14 @@ export function getConversationRequestStatusText(
   }
 
   if (status === "accepted") {
-    return "수락됨";
+    return "대화가 열렸어요";
   }
 
   if (status === "declined") {
-    return "이번 대화는 연결되지 않았어요.";
+    return "이번에는 대화가 이어지지 않았어요.";
   }
 
-  return "취소됨";
+  return "보낸 인사를 취소했어요";
 }
 
 export function formatConversationRequestDate(value: string) {

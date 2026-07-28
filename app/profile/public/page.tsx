@@ -78,7 +78,7 @@ export default async function PublicProfilePage() {
           다른 사람에게 보일 나
         </h1>
         <p className="mt-3 text-sm leading-6 text-neutral-600">
-          AI 페르소나를 중심으로 공개할 정보와 범위를 정해주세요.
+          AI 캐릭터를 중심으로 공개할 정보와 범위를 정해주세요.
         </p>
       </header>
 

@@ -196,10 +196,10 @@ export default async function MyPage() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-xs font-semibold text-neutral-400">
-                내 페르소나
+                내 AI 캐릭터
               </p>
               <h2 className="mt-2 text-lg font-bold text-neutral-900">
-                {persona?.personaTitle ?? "아직 분석된 페르소나가 없어요"}
+                {persona?.personaTitle ?? "아직 만든 AI 캐릭터가 없어요"}
               </h2>
             </div>
             {persona && (
@@ -237,7 +237,7 @@ export default async function MyPage() {
               role="alert"
               className="mt-4 rounded-2xl bg-amber-50 px-4 py-3 text-sm leading-5 text-amber-800"
             >
-              페르소나 정보를 불러오지 못했어요. personas SQL 실행 여부를
+              캐릭터 정보를 불러오지 못했어요. personas SQL 실행 여부를
               확인해주세요.
             </p>
           )}
@@ -248,11 +248,11 @@ export default async function MyPage() {
               variant="secondary"
               ariaLabel={
                 persona
-                  ? "내 페르소나 결과 상세보기"
-                  : "사진을 업로드하고 페르소나 만들기"
+                  ? "내 AI 캐릭터 결과 상세보기"
+                  : "사진을 업로드하고 AI 캐릭터 만들기"
               }
             >
-              {persona ? "결과 상세보기" : "페르소나 만들기"}
+              {persona ? "결과 상세보기" : "AI 캐릭터 만들기"}
             </ActionLink>
           </div>
         </section>
@@ -288,14 +288,14 @@ export default async function MyPage() {
           {!persona ? (
             <>
               <p className="mt-3 text-sm leading-6 text-neutral-600">
-                먼저 AI 페르소나를 만들어주세요.
+                먼저 AI 캐릭터를 만들어주세요.
               </p>
               <ActionLink
                 href="/upload"
                 className="mt-5"
-                ariaLabel="사진을 업로드하고 AI 페르소나 만들기"
+                ariaLabel="사진을 업로드하고 AI 캐릭터 만들기"
               >
-                AI 페르소나 만들기
+                AI 캐릭터 만들기
               </ActionLink>
             </>
           ) : (
@@ -365,8 +365,7 @@ export default async function MyPage() {
             새로운 캐릭터와 이야기해보세요
           </h2>
           <p className="mt-2 text-sm leading-6 text-neutral-600">
-            공개 페르소나를 둘러보고 받은 신청과 보낸 신청을 관리할 수
-            있어요.
+            공개 캐릭터를 둘러보고 주고받은 인사를 관리할 수 있어요.
           </p>
           <div className="mt-5 space-y-3">
             <ActionLink
@@ -378,14 +377,14 @@ export default async function MyPage() {
             <ActionLink
               href="/requests?tab=received"
               variant="secondary"
-              ariaLabel={`받은 대화 신청 확인${
+              ariaLabel={`받은 인사 확인${
                 pendingReceivedCount
                   ? `, 대기 중 ${pendingReceivedCount}개`
                   : ""
               }`}
             >
               <span className="flex items-center gap-2">
-                받은 대화 신청
+                받은 인사
                 {Boolean(pendingReceivedCount) && (
                   <span className="flex min-w-6 items-center justify-center rounded-full bg-coral-500 px-2 py-0.5 text-xs font-bold text-white">
                     {pendingReceivedCount}
@@ -396,9 +395,9 @@ export default async function MyPage() {
             <ActionLink
               href="/requests?tab=sent"
               variant="secondary"
-              ariaLabel="보낸 대화 신청 확인"
+              ariaLabel="보낸 인사 확인"
             >
-              보낸 대화 신청
+              보낸 인사
             </ActionLink>
           </div>
         </section>

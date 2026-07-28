@@ -512,7 +512,7 @@ export default function ProfilePhotoUpload({
         disabled={!previewUrl || isBusy}
         onClick={handleAnalyze}
         className="mt-6"
-        aria-label="선택한 사진을 업로드하고 페르소나 분석 시작하기"
+        aria-label="선택한 사진을 업로드하고 AI 캐릭터 분석 시작하기"
       >
         {isProcessing
           ? "이미지 준비 중..."

@@ -8,8 +8,15 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Mood Match",
-  description: "사진으로 시작하는 가벼운 페르소나 매칭",
+  title: "Mood Match | AI 캐릭터 채팅",
+  description:
+    "사진 한 장으로 내 분위기를 담은 AI 캐릭터를 만들고, 다른 사람의 캐릭터를 둘러보며 편하게 대화해보세요.",
+  openGraph: {
+    title: "Mood Match | AI 캐릭터 채팅",
+    description:
+      "사진 한 장으로 내 분위기를 담은 AI 캐릭터를 만들고, 다른 사람의 캐릭터를 둘러보며 편하게 대화해보세요.",
+    type: "website",
+  },
 };
 
 export const viewport: Viewport = {

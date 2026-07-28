@@ -46,7 +46,8 @@ export default async function ProfileSetupPage() {
           프로필 {profile ? "수정" : "작성"}
         </h1>
         <p className="mt-3 text-sm leading-6 text-neutral-600">
-          매칭에 사용할 기본 정보를 입력해주세요. 언제든 다시 수정할 수 있어요.
+          캐릭터 프로필에 사용할 기본 정보를 입력해주세요. 언제든 다시
+          수정할 수 있어요.
         </p>
       </header>
 

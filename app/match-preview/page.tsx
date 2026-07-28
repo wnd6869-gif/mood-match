@@ -7,9 +7,9 @@ import StoredIdealSummary from "@/components/stored-ideal-summary";
 import type { VisualTraits } from "@/lib/animal-archetypes";
 
 const MATCH_POINTS = [
-  "선호 visual archetype 우선 비교",
-  "여섯 가지 visual traits 균형 반영",
-  "동물상 취향은 보조 기준으로 반영",
+  "선택한 캐릭터 분위기를 먼저 비교",
+  "여섯 가지 시각적 분위기를 고르게 반영",
+  "동물상 취향은 가볍게 참고",
 ] as const;
 
 const MATCH_CANDIDATE: {
@@ -34,15 +34,17 @@ const MATCH_CANDIDATE: {
 export default function MatchPreviewPage() {
   return (
     <AppShell>
-      <BackLink href="/ideal" ariaLabel="이상형 선택 화면으로 돌아가기" />
-      <StepProgress current={5} total={5} label="매칭 미리보기" />
+      <BackLink href="/ideal" ariaLabel="관심 스타일 선택 화면으로 돌아가기" />
+      <StepProgress current={5} total={5} label="캐릭터 추천" />
 
       <header className="mt-7">
-        <p className="text-sm font-semibold text-coral-600">이상형 미리보기</p>
+        <p className="text-sm font-semibold text-coral-600">
+          이런 캐릭터는 어때요?
+        </p>
         <h1 className="mt-2 text-3xl font-bold leading-tight tracking-tight text-neutral-900">
-          잘 어울리는 인연을
+          대화가 잘 맞을 수 있는
           <br />
-          찾았어요
+          캐릭터를 찾았어요
         </h1>
       </header>
 
@@ -58,7 +60,7 @@ export default function MatchPreviewPage() {
           />
 
           <span className="relative inline-flex rounded-full border border-white bg-white/80 px-3 py-1 text-[0.6875rem] font-bold tracking-[0.14em] text-coral-700 shadow-sm">
-            BEST MATCH
+            CHAT PICK
           </span>
           <div
             role="img"
@@ -78,7 +80,7 @@ export default function MatchPreviewPage() {
         <div className="p-5">
           <div>
             <h3 className="text-base font-bold text-neutral-900">
-              두 사람이 잘 맞는 이유
+              대화가 잘 맞을 수 있는 이유
             </h3>
             <StoredIdealSummary
               candidateTraits={MATCH_CANDIDATE.visualTraits}
@@ -87,7 +89,7 @@ export default function MatchPreviewPage() {
           </div>
 
           <div className="mt-6 border-t border-neutral-100 pt-5">
-            <h3 className="text-base font-bold text-neutral-900">매칭 포인트</h3>
+            <h3 className="text-base font-bold text-neutral-900">대화 포인트</h3>
             <ul className="mt-4 space-y-3">
               {MATCH_POINTS.map((point) => (
                 <li
@@ -120,14 +122,14 @@ export default function MatchPreviewPage() {
 
       <div className="mt-6 space-y-3">
         <ActionButton
-          aria-label="서윤 매칭 결과에 마음에 들어요 표시하기"
+          aria-label="서윤 캐릭터와 대화해보고 싶다고 표시하기"
           aria-describedby="prototype-note"
         >
-          마음에 들어요
+          대화해보고 싶어요
         </ActionButton>
         <ActionButton
           variant="secondary"
-          aria-label="서윤 매칭 결과를 다음에 보기"
+          aria-label="서윤 캐릭터를 다음에 보기"
           aria-describedby="prototype-note"
         >
           다음에 볼게요
@@ -139,7 +141,7 @@ export default function MatchPreviewPage() {
         id="prototype-note"
         className="mt-4 text-center text-xs leading-5 text-neutral-400"
       >
-        현재 매칭 결과는 체험용 데이터이며 저장되지 않아요.
+        현재 캐릭터 추천은 체험용 데이터이며 저장되지 않아요.
       </p>
     </AppShell>
   );

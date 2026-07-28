@@ -33,7 +33,7 @@ const IDEAL_QUESTIONS = [
     key: "preferredAnimal",
     title: "특히 끌리는 동물상이 있나요?",
     description:
-      "선택하지 않아도 괜찮아요. 매칭에서는 분위기 취향을 더 중요하게 봐요.",
+      "선택하지 않아도 괜찮아요. 캐릭터 추천에서는 분위기를 더 중요하게 봐요.",
     options: PREFERRED_ANIMAL_OPTIONS.map((value) => ({
       value,
       label: value,
@@ -64,26 +64,26 @@ export default function IdealPage() {
 
   return (
     <AppShell>
-      <BackLink href="/result" ariaLabel="페르소나 결과 화면으로 돌아가기" />
-      <StepProgress current={4} total={5} label="이상형 선택" />
+      <BackLink href="/result" ariaLabel="AI 캐릭터 결과 화면으로 돌아가기" />
+      <StepProgress current={4} total={5} label="관심 스타일" />
 
       <header className="mt-7">
         <div className="flex items-center justify-between gap-4">
           <p className="text-sm font-semibold text-coral-600">
-            나의 이상형 찾기
+            관심 가는 캐릭터 찾기
           </p>
           <span className="shrink-0 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-neutral-500 shadow-sm">
             필수 {isComplete ? "1 / 1 완료" : "0 / 1"}
           </span>
         </div>
         <h1 className="mt-2 text-3xl font-bold leading-tight tracking-tight text-neutral-900">
-          어떤 사람에게
+          어떤 캐릭터가
           <br />
-          마음이 가나요?
+          눈에 들어오나요?
         </h1>
         <p className="mt-3 text-sm leading-6 text-neutral-600">
-          공통 분위기를 먼저 고르고, 원한다면 동물상 취향을
-          더해주세요.
+          편하게 이야기해보고 싶은 분위기를 먼저 고르고, 원한다면 동물상
+          취향을 더해주세요.
         </p>
       </header>
 
@@ -191,9 +191,9 @@ export default function IdealPage() {
           type="submit"
           disabled={!isComplete}
           className="mt-6"
-          aria-label="선택한 답변으로 이상형 완성하기"
+          aria-label="선택한 관심 스타일로 캐릭터 추천 보기"
         >
-          내 이상형 완성하기
+          이 스타일로 캐릭터 보기
         </ActionButton>
       </form>
 

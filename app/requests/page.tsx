@@ -51,13 +51,13 @@ export default async function RequestsPage({
     <AppShell>
       <header className="pt-2">
         <p className="text-sm font-semibold text-coral-600">
-          대화 신청
+          대화 연결
         </p>
         <h1 className="mt-2 text-3xl font-bold leading-tight tracking-tight text-neutral-900">
-          요청을 확인해보세요
+          주고받은 인사를 확인해보세요
         </h1>
         <p className="mt-3 text-sm leading-6 text-neutral-600">
-          받은 신청에 답하거나 내가 보낸 신청의 상태를 확인할 수 있어요.
+          받은 인사에 답하거나 내가 먼저 건넨 인사의 상태를 확인할 수 있어요.
         </p>
       </header>
 

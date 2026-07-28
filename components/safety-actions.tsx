@@ -204,7 +204,7 @@ export default function ProfileSafetyMenu({
     if (
       isBlocking ||
       !window.confirm(
-        "차단하면 서로의 공개 프로필이 보이지 않고, 새로운 대화 신청과 메시지 전송이 제한돼요.",
+        "차단하면 서로의 공개 프로필이 보이지 않고, 새로운 대화 걸기와 메시지 전송이 제한돼요.",
       )
     ) {
       return;

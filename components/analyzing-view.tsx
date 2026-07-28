@@ -20,7 +20,7 @@ import {
 const ANALYSIS_STEPS = [
   "사진의 인상과 분위기를 살펴보는 중",
   "어울리는 동물상을 찾는 중",
-  "나만의 페르소나를 만드는 중",
+  "나만의 AI 캐릭터를 만드는 중",
 ] as const;
 
 type AnalyzingViewProps = {
@@ -159,7 +159,7 @@ export default function AnalyzingView({
         aria-busy={status === "loading"}
       >
         <p className="text-sm font-semibold text-coral-600">
-          AI 페르소나 만들기
+          AI 캐릭터 만들기
         </p>
 
         <div className="relative mt-10 flex size-28 items-center justify-center">

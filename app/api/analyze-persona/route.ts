@@ -393,7 +393,7 @@ export async function POST(request: Request) {
     return jsonResponse(
       {
         error:
-          "저장된 페르소나를 확인하지 못했어요. personas SQL 실행 여부를 확인해주세요.",
+          "저장된 AI 캐릭터를 확인하지 못했어요. personas SQL 실행 여부를 확인해주세요.",
       },
       503,
     );

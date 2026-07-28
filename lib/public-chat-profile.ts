@@ -7,8 +7,8 @@ export const AGE_VISIBILITY_OPTIONS = [
 export const PHOTO_VISIBILITY_OPTIONS = [
   {
     value: "persona_only",
-    label: "페르소나 이미지만 공개",
-    description: "실제 사진 없이 AI 페르소나 카드만 보여줘요.",
+    label: "AI 캐릭터만 공개",
+    description: "실제 사진 없이 AI 캐릭터 카드만 보여줘요.",
   },
   {
     value: "mutual",
@@ -23,13 +23,13 @@ export const PHOTO_VISIBILITY_OPTIONS = [
 ] as const;
 
 export const CONVERSATION_GOAL_OPTIONS = [
-  { value: "casual_chat", label: "가볍게 잡담" },
-  { value: "hobby_chat", label: "취미 이야기" },
-  { value: "고민_나누기", label: "고민 나누기" },
-  { value: "new_friends", label: "새로운 친구" },
+  { value: "casual_chat", label: "가볍게 이야기하고 싶어요" },
+  { value: "new_friends", label: "새로운 사람을 알아가고 싶어요" },
+  { value: "hobby_chat", label: "취향이 비슷한 사람을 만나고 싶어요" },
+  { value: "고민_나누기", label: "천천히 친해지고 싶어요" },
   {
     value: "relationship_open",
-    label: "좋은 사람이면 관계 발전도 열어두기",
+    label: "좋은 인연이 생기면 열려 있어요",
   },
 ] as const;
 
@@ -53,7 +53,7 @@ export const CONVERSATION_TOPIC_OPTIONS = [
   { value: "운동", label: "운동" },
   { value: "게임", label: "게임" },
   { value: "책", label: "책" },
-  { value: "연애", label: "연애" },
+  { value: "연애", label: "관계 이야기" },
   { value: "고민", label: "고민" },
   { value: "직장", label: "직장" },
   { value: "아무말", label: "아무 말" },

@@ -51,7 +51,7 @@ export default function PublicProfileVisual({
   return (
     <div
       role="img"
-      aria-label={`${personaTitle} 페르소나 스타일 카드`}
+      aria-label={`${personaTitle} AI 캐릭터 카드`}
       className={`flex ${sizeClasses} flex-col items-center justify-center bg-gradient-to-br from-coral-50 via-white to-neutral-100 px-6 text-center`}
     >
       <span className="flex size-12 items-center justify-center rounded-full bg-white text-xl shadow-sm">

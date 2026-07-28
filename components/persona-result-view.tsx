@@ -36,7 +36,7 @@ export default function PersonaResultView({
           ariaLabel="사진 선택 화면으로 돌아가기"
           label="사진 선택"
         />
-        <StepProgress current={3} total={5} label="페르소나 결과" />
+        <StepProgress current={3} total={5} label="캐릭터 결과" />
 
         <div className="flex flex-1 flex-col justify-center py-10 text-center">
           <span className="mx-auto flex size-16 items-center justify-center rounded-full bg-coral-50 text-coral-600">
@@ -59,7 +59,7 @@ export default function PersonaResultView({
             분석 결과가 없어요
           </h1>
           <p className="mt-3 text-sm leading-6 text-neutral-600">
-            사진 분석을 먼저 완료하면 실제 페르소나 결과를 확인할 수 있어요.
+            사진 분석을 먼저 완료하면 내 AI 캐릭터를 확인할 수 있어요.
           </p>
           <div className="mt-7 space-y-3">
             <ActionLink
@@ -88,11 +88,11 @@ export default function PersonaResultView({
         ariaLabel="사진 선택 화면으로 돌아가기"
         label="사진 선택"
       />
-      <StepProgress current={3} total={5} label="페르소나 결과" />
+      <StepProgress current={3} total={5} label="캐릭터 결과" />
 
       <header className="mt-7">
         <p className="text-sm font-semibold text-coral-600">
-          나의 분위기 페르소나
+          사진에서 느껴진 나의 캐릭터
         </p>
         <h1 className="mt-2 text-3xl font-bold leading-tight tracking-tight text-neutral-900">
           {result.personaTitle}
@@ -182,9 +182,9 @@ export default function PersonaResultView({
       <div className="mt-6 space-y-3">
         <ActionLink
           href="/ideal"
-          ariaLabel="이상형 질문 선택 화면으로 이동하기"
+          ariaLabel="관심 가는 캐릭터 분위기 선택 화면으로 이동하기"
         >
-          내 이상형 찾아보기
+          관심 스타일 골라보기
         </ActionLink>
         <ReanalyzeButton />
         <ActionLink

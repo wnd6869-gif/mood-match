@@ -183,17 +183,17 @@ export default async function PublicProfilePreviewPage() {
       {!persona ? (
         <section className="mt-6 rounded-3xl border border-neutral-200/80 bg-white p-5 shadow-sm">
           <h2 className="text-lg font-bold text-neutral-900">
-            먼저 AI 페르소나를 만들어주세요
+            먼저 AI 캐릭터를 만들어주세요
           </h2>
           <p className="mt-2 text-sm leading-6 text-neutral-600">
-            공개 프로필의 중심이 되는 페르소나 분석 결과가 필요해요.
+            공개 프로필의 중심이 되는 AI 캐릭터 분석 결과가 필요해요.
           </p>
           <ActionLink
             href="/upload"
             className="mt-5"
-            ariaLabel="사진을 업로드하고 AI 페르소나 만들기"
+            ariaLabel="사진을 업로드하고 AI 캐릭터 만들기"
           >
-            AI 페르소나 만들기
+            AI 캐릭터 만들기
           </ActionLink>
         </section>
       ) : (
@@ -202,7 +202,7 @@ export default async function PublicProfilePreviewPage() {
             {profile.photo_visibility === "persona_only" ? (
               <div
                 role="img"
-                aria-label={`${persona.personaTitle} 페르소나 스타일 카드`}
+                aria-label={`${persona.personaTitle} AI 캐릭터 카드`}
                 className="flex aspect-[4/3] flex-col items-center justify-center bg-gradient-to-br from-coral-50 via-white to-neutral-100 px-8 text-center"
               >
                 <span className="flex size-16 items-center justify-center rounded-full bg-white text-2xl shadow-sm">
@@ -278,7 +278,7 @@ export default async function PublicProfilePreviewPage() {
 
             <section className="mt-6 border-t border-neutral-100 pt-5">
               <h3 className="text-xs font-bold text-neutral-400">
-                페르소나 분위기
+                캐릭터 분위기
               </h3>
               <div className="mt-3">
                 <TagList

@@ -70,13 +70,13 @@ export default function ConversationRequestButton({
       if (!response.ok) {
         setFeedback(
           data?.error ??
-            "대화 신청을 보내지 못했어요. 잠시 후 다시 시도해주세요.",
+            "인사를 보내지 못했어요. 잠시 후 다시 시도해주세요.",
         );
         setShowReceivedLink(data?.code === "reverse_pending");
         return;
       }
 
-      setFeedback(data?.message ?? "대화 신청을 보냈어요.");
+      setFeedback(data?.message ?? "가볍게 인사를 보냈어요.");
       setIsOpen(false);
       router.refresh();
     } catch {
@@ -91,8 +91,8 @@ export default function ConversationRequestButton({
   if (requestStatus === "accepted") {
     return (
       <div>
-        <ActionButton disabled aria-label="이미 대화가 연결됨">
-          대화 연결됨
+        <ActionButton disabled aria-label="이미 대화가 열림">
+          대화가 열렸어요
         </ActionButton>
       </div>
     );
@@ -103,13 +103,13 @@ export default function ConversationRequestButton({
       return (
         <div className="space-y-3">
           <p className="rounded-2xl bg-coral-50 px-4 py-3 text-sm leading-5 text-coral-800">
-            상대가 이미 대화를 신청했어요.
+            이 캐릭터가 먼저 인사를 건넸어요.
           </p>
           <Link
             href="/requests?tab=received"
             className="flex min-h-14 w-full cursor-pointer items-center justify-center rounded-2xl bg-neutral-900 px-5 py-3.5 text-base font-semibold text-white transition-all hover:bg-neutral-800 active:scale-[0.98]"
           >
-            받은 요청 확인하기
+            받은 인사 확인하기
           </Link>
         </div>
       );
@@ -117,11 +117,11 @@ export default function ConversationRequestButton({
 
     return (
       <div>
-        <ActionButton disabled aria-label="이미 보낸 대화 신청">
-          대화 신청 보냄
+        <ActionButton disabled aria-label="이미 인사를 보냄">
+          인사를 보냈어요
         </ActionButton>
         <p className="mt-2 text-center text-xs text-neutral-400">
-          보낸 요청 화면에서 상태를 확인할 수 있어요.
+          보낸 인사 화면에서 상태를 확인할 수 있어요.
         </p>
       </div>
     );
@@ -130,8 +130,8 @@ export default function ConversationRequestButton({
   if (!canReceiveOneToOne) {
     return (
       <div>
-        <ActionButton disabled aria-label="현재 1대1 대화 신청 불가">
-          현재 1:1 신청을 받지 않아요
+        <ActionButton disabled aria-label="현재 1대1 대화 시작 불가">
+          지금은 1:1 대화를 받지 않아요
         </ActionButton>
       </div>
     );
@@ -145,9 +145,9 @@ export default function ConversationRequestButton({
           setShowReceivedLink(false);
           setIsOpen(true);
         }}
-        aria-label={`${targetNickname}님에게 대화 신청하기`}
+        aria-label={`${targetNickname}님에게 가볍게 대화 걸기`}
       >
-        대화 신청하기
+        대화 걸기
       </ActionButton>
 
       {feedback && !isOpen && (
@@ -164,7 +164,7 @@ export default function ConversationRequestButton({
           href="/requests?tab=received"
           className="mt-3 flex min-h-12 w-full cursor-pointer items-center justify-center rounded-2xl border border-neutral-200 bg-white px-4 text-sm font-semibold text-neutral-700"
         >
-          받은 요청으로 이동
+          받은 인사로 이동
         </Link>
       )}
 
@@ -177,7 +177,7 @@ export default function ConversationRequestButton({
         >
           <button
             type="button"
-            aria-label="대화 신청 창 닫기"
+            aria-label="대화 걸기 창 닫기"
             className="absolute inset-0 cursor-default"
             onClick={() => {
               if (!isSubmitting) {
@@ -190,7 +190,7 @@ export default function ConversationRequestButton({
             <div className="mt-4 flex items-start justify-between gap-4 sm:mt-0">
               <div>
                 <p className="text-xs font-semibold text-coral-600">
-                  1:1 대화 신청
+                  가벼운 1:1 대화
                 </p>
                 <h2
                   id="conversation-request-title"
@@ -202,7 +202,7 @@ export default function ConversationRequestButton({
               <button
                 type="button"
                 disabled={isSubmitting}
-                aria-label="대화 신청 창 닫기"
+                aria-label="대화 걸기 창 닫기"
                 onClick={() => setIsOpen(false)}
                 className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-neutral-100 text-neutral-500 transition-colors hover:bg-neutral-200 disabled:cursor-not-allowed"
               >
@@ -212,10 +212,14 @@ export default function ConversationRequestButton({
               </button>
             </div>
 
+            <p className="mt-3 rounded-2xl bg-coral-50 px-4 py-3 text-sm leading-6 text-coral-800">
+              가벼운 인사부터 시작해보세요. 상대가 답하면 대화가 열려요.
+            </p>
+
             <label htmlFor="conversation-intro" className="mt-5 block">
               <span className="flex items-center justify-between gap-3">
                 <span className="text-sm font-semibold text-neutral-800">
-                  신청 메시지 <span className="text-neutral-400">(선택)</span>
+                  첫 인사 <span className="text-neutral-400">(선택)</span>
                 </span>
                 <span className="text-xs font-medium text-neutral-400">
                   {introMessage.length}/120
@@ -247,7 +251,7 @@ export default function ConversationRequestButton({
                 href="/requests?tab=received"
                 className="mt-3 flex min-h-12 w-full cursor-pointer items-center justify-center rounded-2xl border border-neutral-200 text-sm font-semibold text-neutral-700"
               >
-                받은 요청으로 이동
+                받은 인사로 이동
               </Link>
             )}
 
@@ -255,9 +259,9 @@ export default function ConversationRequestButton({
               <ActionButton
                 onClick={handleSend}
                 disabled={isSubmitting}
-                aria-label={`${targetNickname}님에게 대화 신청 보내기`}
+                aria-label={`${targetNickname}님에게 첫 인사 보내기`}
               >
-                {isSubmitting ? "보내는 중..." : "신청 보내기"}
+                {isSubmitting ? "보내는 중..." : "인사 보내기"}
               </ActionButton>
               <ActionButton
                 variant="secondary"

@@ -26,7 +26,7 @@ type PublicProfileFormProps = {
 
 const PHOTO_GUIDANCE: Record<PhotoVisibility, string> = {
   persona_only:
-    "다른 사용자에게는 실제 사진 대신 페르소나 스타일 카드가 보여요.",
+    "다른 사용자에게는 실제 사진 대신 AI 캐릭터 카드가 보여요.",
   mutual:
     "다른 사용자에게는 흐린 사진만 보이고, 서로 동의한 경우에만 실제 사진을 공개할 수 있어요.",
   public:
@@ -89,7 +89,7 @@ export default function PublicProfileForm({
     }
 
     if (isPublic && !persona) {
-      setErrorMessage("공개 프로필을 활성화하려면 AI 페르소나가 필요해요.");
+      setErrorMessage("공개 프로필을 활성화하려면 AI 캐릭터가 필요해요.");
       return;
     }
 
@@ -157,10 +157,10 @@ export default function PublicProfileForm({
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-xs font-semibold text-coral-600">
-              AI 페르소나 미리보기
+              AI 캐릭터 미리보기
             </p>
             <h2 className="mt-1.5 text-xl font-bold text-neutral-900">
-              {persona?.personaTitle ?? "페르소나가 아직 없어요"}
+              {persona?.personaTitle ?? "AI 캐릭터가 아직 없어요"}
             </h2>
           </div>
           {persona && (
@@ -208,15 +208,15 @@ export default function PublicProfileForm({
         ) : (
           <div className="mt-4">
             <p className="text-sm leading-6 text-neutral-600">
-              사진 분석을 완료하면 페르소나와 추천 닉네임을 불러올 수 있어요.
+              사진 분석을 완료하면 AI 캐릭터와 추천 닉네임을 불러올 수 있어요.
             </p>
             <ActionLink
               href="/upload"
               variant="secondary"
               className="mt-4"
-              ariaLabel="사진을 업로드하고 AI 페르소나 만들기"
+              ariaLabel="사진을 업로드하고 AI 캐릭터 만들기"
             >
-              AI 페르소나 만들기
+              AI 캐릭터 만들기
             </ActionLink>
           </div>
         )}
@@ -372,7 +372,7 @@ export default function PublicProfileForm({
           </button>
         </div>
         <p className="mt-4 rounded-2xl bg-coral-50 px-4 py-3 text-xs leading-5 text-coral-800">
-          저장 전 확인: 공개를 켜면 닉네임, 페르소나와 선택한 대화
+          저장 전 확인: 공개를 켜면 닉네임, AI 캐릭터와 선택한 대화
           설정이 다른 로그인 사용자에게 보여요. 이메일과 생년월일 원본은
           공개되지 않아요. 대화 설정까지 완료한 뒤 공개 목록에 반영돼요.
         </p>
