@@ -14,6 +14,13 @@ import {
   PROFILE_PHOTO_BUCKET,
   PROFILE_PHOTO_MAX_SIZE_BYTES,
 } from "@/lib/profile-photo";
+import {
+  getPhotoEligibilityErrorMessage,
+  isPhotoEligible,
+  parsePhotoEligibility,
+  PHOTO_ELIGIBILITY_REASON_CODES,
+  type PhotoEligibility,
+} from "@/lib/photo-eligibility";
 import { getModerationStateFromRecord } from "@/lib/moderation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -25,6 +32,7 @@ const PROFILE_PHOTO_PATH = "profile.webp";
 
 type AnalysisOutput = {
   result: PersonaAnalysisResult;
+  photoEligibility: PhotoEligibility;
   modelName: string;
   inputTokens: number | null;
   outputTokens: number | null;
@@ -40,6 +48,37 @@ type AnalysisClaim = {
 const PERSONA_RESULT_SCHEMA = {
   type: "object",
   properties: {
+    photoEligibility: {
+      type: "object",
+      properties: {
+        isEligible: { type: "boolean" },
+        personCount: { type: "integer", minimum: 0, maximum: 10 },
+        faceLargeEnough: { type: "boolean" },
+        faceSharpEnough: { type: "boolean" },
+        faceFrontFacing: { type: "boolean" },
+        leftEyeVisible: { type: "boolean" },
+        rightEyeVisible: { type: "boolean" },
+        noseVisible: { type: "boolean" },
+        mouthVisible: { type: "boolean" },
+        reasonCode: {
+          type: "string",
+          enum: PHOTO_ELIGIBILITY_REASON_CODES,
+        },
+      },
+      required: [
+        "isEligible",
+        "personCount",
+        "faceLargeEnough",
+        "faceSharpEnough",
+        "faceFrontFacing",
+        "leftEyeVisible",
+        "rightEyeVisible",
+        "noseVisible",
+        "mouthVisible",
+        "reasonCode",
+      ],
+      additionalProperties: false,
+    },
     animalTypes: {
       type: "array",
       minItems: 3,
@@ -90,6 +129,7 @@ const PERSONA_RESULT_SCHEMA = {
     },
   },
   required: [
+    "photoEligibility",
     "animalTypes",
     "moodKeywords",
     "personaTitle",
@@ -104,6 +144,12 @@ const PERSONA_INSTRUCTIONS = `
 당신은 사진에서 느껴지는 가벼운 분위기를 동물 페르소나로 표현하는 한국어 카피라이터입니다.
 
 반드시 지킬 원칙:
+- 가장 먼저 photoEligibility를 판정합니다.
+- isEligible은 사진 속 실제 사람이 정확히 한 명이고, 그 사람의 얼굴이 충분히 크게 나온 정면 또는 준정면이며, 두 눈·코·입이 모두 선명하게 보일 때만 true입니다.
+- 다른 사람의 얼굴이나 신체 일부가 추가로 보이면 multiple_people입니다. 콜라주나 화면 속 사람처럼 사람 얼굴이 여러 개 보이는 이미지도 허용하지 않습니다.
+- 얼굴이 너무 작거나, 흐리거나, 어둡거나, 옆모습이라 한쪽 눈이 안 보이거나, 얼굴이 사진 밖으로 잘렸으면 허용하지 않습니다.
+- 선글라스·마스크·손·머리카락·소품 등으로 두 눈·코·입 중 하나라도 명확히 가려지면 허용하지 않습니다. 일반 안경은 두 눈이 선명하게 보일 때만 허용합니다.
+- isEligible이 false여도 JSON 스키마의 나머지 페르소나 필드는 형식에 맞게 채웁니다. 서버는 부적합 사진의 페르소나 결과를 사용하지 않습니다.
 - 사진에서 직접 보이는 표정, 자세, 스타일링, 색감, 구도에서 느껴지는 인상만 다룹니다.
 - 실제 성격을 단정하지 말고 "사진에서는 ~한 인상이 느껴져요"처럼 표현합니다.
 - 결과는 따뜻하고 긍정적이며 부담 없는 한국어로 작성합니다.
@@ -192,7 +238,7 @@ async function requestPersonaAnalysis(
           content: [
             {
               type: "input_text",
-              text: "이 사진에서 느껴지는 인상과 분위기만 바탕으로 동물 페르소나 결과를 만들어주세요.",
+              text: "먼저 한 명의 얼굴과 두 눈·코·입이 모두 선명하게 보이는 사진인지 엄격히 판정한 뒤, 적합한 경우에만 사진에서 느껴지는 인상과 분위기를 바탕으로 동물 페르소나 결과를 만들어주세요.",
             },
             {
               type: "input_image",
@@ -224,14 +270,33 @@ async function requestPersonaAnalysis(
     }
 
     try {
-      const parsed = parsePersonaAnalysisResult(
-        JSON.parse(response.output_text),
-        { requireVisualTraits: true },
-      );
+      const rawOutput = JSON.parse(response.output_text) as unknown;
+      const photoEligibility =
+        rawOutput && typeof rawOutput === "object"
+          ? parsePhotoEligibility(
+              (rawOutput as Record<string, unknown>).photoEligibility,
+            )
+          : null;
 
-      if (parsed) {
+      if (photoEligibility && !isPhotoEligible(photoEligibility)) {
+        return {
+          result: SAFE_PERSONA_RESULT,
+          photoEligibility,
+          modelName,
+          inputTokens: hasUsage ? inputTokens : null,
+          outputTokens: hasUsage ? outputTokens : null,
+          totalTokens: hasUsage ? totalTokens : null,
+        };
+      }
+
+      const parsed = parsePersonaAnalysisResult(rawOutput, {
+        requireVisualTraits: true,
+      });
+
+      if (photoEligibility && parsed) {
         return {
           result: parsed,
+          photoEligibility,
           modelName,
           inputTokens: hasUsage ? inputTokens : null,
           outputTokens: hasUsage ? outputTokens : null,
@@ -243,13 +308,7 @@ async function requestPersonaAnalysis(
     }
   }
 
-  return {
-    result: SAFE_PERSONA_RESULT,
-    modelName,
-    inputTokens: hasUsage ? inputTokens : null,
-    outputTokens: hasUsage ? outputTokens : null,
-    totalTokens: hasUsage ? totalTokens : null,
-  };
+  throw new Error("OpenAI photo eligibility output was invalid");
 }
 
 function parseForceRequest(value: unknown) {
@@ -557,6 +616,32 @@ export async function POST(request: Request) {
       `data:image/webp;base64,${imageBuffer.toString("base64")}`,
       safetyIdentifier,
     );
+
+    if (!isPhotoEligible(analysis.photoEligibility)) {
+      const { error: cancellationError } = await supabase.rpc(
+        "cancel_persona_analysis",
+        { p_log_id: claimLogId },
+      );
+
+      if (!cancellationError) {
+        claimLogId = null;
+      } else if (process.env.NODE_ENV === "development") {
+        console.error("[persona-analysis] 부적합 사진 분석 예약 취소 실패", {
+          code: cancellationError.code,
+          message: cancellationError.message,
+        });
+      }
+
+      return jsonResponse(
+        {
+          code: "photo_requirements_not_met",
+          error: getPhotoEligibilityErrorMessage(
+            analysis.photoEligibility,
+          ),
+        },
+        422,
+      );
+    }
 
     const { error: saveError } = await supabase.from("personas").upsert(
       {
