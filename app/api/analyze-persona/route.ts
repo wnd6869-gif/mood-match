@@ -11,7 +11,9 @@ import {
   type PersonaRecord,
 } from "@/lib/persona-record";
 import {
+  detectProfilePhotoMimeType,
   PROFILE_PHOTO_BUCKET,
+  PROFILE_PHOTO_FILE_NAMES,
   PROFILE_PHOTO_MAX_SIZE_BYTES,
 } from "@/lib/profile-photo";
 import {
@@ -28,7 +30,6 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 const OPENAI_MODEL = "gpt-5.6";
-const PROFILE_PHOTO_PATH = "profile.webp";
 
 type AnalysisOutput = {
   result: PersonaAnalysisResult;
@@ -175,14 +176,6 @@ function jsonResponse(body: unknown, status = 200) {
       "Cache-Control": "no-store",
     },
   });
-}
-
-function isWebP(bytes: Uint8Array) {
-  return (
-    bytes.length >= 12 &&
-    String.fromCharCode(...bytes.slice(0, 4)) === "RIFF" &&
-    String.fromCharCode(...bytes.slice(8, 12)) === "WEBP"
-  );
 }
 
 function safeErrorDetails(error: unknown) {
@@ -392,6 +385,24 @@ async function getStoredPersona(
   };
 }
 
+async function downloadStoredProfilePhoto(
+  supabase: NonNullable<Awaited<ReturnType<typeof createClient>>>,
+  userId: string,
+) {
+  for (const fileName of PROFILE_PHOTO_FILE_NAMES) {
+    const objectPath = `${userId}/${fileName}`;
+    const { data, error } = await supabase.storage
+      .from(PROFILE_PHOTO_BUCKET)
+      .download(objectPath);
+
+    if (!error && data) {
+      return { imageBlob: data, objectPath };
+    }
+  }
+
+  return null;
+}
+
 export async function POST(request: Request) {
   const requestOrigin = request.headers.get("origin");
 
@@ -559,20 +570,14 @@ export async function POST(request: Request) {
     }
 
     claimLogId = claim.log_id;
-    const objectPath = `${user.id}/${PROFILE_PHOTO_PATH}`;
-    const { data: imageBlob, error: downloadError } =
-      await supabase.storage
-        .from(PROFILE_PHOTO_BUCKET)
-        .download(objectPath);
+    const storedPhoto = await downloadStoredProfilePhoto(
+      supabase,
+      user.id,
+    );
 
-    if (downloadError || !imageBlob) {
+    if (!storedPhoto) {
       if (process.env.NODE_ENV === "development") {
-        console.error("[persona-analysis] Storage 다운로드 실패", {
-          name: downloadError?.name,
-          message: downloadError?.message,
-          status: downloadError?.status,
-          statusCode: downloadError?.statusCode,
-        });
+        console.error("[persona-analysis] Storage 사진을 찾지 못함");
       }
 
       return jsonResponse(
@@ -580,6 +585,8 @@ export async function POST(request: Request) {
         404,
       );
     }
+
+    const { imageBlob, objectPath } = storedPhoto;
 
     if (
       imageBlob.size === 0 ||
@@ -592,10 +599,14 @@ export async function POST(request: Request) {
     }
 
     const imageBuffer = Buffer.from(await imageBlob.arrayBuffer());
+    const imageContentType = detectProfilePhotoMimeType(imageBuffer);
 
-    if (!isWebP(imageBuffer)) {
+    if (!imageContentType) {
       return jsonResponse(
-        { error: "WebP 형식의 프로필 사진이 필요해요. 사진을 다시 올려주세요." },
+        {
+          error:
+            "JPEG, PNG 또는 WebP 형식의 프로필 사진이 필요해요. 사진을 다시 올려주세요.",
+        },
         400,
       );
     }
@@ -615,7 +626,7 @@ export async function POST(request: Request) {
       .digest("hex");
     const analysis = await requestPersonaAnalysis(
       openai,
-      `data:image/webp;base64,${imageBuffer.toString("base64")}`,
+      `data:${imageContentType};base64,${imageBuffer.toString("base64")}`,
       safetyIdentifier,
     );
 
