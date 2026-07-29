@@ -15,6 +15,7 @@ import {
 import {
   getPersonaResultFromRecord,
   getCharacterCompositionFromRecord,
+  getCharacterRecipeFromRecord,
   PERSONA_SELECT_COLUMNS,
   type PersonaRecord,
 } from "@/lib/persona-record";
@@ -80,6 +81,9 @@ export default async function HomePage() {
   const personaComposition = getCharacterCompositionFromRecord(
     personaResponse.data as PersonaRecord | null,
   );
+  const characterRecipe = getCharacterRecipeFromRecord(
+    personaResponse.data as PersonaRecord | null,
+  );
   const publicProfile = getPublicChatProfileFromRecord(
     profileResponse.data,
   );
@@ -118,6 +122,7 @@ export default async function HomePage() {
               animalTypes={persona.animalTypes}
               personaTitle={persona.personaTitle}
               composition={personaComposition ?? undefined}
+              recipe={characterRecipe ?? undefined}
               className="min-h-44"
             />
             <div className="flex flex-col justify-center p-5">
