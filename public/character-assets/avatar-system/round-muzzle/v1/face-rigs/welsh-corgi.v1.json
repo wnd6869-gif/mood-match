@@ -1,0 +1,33 @@
+{
+  "version": "round-muzzle-v1",
+  "animalId": "welsh-corgi",
+  "faceFamily": "round-muzzle",
+  "coordinateSystem": "face-centers-v1",
+  "sourceAssets": {
+    "sharedExpressionFamily": "round-muzzle",
+    "expressionAssetVersion": "v1",
+    "roundGlasses": "/character-assets/approval/golden-retriever-v2/mvp/png/accessories/round-glasses.png"
+  },
+  "anchors": {
+    "noseCenter": { "x": 512, "y": 432 },
+    "eyeCenter": { "x": 512, "y": 350 },
+    "browCenter": { "x": 512, "y": 289 },
+    "mouthCenter": { "x": 512, "y": 467 }
+  },
+  "layers": {
+    "eyes": { "offsetX": 0, "offsetY": 0, "scaleX": 0.98, "scaleY": 0.98, "rotation": 0 },
+    "eyebrows": { "offsetX": 0, "offsetY": 0, "scaleX": 0.9, "scaleY": 0.9, "rotation": 0 },
+    "mouth": { "offsetX": 0, "offsetY": 10, "scaleX": 0.94, "scaleY": 0.94, "rotation": 0 },
+    "glasses": { "offsetX": 0, "offsetY": 0, "scaleX": 1, "scaleY": 1, "rotation": 0 }
+  },
+  "colors": { "eyes": "#392116", "eyebrows": "#5d321c", "mouth": "#5a2e1d" },
+  "expressionTransformOverrides": {
+    "gentle": {},
+    "bright": { "eyes": { "deltaY": -4, "scaleX": 1.08, "scaleY": 1.08 }, "eyebrows": { "deltaY": -7, "scaleX": 1.04, "scaleY": 1.04, "rotation": 3 }, "mouth": { "deltaY": -2, "scaleX": 1.1, "scaleY": 1.08 } },
+    "chic": { "eyes": { "deltaY": 2, "scaleX": 0.9, "scaleY": 0.9 }, "eyebrows": { "deltaY": 3, "scaleX": 0.9, "scaleY": 0.9 }, "mouth": { "deltaY": 3, "scaleX": 0.88, "scaleY": 0.88 } },
+    "confident": { "eyes": { "deltaY": -2, "scaleX": 1.03, "scaleY": 1.03 }, "eyebrows": { "deltaY": -4, "scaleX": 1.1, "scaleY": 1.08, "rotation": -4 }, "mouth": { "deltaY": 1, "scaleX": 1.05, "scaleY": 1.03 } },
+    "playful": { "eyes": { "deltaY": -3, "scaleX": 1.08, "scaleY": 1.06 }, "eyebrows": { "deltaY": -8, "scaleX": 1.1, "scaleY": 1.08, "rotation": 5 }, "mouth": { "deltaX": 5, "deltaY": -1, "scaleX": 1.1, "scaleY": 1.06, "rotation": -6 } }
+  },
+  "approvedAt": "2026-07-29",
+  "qaSnapshotId": "welsh-corgi-round-muzzle-v1-approved"
+}

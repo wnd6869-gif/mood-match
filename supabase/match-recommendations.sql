@@ -33,7 +33,13 @@ create table if not exists public.match_preferences (
         '햄스터',
         '곰',
         '늑대',
-        '사슴'
+        '사슴',
+        '펭귄',
+        '카피바라',
+        '라쿤',
+        '미어캣',
+        '부엉이',
+        '알파카'
       )
     )
 );

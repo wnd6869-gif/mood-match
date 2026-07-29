@@ -1,4 +1,6 @@
 import type { PersonaAnalysisResult } from "@/lib/persona-analysis";
+import { isCharacterRecipe } from "@/lib/persona-record";
+import type { CharacterRecipe } from "@/lib/character-casting";
 import {
   getPublicChatProfileFromRecord,
   type PublicChatProfile,
@@ -32,6 +34,7 @@ export type DiscoverableProfile = Omit<PublicChatProfile, "id"> & {
   requestId: string | null;
   requestStatus: ConversationRequestStatus | null;
   requestDirection: ConversationRequestDirection | null;
+  characterRecipe: CharacterRecipe | null;
 };
 
 export type ConversationRequestListItem = {
@@ -145,6 +148,9 @@ export function getDiscoverableProfileFromRecord(
       : null,
     requestDirection: isRequestDirection(record.request_direction)
       ? record.request_direction
+      : null,
+    characterRecipe: isCharacterRecipe(record.character_recipe)
+      ? record.character_recipe
       : null,
   };
 }

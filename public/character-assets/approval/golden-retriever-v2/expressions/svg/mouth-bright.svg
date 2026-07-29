@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="eyeFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a0d06"/>
+      <stop offset="0.58" stop-color="#3c1609"/>
+      <stop offset="1" stop-color="#74320d"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M458 527 Q512 566 566 527 Q512 579 458 527 Z" fill="#4a190d" stroke="#7b2f14" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M483 550 Q512 564 541 550" fill="none" stroke="#b55b3d" stroke-width="4" stroke-linecap="round"/>
+
+</svg>

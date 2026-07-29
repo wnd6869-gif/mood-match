@@ -1,0 +1,24 @@
+{
+  "id": "cat",
+  "version": "v1",
+  "status": "approved",
+  "expressions": ["gentle", "bright", "chic", "confident", "playful"],
+  "layers": ["eyes", "eyebrows", "nose-mouth"],
+  "sourceExpressionRoot": "/character-assets/avatar-system/cat/v1/expressions",
+  "accessories": { "roundGlasses": "/character-assets/avatar-system/cat/v1/accessories/round-glasses.svg" },
+  "outfitBases": {
+    "russian-blue-navy-cardigan": { "animalId": "russian-blue", "file": "/character-assets/animals/russian-blue/navy-cardigan/russian-blue.navy-cardigan-base.v2.png" },
+    "ragdoll-dusty-lavender-cardigan": { "animalId": "ragdoll", "file": "/character-assets/animals/ragdoll/dusty-lavender-cardigan/ragdoll-dusty-lavender-cardigan-base.v2.png" }
+    ,"scottish-fold-olive-knit": { "animalId": "scottish-fold", "file": "/character-assets/animals/scottish-fold/olive-knit/scottish-fold-olive-knit-base.png" }
+  },
+  "faceRigPresets": {
+    "russian-blue.navy-cardigan.v1.json": "eacdae8e23e3102d3a466cebe868fe2c8e6cbbcca97648b1ae2b4304f27a7f82",
+    "ragdoll.dusty-lavender-cardigan.v1.json": "c6c19a8d40c080f482731264e1b5160cb05e5ed19d6cb17df8c4f9a1aad4a6bd",
+    "scottish-fold.olive-knit.v1.json": "47fc02fc8dd868bd6df22ec40bfeb70db3fa987678057b038c38b71714568b79"
+  },
+  "invariants": [
+    "Cat expression SVGs are independent from round-muzzle v1 and use one nose-mouth layer.",
+    "An animal-outfit base is a complete fixed illustration.",
+    "One immutable animal FaceRig is reused by every future approved outfit base for that animal."
+  ]
+}

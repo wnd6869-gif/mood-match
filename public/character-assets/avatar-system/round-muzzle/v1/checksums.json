@@ -1,0 +1,9 @@
+{
+  "algorithm": "sha256",
+  "sourceRoot": "/character-assets/expressions/round-muzzle",
+  "gentle": { "eyes": "0fb0c48db7e4ca352e06e9a7fa8af34cf6ea33d4f109ddd82315e035f8cd19bb", "eyebrows": "7b00b5a627b103180f89e688fe6adbbb09368dcfff061d8c52e34569d3fb1b5e", "mouth": "91cd92eb018cd71e77a41bee630e8b84065bbd787218e9e4b4b5d679d20cfe84" },
+  "bright": { "eyes": "8e89118c4ab61cc70201cd6ca9b7baf63dcd053177a61c2192d663496c7c5db3", "eyebrows": "60b6e6adaae124d5bf7e8aa85354afd63cc7c98aed432e87413b4b0ebe0fee95", "mouth": "f08448b3506fc662016d3f1e14fefccc6326cbfefb89b86f1c34d02a042941a7" },
+  "chic": { "eyes": "125dcb9a8c12498a3780b5b7e653fa2c99de8cb559fffa8201f1a509522a6817", "eyebrows": "31e72ad9160901ab8ef301dbeba64de6936c01686cf6e337a9b316cf8af369e7", "mouth": "6acb4a8d471bccdcd8aa0bf46e0e826c343ae78b9a1e64309057fa457b4cfff4" },
+  "confident": { "eyes": "24afa3fa893db75131f156751168fab7a9746d29c92c6c70bbe847dfc7d82162", "eyebrows": "249ee9ad0d3d3c4c979dcc4157a441a4f91c7acefe9b2e077fa0a4a214d3c879", "mouth": "5ecf738b8b99c0d703faee9677f76942d46b19ff4f5473313c220a6af636d295" },
+  "playful": { "eyes": "a14bc0f0c2a4621280e29979ce919afb5149bad5acdcbfd4f206b4177e3806e1", "eyebrows": "9677bc3f661f27914f5134f980950fbb3ff52d993e4eed4c48003e363ecebade", "mouth": "7af6be0495ec11351098927fb748210d4fcf916e3b88cab978d37f600bd9c153" }
+}

@@ -1,0 +1,18 @@
+{
+  "version": "round-muzzle-v1",
+  "faceFamily": "round-muzzle",
+  "anchors": {
+    "noseCenter": { "x": 0, "y": 0 },
+    "eyes": { "x": 0, "y": 0, "scaleX": 1, "scaleY": 1, "rotation": 0 },
+    "eyebrows": { "x": 0, "y": 0, "scaleX": 1, "scaleY": 1, "rotation": 0 },
+    "mouth": { "x": 0, "y": 0, "scaleX": 1, "scaleY": 1, "rotation": 0 }
+  },
+  "colors": { "eyes": "#32140c", "eyebrows": "#5b2615", "mouth": "#5b2615" },
+  "expressionTransformOverrides": {
+    "gentle": {},
+    "bright": {},
+    "chic": {},
+    "confident": {},
+    "playful": {}
+  }
+}

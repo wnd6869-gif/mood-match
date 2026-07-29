@@ -23,6 +23,7 @@ export type ChatListItem = {
   lastMessagePreview: string | null;
   isMuted: boolean;
   unreadCount: number;
+  characterRecipe?: unknown;
 };
 
 export type ConversationContext = {
@@ -37,6 +38,7 @@ export type ConversationContext = {
   isMuted: boolean;
   isHidden: boolean;
   isBlocked: boolean;
+  otherCharacterRecipe?: unknown;
 };
 
 export type GroupChatCandidate = {
@@ -179,6 +181,7 @@ export function getChatListItemFromRecord(
         : typeof record.unread_count === "string"
           ? Math.max(0, Number(record.unread_count) || 0)
           : 0,
+    characterRecipe: record.other_character_recipe,
   };
 }
 
@@ -230,6 +233,7 @@ export function getConversationContextFromRecord(
     isMuted: record.is_muted === true,
     isHidden: record.is_hidden === true,
     isBlocked: record.is_blocked === true,
+    otherCharacterRecipe: record.other_character_recipe,
   };
 }
 

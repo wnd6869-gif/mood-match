@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="eyeFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a0d06"/>
+      <stop offset="0.58" stop-color="#3c1609"/>
+      <stop offset="1" stop-color="#74320d"/>
+    </linearGradient>
+  </defs>
+
+  <ellipse cx="436" cy="414" rx="20" ry="22" fill="url(#eyeFill)" stroke="#210a05" stroke-width="3"/>
+  <ellipse cx="436" cy="416" rx="14" ry="16" fill="#180704"/>
+  <circle cx="429" cy="406" r="4.5" fill="#fffdf6"/>
+
+  <ellipse cx="588" cy="414" rx="20" ry="22" fill="url(#eyeFill)" stroke="#210a05" stroke-width="3"/>
+  <ellipse cx="588" cy="416" rx="14" ry="16" fill="#180704"/>
+  <circle cx="581" cy="406" r="4.5" fill="#fffdf6"/>
+
+</svg>

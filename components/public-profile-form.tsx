@@ -6,6 +6,7 @@ import { ActionButton, ActionLink } from "@/components/action";
 import CharacterAvatar from "@/components/character-avatar";
 import ChoiceCard from "@/components/choice-card";
 import type { PersonaAnalysisResult } from "@/lib/persona-analysis";
+import type { CharacterComposition } from "@/lib/character/character-types";
 import {
   AGE_VISIBILITY_OPTIONS,
   PHOTO_VISIBILITY_OPTIONS,
@@ -19,6 +20,7 @@ type PublicProfileFormProps = {
   userId: string;
   initialSettings: PublicChatProfile;
   persona: PersonaAnalysisResult | null;
+  composition?: CharacterComposition | null;
   initialLoadFailed?: boolean;
 };
 
@@ -33,6 +35,7 @@ export default function PublicProfileForm({
   userId,
   initialSettings,
   persona,
+  composition,
   initialLoadFailed = false,
 }: PublicProfileFormProps) {
   const router = useRouter();
@@ -180,6 +183,7 @@ export default function PublicProfileForm({
             <CharacterAvatar
               animalTypes={persona.animalTypes}
               personaTitle={persona.personaTitle}
+              composition={composition ?? undefined}
               className="mt-5 aspect-square rounded-[2rem] shadow-sm"
             />
             <div className="mt-4 grid grid-cols-3 gap-2">

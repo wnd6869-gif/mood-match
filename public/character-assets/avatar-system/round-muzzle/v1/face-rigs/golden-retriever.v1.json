@@ -1,0 +1,26 @@
+{
+  "version": "round-muzzle-v1",
+  "animalId": "golden-retriever",
+  "faceFamily": "round-muzzle",
+  "coordinateSystem": "face-centers-v1",
+  "sourceAssets": {
+    "sharedExpressionFamily": "round-muzzle",
+    "expressionAssetVersion": "v1",
+    "roundGlasses": "/character-assets/approval/golden-retriever-v2/mvp/png/accessories/round-glasses.png"
+  },
+  "anchors": {
+    "noseCenter": { "x": 512, "y": 404 },
+    "eyeCenter": { "x": 511.5, "y": 325.5 },
+    "browCenter": { "x": 509.5, "y": 266.5 },
+    "mouthCenter": { "x": 511.5, "y": 456.5 }
+  },
+  "layers": {
+    "eyes": { "offsetX": 0, "offsetY": 0, "scaleX": 1, "scaleY": 1, "rotation": 0 },
+    "eyebrows": { "offsetX": 0, "offsetY": 0, "scaleX": 1, "scaleY": 1, "rotation": 0 },
+    "mouth": { "offsetX": 0, "offsetY": 0, "scaleX": 1, "scaleY": 1, "rotation": 0 },
+    "glasses": { "offsetX": 0, "offsetY": 0, "scaleX": 1, "scaleY": 1, "rotation": 0 }
+  },
+  "colors": { "eyes": "#32140c", "eyebrows": "#793805", "mouth": "#5b2615" },
+  "approvedAt": "2026-07-28",
+  "qaSnapshotId": "golden-round-muzzle-v1"
+}

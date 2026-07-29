@@ -117,6 +117,11 @@ export const ANIMAL_ARCHETYPE_MAP = {
   셰퍼드: ["reliable_strong", "smart_stylish"],
   리트리버: ["friendly_warm", "bright_playful"],
   진돗개: ["reliable_strong", "calm_mysterious"],
+  카피바라: ["friendly_warm", "reliable_strong"],
+  라쿤: ["bright_playful", "friendly_warm"],
+  미어캣: ["friendly_warm", "smart_stylish"],
+  부엉이: ["smart_stylish", "calm_mysterious"],
+  알파카: ["cute_cozy", "bright_playful"],
 } as const satisfies Record<string, readonly VisualArchetype[]>;
 
 export const PREFERRED_ANIMAL_OPTIONS = [
@@ -129,6 +134,12 @@ export const PREFERRED_ANIMAL_OPTIONS = [
   "곰",
   "늑대",
   "사슴",
+  "펭귄",
+  "카피바라",
+  "라쿤",
+  "미어캣",
+  "부엉이",
+  "알파카",
   "상관없음",
 ] as const;
 

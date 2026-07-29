@@ -1,0 +1,33 @@
+{
+  "version": "round-muzzle-v1",
+  "animalId": "otter",
+  "faceFamily": "round-muzzle",
+  "coordinateSystem": "face-centers-v1",
+  "sourceAssets": {
+    "sharedExpressionFamily": "round-muzzle",
+    "expressionAssetVersion": "v1",
+    "roundGlasses": "/character-assets/approval/golden-retriever-v2/mvp/png/accessories/round-glasses.png"
+  },
+  "anchors": {
+    "noseCenter": { "x": 512, "y": 456 },
+    "eyeCenter": { "x": 511.507, "y": 265.48 },
+    "browCenter": { "x": 509.5725, "y": 205.6915 },
+    "mouthCenter": { "x": 510.328, "y": 422.5445 }
+  },
+  "layers": {
+    "eyes": { "offsetX": 0, "offsetY": 0, "scaleX": 1.018, "scaleY": 1.04, "rotation": 0 },
+    "eyebrows": { "offsetX": 0, "offsetY": 0, "scaleX": 0.955, "scaleY": 0.967, "rotation": 0 },
+    "mouth": { "offsetX": 0, "offsetY": 0, "scaleX": 1.328, "scaleY": 1.171, "rotation": 0 },
+    "glasses": { "offsetX": 0, "offsetY": 0, "scaleX": 1, "scaleY": 1, "rotation": 0 }
+  },
+  "colors": { "eyes": "#2b1a13", "eyebrows": "#3c2015", "mouth": "#542a1d" },
+  "expressionTransformOverrides": {
+    "gentle": {},
+    "bright": { "eyes": { "deltaX": 11.464207, "deltaY": 0.94208, "scaleX": 1.101, "scaleY": 1.096 }, "eyebrows": { "deltaX": -0.07197, "deltaY": -8.170797, "scaleX": 1.028, "scaleY": 1.035, "rotation": 3 }, "mouth": { "deltaX": 3.950704, "deltaY": 1.385361, "scaleX": 1.118, "scaleY": 1.098 } },
+    "chic": { "eyes": { "deltaX": -6.442644, "deltaY": -1.94208, "scaleX": 0.908, "scaleY": 0.904 }, "eyebrows": { "deltaX": 0.013123, "deltaY": 5.194489, "scaleX": 0.981, "scaleY": 0.966 }, "mouth": { "deltaX": 0.012712, "deltaY": 2.478251, "scaleX": 0.929, "scaleY": 0.927 } },
+    "confident": { "eyes": { "deltaX": 4.426773, "deltaY": -0.04376, "scaleX": 1.039, "scaleY": 1.038 }, "eyebrows": { "deltaX": -0.013123, "deltaY": -4.194489, "scaleX": 1.019, "scaleY": 1.034, "rotation": -4 }, "mouth": { "deltaX": 1.963416, "deltaY": 3.829068, "scaleX": 1.047, "scaleY": 1.024 } },
+    "playful": { "eyes": { "deltaX": 11.464207, "deltaY": 0.94208, "scaleX": 1.101, "scaleY": 1.096 }, "eyebrows": { "deltaX": -0.130818, "deltaY": -10.365286, "scaleX": 1.037, "scaleY": 1.069, "rotation": 5 }, "mouth": { "deltaX": 15.950704, "deltaY": 1.521748, "scaleX": 1.118, "scaleY": 1.073, "rotation": -6 } }
+  },
+  "approvedAt": "2026-07-29",
+  "qaSnapshotId": "otter-expression-focus-qa-approved"
+}

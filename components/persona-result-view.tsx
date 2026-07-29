@@ -4,22 +4,30 @@ import { ActionLink } from "@/components/action";
 import AppShell from "@/components/app-shell";
 import BackLink from "@/components/back-link";
 import CharacterAvatar from "@/components/character-avatar";
+import AvatarRenderer from "@/components/avatar-renderer";
 import ResetFlowButton from "@/components/reset-flow-button";
 import ReanalyzeButton from "@/components/reanalyze-button";
 import StepProgress from "@/components/step-progress";
 import usePrototypeData from "@/hooks/use-prototype-data";
 import type { PersonaAnalysisResult } from "@/lib/persona-analysis";
+import { mapAnalysisToCharacter } from "@/lib/character/character-mapper";
+import type { CharacterComposition } from "@/lib/character/character-types";
+import type { CharacterRecipe } from "@/lib/character-casting";
 
 type PersonaResultViewProps = {
   userId: string;
   serverResult: PersonaAnalysisResult | null;
   personaIdentity: string | null;
+  serverComposition: CharacterComposition | null;
+  serverRecipe: CharacterRecipe | null;
 };
 
 export default function PersonaResultView({
   userId,
   serverResult,
   personaIdentity,
+  serverComposition,
+  serverRecipe,
 }: PersonaResultViewProps) {
   const { personaAnalysis } = usePrototypeData();
   const result =
@@ -81,6 +89,8 @@ export default function PersonaResultView({
     );
   }
 
+  const characterComposition = serverComposition ?? mapAnalysisToCharacter(result, userId);
+
   return (
     <AppShell>
       <BackLink
@@ -91,12 +101,11 @@ export default function PersonaResultView({
       <StepProgress current={3} total={5} label="캐릭터 결과" />
 
       <section className="relative mt-7 overflow-hidden rounded-[2.25rem] bg-neutral-900 text-white shadow-[0_22px_55px_rgba(23,23,23,0.16)]">
-        <CharacterAvatar
-          animalTypes={result.animalTypes}
-          personaTitle={result.personaTitle}
-          priority
-          className="aspect-square w-full"
-        />
+        {serverRecipe ? (
+          <AvatarRenderer recipe={serverRecipe} size={256} priority className="aspect-square w-full" alt={`${result.personaTitle} AI 동물 캐릭터`} />
+        ) : (
+          <CharacterAvatar animalTypes={result.animalTypes} personaTitle={result.personaTitle} priority composition={characterComposition} className="aspect-square w-full" />
+        )}
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-neutral-950/90 via-neutral-950/45 to-transparent px-6 pb-6 pt-20">
           <p className="text-xs font-bold tracking-[0.15em] text-white/75">
             MY ANIMAL CHARACTER

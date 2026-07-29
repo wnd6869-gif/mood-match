@@ -1,0 +1,34 @@
+{
+  "version": "pointed-muzzle-v1",
+  "animalId": "shiba-inu",
+  "outfitBaseId": "shiba-inu-olive-hoodie",
+  "faceFamily": "pointed-muzzle",
+  "coordinateSystem": "face-centers-v1",
+  "sourceAssets": {
+    "sharedExpressionFamily": "pointed-muzzle",
+    "expressionAssetVersion": "v1",
+    "roundGlasses": "/character-assets/avatar-system/pointed-muzzle/v1/accessories/round-glasses.svg"
+  },
+  "anchors": {
+    "noseCenter": { "x": 512, "y": 414 },
+    "eyeCenter": { "x": 512, "y": 300 },
+    "browCenter": { "x": 512, "y": 238 },
+    "snoutMark": { "x": 512, "y": 456 }
+  },
+  "layers": {
+    "eyes": { "offsetX": 0, "offsetY": 0, "scaleX": 0.96, "scaleY": 0.96, "rotation": 0 },
+    "eyebrows": { "offsetX": 0, "offsetY": 0, "scaleX": 0.92, "scaleY": 0.92, "rotation": 0 },
+    "snoutMark": { "offsetX": 0, "offsetY": 0, "scaleX": 0.92, "scaleY": 0.92, "rotation": 0 },
+    "glasses": { "offsetX": 0, "offsetY": 0, "scaleX": 0.92, "scaleY": 0.92, "rotation": 0 }
+  },
+  "colors": { "eyes": "#3a2016", "eyebrows": "#613722", "snoutMark": "#593126" },
+  "expressionTransformOverrides": {
+    "gentle": {},
+    "bright": { "eyes": { "deltaY": -3, "scaleX": 1.08, "scaleY": 1.10 }, "eyebrows": { "deltaY": -5, "rotation": 2 }, "snoutMark": { "deltaY": -1, "scaleX": 1.02, "scaleY": 1.02 } },
+    "chic": { "eyes": { "deltaY": 1, "scaleX": 0.94, "scaleY": 0.90 }, "eyebrows": { "deltaY": 2, "scaleX": 0.94, "scaleY": 0.94 }, "snoutMark": { "deltaY": 1, "scaleX": 0.98, "scaleY": 0.98 } },
+    "confident": { "eyes": { "deltaY": -1, "scaleX": 1.02, "scaleY": 0.98 }, "eyebrows": { "deltaY": -3, "scaleX": 1.05, "rotation": -3 }, "snoutMark": { "deltaY": 1, "scaleX": 1 } },
+    "playful": { "eyes": { "deltaY": -2, "scaleX": 1.04, "scaleY": 1.02 }, "eyebrows": { "deltaY": -6, "scaleX": 1.06, "rotation": 4 }, "snoutMark": { "deltaX": 2, "deltaY": 0, "scaleX": 1.02, "rotation": -2 } }
+  },
+  "approvedAt": null,
+  "qaSnapshotId": "shiba-inu-pointed-muzzle-v1-candidate"
+}

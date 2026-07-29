@@ -5,6 +5,7 @@ import BackLink from "@/components/back-link";
 import PublicProfileForm from "@/components/public-profile-form";
 import {
   getPersonaResultFromRecord,
+  getCharacterCompositionFromRecord,
   PERSONA_SELECT_COLUMNS,
   type PersonaRecord,
 } from "@/lib/persona-record";
@@ -52,6 +53,9 @@ export default async function PublicProfilePage() {
     ]);
 
   const persona = getPersonaResultFromRecord(
+    personaResponse.data as PersonaRecord | null,
+  );
+  const composition = getCharacterCompositionFromRecord(
     personaResponse.data as PersonaRecord | null,
   );
   const initialSettings =
@@ -106,6 +110,7 @@ export default async function PublicProfilePage() {
           userId={user.id}
           initialSettings={initialSettings}
           persona={persona}
+          composition={composition}
           initialLoadFailed={Boolean(settingsResponse.error)}
         />
       )}

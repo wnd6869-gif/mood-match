@@ -1,0 +1,36 @@
+{
+  "id": "round-muzzle",
+  "version": "v1",
+  "status": "locked",
+  "expressions": ["gentle", "bright", "chic", "confident", "playful"],
+  "layers": ["eyes", "eyebrows", "mouth"],
+  "optionalLayers": ["round-glasses", "background", "warm-sparkles"],
+  "sourceExpressionRoot": "/character-assets/expressions/round-muzzle",
+  "checksumFile": "checksums.json",
+  "familyDefaults": {
+    "file": "family-defaults.json",
+    "sha256": "e1868486b681bf88e0e3148d42135e0be68ba9409c6c12a3370e1212347a836d"
+  },
+  "faceRigPresetRoot": "face-rigs",
+  "outfitBases": {
+    "golden-retriever-cream-knit": { "animalId": "golden-retriever", "file": "/character-assets/approval/golden-retriever-v2/mvp/png/fixed-bases/golden-retriever-cream-knit-base.png" },
+    "golden-retriever-coral-hoodie": { "animalId": "golden-retriever", "file": "/character-assets/approval/golden-retriever-v2/mvp/png/fixed-bases/golden-retriever-coral-hoodie-base.png" },
+    "golden-retriever-navy-cardigan": { "animalId": "golden-retriever", "file": "/character-assets/approval/golden-retriever-v2/mvp/png/fixed-bases/golden-retriever-navy-cardigan-base.png" },
+    "otter-sage-green-hoodie": { "animalId": "otter", "file": "/character-assets/animals/otter/sage-green-hoodie/otter-sage-green-hoodie-base.png" },
+    "brown-bear-sage-green-hoodie": { "animalId": "brown-bear", "file": "/character-assets/animals/brown-bear/sage-green-hoodie/brown-bear-sage-hoodie-base.png" },
+    "capybara-sage-cardigan": { "animalId": "capybara", "file": "/character-assets/animals/capybara/sage-cardigan/capybara-sage-cardigan-base.png" },
+    "welsh-corgi-coral-hoodie": { "animalId": "welsh-corgi", "file": "/character-assets/animals/welsh-corgi/coral-hoodie/welsh-corgi-coral-hoodie-base.png" }
+  },
+  "faceRigPresets": {
+    "brown-bear.v1.json": "f339473cc88568a5216092a4d4c5842a90b3fe571c9d4b3311d41e72a8465c95",
+    "capybara.v1.json": "aef9109cbe2a2fe091bfe4f50b13dd0c20cf2454dd9162b4e584c86f81da831d",
+    "golden-retriever.v1.json": "cc1ba6436339936d4514e00f2c127a52996c88e30ec41e38dd498dea0b1a1f9c",
+    "otter.v1.json": "13aa11402e1a8a5163ef0d8d1d26ac4f3c94b0930d4866321343e660fe08282c",
+    "welsh-corgi.v1.json": "af11357dcce44ea10a16830252d8e027a6697e54f0c6f069bd405b89bbd7e9c9"
+  },
+  "invariants": [
+    "An animal-outfit base is a complete fixed illustration.",
+    "Expressions are shared SVG files; one immutable FaceRig preset is reused by every approved outfit-base for that animal.",
+    "Head, neck, and hand accessories are not part of public compositions."
+  ]
+}

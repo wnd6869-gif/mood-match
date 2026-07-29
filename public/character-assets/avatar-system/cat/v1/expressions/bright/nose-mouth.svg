@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 100">
+  <path d="M57 24 Q70 17 83 24 Q80 35 70 39 Q60 35 57 24Z" fill="var(--nose-mouth-color)"/>
+  <path d="M70 38 L70 50 M70 50 Q60 64 48 56 M70 50 Q80 64 92 56" fill="none" stroke="var(--nose-mouth-color)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

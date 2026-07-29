@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="eyeFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a0d06"/>
+      <stop offset="0.58" stop-color="#3c1609"/>
+      <stop offset="1" stop-color="#74320d"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M458 537 Q510 564 568 529" fill="none" stroke="#7b2f14" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+
+</svg>
