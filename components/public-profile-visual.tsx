@@ -1,12 +1,14 @@
 import CharacterAvatar from "@/components/character-avatar";
 import StoredImagePreview from "@/components/stored-image-preview";
 import type { PhotoVisibility } from "@/lib/public-chat-profile";
+import type { CharacterComposition } from "@/lib/character/character-types";
 
 type PublicProfileVisualProps = {
   personaTitle: string;
   photoVisibility: PhotoVisibility;
   photoUrl: string | null;
   animalTypes?: readonly { name: string; score?: number }[];
+  composition?: CharacterComposition;
   compact?: boolean;
 };
 
@@ -15,6 +17,7 @@ export default function PublicProfileVisual({
   photoVisibility,
   photoUrl,
   animalTypes = [],
+  composition,
   compact = false,
 }: PublicProfileVisualProps) {
   const sizeClasses = compact
@@ -36,6 +39,7 @@ export default function PublicProfileVisual({
       <CharacterAvatar
         animalTypes={animalTypes}
         personaTitle={personaTitle}
+        composition={composition}
         className="absolute inset-0"
       />
       {photoVisibility === "mutual" && (

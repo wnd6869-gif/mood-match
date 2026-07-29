@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="cream" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff6df"/><stop offset="1" stop-color="#ead2a5"/></linearGradient>
+    <linearGradient id="coral" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f6a18d"/><stop offset="1" stop-color="#d86f64"/></linearGradient>
+    <linearGradient id="navy" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#2f4566"/><stop offset="1" stop-color="#192b48"/></linearGradient>
+    <linearGradient id="cup" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f7e4c8"/><stop offset="1" stop-color="#d8a679"/></linearGradient>
+    <linearGradient id="park" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e4f0d9"/><stop offset="1" stop-color="#9fc7a6"/></linearGradient>
+    <linearGradient id="cafe" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f9e8cf"/><stop offset="1" stop-color="#caa784"/></linearGradient>
+    <linearGradient id="creamBg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff8e6"/><stop offset="1" stop-color="#f4e6cc"/></linearGradient>
+  </defs>
+
+  <path d="M382 765 L642 765 L630 862 L394 862 Z" fill="#907252" stroke="#634936" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M512 765 V862" stroke="#d1b089" stroke-width="6"/>
+  <path d="M408 786 Q454 775 493 786 M531 786 Q570 775 616 786" fill="none" stroke="#b99a71" stroke-width="5" opacity=".8"/>
+
+</svg>

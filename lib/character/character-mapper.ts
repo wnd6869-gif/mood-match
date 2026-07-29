@@ -1,5 +1,6 @@
 import type { PersonaAnalysisResult } from "@/lib/persona-analysis";
 import { normalizeComposition } from "@/lib/character/character-rules";
+import { avatarSelectionFromComposition } from "@/lib/character/avatar-system";
 import type {
   AnimalId,
   CharacterComposition,
@@ -43,16 +44,20 @@ export function mapAvatarInputToCharacter(
   const seed = hash(seedText);
   const eyes = pick(["gentle", "bright", "chic", "focused", "cozy", "curious"] as const, seed, 1);
   const mouth = pick(["small-smile", "warm-smile", "big-smile", "playful-smirk", "shy-smile"] as const, seed, 2);
-  return {
+  const composition: CharacterComposition = {
     animal,
     eyes,
     eyebrows: eyes,
     mouth,
-    outfit: pick(["cream-knit", "coral-hoodie", "navy-shirt", "sage-cardigan", "lavender-sweater"] as const, seed, 3),
+    outfitBase: pick(["cream-knit", "coral-hoodie", "navy-shirt", "sage-cardigan", "lavender-sweater"] as const, seed, 3),
     background: pick(["minimal-coral", "minimal-sage", "minimal-lavender"] as const, seed, 4),
     palette: pick(["coral-cream", "sage-cream", "lavender-cream"] as const, seed, 5),
     seed: seedText,
     version: 1,
+  };
+  return {
+    ...composition,
+    avatarSelection: avatarSelectionFromComposition(composition),
   };
 }
 
@@ -79,16 +84,11 @@ export function mapAnalysisToCharacter(
     eyes,
     eyebrows: eyes,
     mouth,
-    outfit: traits.reliable >= 70 ? "navy-shirt"
+    outfitBase: traits.reliable >= 70 ? "navy-shirt"
       : traits.cute >= 70 ? "lavender-sweater" : "cream-knit",
     faceEffect: traits.cute >= 68 ? "soft-blush" : undefined,
     faceAccessory: stylish
       ? pick(["round-glasses", "thin-glasses"] as const, seed, 3) : undefined,
-    headAccessory: traits.cute >= 78 ? "hairpin" : undefined,
-    neckAccessory: traits.calm >= 78 ? "scarf" : undefined,
-    handProp: traits.reliable >= 75 ? "book"
-      : traits.playful >= 72 ? "camera"
-      : traits.friendly >= 76 ? "coffee" : undefined,
     background: traits.calm >= 75 ? "minimal-sage"
       : traits.stylish >= 72 ? "minimal-lavender" : "minimal-coral",
     palette: traits.calm >= 75 ? "sage-cream"
@@ -98,5 +98,9 @@ export function mapAnalysisToCharacter(
     seed: stableSeed,
     version: 1,
   };
-  return normalizeComposition(composition);
+  const normalized = normalizeComposition(composition);
+  return {
+    ...normalized,
+    avatarSelection: avatarSelectionFromComposition(normalized),
+  };
 }

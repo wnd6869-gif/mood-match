@@ -1,0 +1,15 @@
+{
+  "version": "round-muzzle-v1", "animalId": "otter", "outfitBaseId": "otter-sage-green-hoodie", "faceFamily": "round-muzzle",
+  "sourceAssets": { "base": "/character-assets/animals/otter/sage-green-hoodie/otter-sage-green-hoodie-base.png", "sharedExpressionFamily": "round-muzzle", "expressionAssetVersion": "v1", "roundGlasses": "/character-assets/approval/golden-retriever-v2/mvp/png/accessories/round-glasses.png" },
+  "anchors": { "noseCenter": { "x": 512, "y": 456 }, "eyes": { "x": 398, "y": 214, "scaleX": 1.018, "scaleY": 1.04, "rotation": 0 }, "eyebrows": { "x": 405, "y": 182, "scaleX": 0.955, "scaleY": 0.967, "rotation": 0 }, "mouth": { "x": 426, "y": 388, "scaleX": 1.328, "scaleY": 1.171, "rotation": 0 } },
+  "colors": { "eyes": "#2b1a13", "eyebrows": "#3c2015", "mouth": "#542a1d" },
+  "expressionTransformOverrides": {
+    "gentle": {},
+    "bright": { "eyes": { "y": -4, "scaleX": 1.101, "scaleY": 1.096 }, "eyebrows": { "x": -3, "y": -9, "scaleX": 1.028, "scaleY": 1.035, "rotation": 3 }, "mouth": { "x": -6, "y": -2, "scaleX": 1.118, "scaleY": 1.098 } },
+    "chic": { "eyes": { "x": 4, "y": 3, "scaleX": 0.908, "scaleY": 0.904 }, "eyebrows": { "x": 2, "y": 6, "scaleX": 0.981, "scaleY": 0.966 }, "mouth": { "x": 6, "y": 5, "scaleX": 0.929, "scaleY": 0.927 } },
+    "confident": { "eyes": { "y": -2, "scaleX": 1.039, "scaleY": 1.038 }, "eyebrows": { "x": -2, "y": -5, "scaleX": 1.019, "scaleY": 1.034, "rotation": -4 }, "mouth": { "x": -2, "y": 3, "scaleX": 1.047, "scaleY": 1.024 } },
+    "playful": { "eyes": { "y": -4, "scaleX": 1.101, "scaleY": 1.096 }, "eyebrows": { "x": -4, "y": -12, "scaleX": 1.037, "scaleY": 1.069, "rotation": 5 }, "mouth": { "x": 6, "y": -1, "scaleX": 1.118, "scaleY": 1.073, "rotation": -6 } }
+  },
+  "approvedAt": "2026-07-29",
+  "qaSnapshotId": "otter-expression-focus-qa-approved"
+}

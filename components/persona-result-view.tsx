@@ -10,17 +10,20 @@ import StepProgress from "@/components/step-progress";
 import usePrototypeData from "@/hooks/use-prototype-data";
 import type { PersonaAnalysisResult } from "@/lib/persona-analysis";
 import { mapAnalysisToCharacter } from "@/lib/character/character-mapper";
+import type { CharacterComposition } from "@/lib/character/character-types";
 
 type PersonaResultViewProps = {
   userId: string;
   serverResult: PersonaAnalysisResult | null;
   personaIdentity: string | null;
+  serverComposition: CharacterComposition | null;
 };
 
 export default function PersonaResultView({
   userId,
   serverResult,
   personaIdentity,
+  serverComposition,
 }: PersonaResultViewProps) {
   const { personaAnalysis } = usePrototypeData();
   const result =
@@ -82,7 +85,7 @@ export default function PersonaResultView({
     );
   }
 
-  const characterComposition = mapAnalysisToCharacter(result, userId);
+  const characterComposition = serverComposition ?? mapAnalysisToCharacter(result, userId);
 
   return (
     <AppShell>

@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
-import CharacterRenderer from "@/components/character-renderer";
+import CharacterRenderer, { type CharacterRenderLayer } from "@/components/character-renderer";
 import {
-  ACCESSORY_ASSETS,
+  FACE_ACCESSORY_ASSETS,
   ANIMAL_LAYER_TRANSFORMS,
   ANIMAL_MANIFEST,
   BACKGROUND_ASSETS,
@@ -12,8 +12,11 @@ import {
   FOREGROUND_ASSETS,
   MOUTH_ASSETS,
   OUTFIT_ASSETS,
-  PROP_ASSETS,
 } from "@/lib/character/character-manifest";
+import {
+  avatarSelectionFromComposition,
+  resolveFixedAvatarLayers,
+} from "@/lib/character/avatar-system";
 import type {
   CharacterComposition,
   CharacterDisplayVariant,
@@ -44,6 +47,11 @@ export default function ComposedCharacter({
   alt = "AI 동물 캐릭터",
 }: Props) {
   const layers = useMemo(() => {
+    // Complete animal+outfit bases use the locked round-muzzle v1 rig. This
+    // keeps the same AvatarSelection reproducible across cards and chat.
+    const fixedSelection = avatarSelectionFromComposition(composition);
+    if (fixedSelection) return resolveFixedAvatarLayers(fixedSelection);
+
     const transforms = ANIMAL_LAYER_TRANSFORMS[composition.animal];
     return [
       { src: BACKGROUND_ASSETS[composition.background] },
@@ -51,13 +59,10 @@ export default function ComposedCharacter({
       { src: EYE_ASSETS[composition.eyes], transform: transforms?.eyes },
       { src: MOUTH_ASSETS[composition.mouth], transform: transforms?.mouth },
       { src: composition.faceEffect ? FACE_EFFECT_ASSETS[composition.faceEffect] : undefined },
-      { src: OUTFIT_ASSETS[composition.outfit] },
-      { src: composition.headAccessory ? ACCESSORY_ASSETS[composition.headAccessory] : undefined, transform: transforms?.accessories },
-      { src: composition.faceAccessory ? ACCESSORY_ASSETS[composition.faceAccessory] : undefined, transform: transforms?.accessories },
-      { src: composition.neckAccessory ? ACCESSORY_ASSETS[composition.neckAccessory] : undefined },
-      { src: composition.handProp ? PROP_ASSETS[composition.handProp] : undefined },
+      { src: OUTFIT_ASSETS[composition.outfitBase] },
+      { src: composition.faceAccessory ? FACE_ACCESSORY_ASSETS[composition.faceAccessory] : undefined, transform: transforms?.accessories },
       { src: composition.foregroundEffect ? FOREGROUND_ASSETS[composition.foregroundEffect] : undefined },
-    ].filter((value): value is { src: string; transform?: string } => Boolean(value.src));
+    ].filter((value): value is CharacterRenderLayer => Boolean(value.src));
   }, [composition]);
 
   return (

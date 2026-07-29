@@ -14,6 +14,7 @@ import {
 } from "@/lib/conversation-request";
 import {
   getPersonaResultFromRecord,
+  getCharacterCompositionFromRecord,
   PERSONA_SELECT_COLUMNS,
   type PersonaRecord,
 } from "@/lib/persona-record";
@@ -76,6 +77,9 @@ export default async function HomePage() {
   const persona = getPersonaResultFromRecord(
     personaResponse.data as PersonaRecord | null,
   );
+  const personaComposition = getCharacterCompositionFromRecord(
+    personaResponse.data as PersonaRecord | null,
+  );
   const publicProfile = getPublicChatProfileFromRecord(
     profileResponse.data,
   );
@@ -113,6 +117,7 @@ export default async function HomePage() {
             <CharacterAvatar
               animalTypes={persona.animalTypes}
               personaTitle={persona.personaTitle}
+              composition={personaComposition ?? undefined}
               className="min-h-44"
             />
             <div className="flex flex-col justify-center p-5">

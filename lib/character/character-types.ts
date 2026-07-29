@@ -8,10 +8,7 @@ export const CHARACTER_LAYER_ORDER = [
   "mouth",
   "blush",
   "outfit",
-  "head-accessory",
   "face-accessory",
-  "neck-accessory",
-  "hand-prop",
   "foreground-effect",
 ] as const;
 
@@ -21,7 +18,9 @@ export type AnimalId =
   | "otter"
   | "red-fox"
   | "white-rabbit"
-  | "capybara";
+  | "capybara"
+  | "brown-bear"
+  | "welsh-corgi";
 export type EyeStyleId =
   | "gentle" | "bright" | "chic" | "confident"
   | "focused" | "cozy" | "curious" | "delicate";
@@ -34,11 +33,7 @@ export type FaceEffectId =
 export type OutfitId =
   | "cream-knit" | "coral-hoodie" | "navy-shirt"
   | "sage-cardigan" | "charcoal-jacket" | "lavender-sweater";
-export type HeadAccessoryId = "beret" | "beanie" | "hairpin";
-export type FaceAccessoryId = "round-glasses" | "thin-glasses";
-export type NeckAccessoryId = "headphones" | "bow-tie" | "scarf";
-export type HandPropId =
-  | "coffee" | "book" | "camera" | "smartphone" | "flower" | "music-player";
+export type FaceAccessoryId = "round-glasses" | "thin-glasses" | "sunglasses";
 export type BackgroundId =
   | "warm-cafe" | "cozy-room" | "green-park" | "evening-sky"
   | "quiet-library" | "minimal-coral" | "minimal-sage" | "minimal-lavender";
@@ -64,20 +59,40 @@ export type CharacterDisplayTransforms = Record<
   CharacterDisplayTransform
 >;
 
+export type AvatarExpressionId =
+  | "gentle"
+  | "bright"
+  | "chic"
+  | "confident"
+  | "playful";
+
+/**
+ * The immutable recipe persisted with a generated persona.  The renderer
+ * resolves it using the matching animal+outfit FaceRig preset, not by
+ * recalculating facial coordinates on each screen.
+ */
+export type AvatarSelection = {
+  animalId: AnimalId;
+  outfitBaseId: string;
+  faceRigVersion: string;
+  expressionId: AvatarExpressionId;
+  backgroundId: string;
+  glassesId?: "round-glasses";
+  effectId?: "warm-sparkles";
+};
+
 export type CharacterComposition = {
   animal: AnimalId;
   eyes: EyeStyleId;
   eyebrows: EyebrowStyleId;
   mouth: MouthStyleId;
   faceEffect?: FaceEffectId;
-  outfit: OutfitId;
-  headAccessory?: HeadAccessoryId;
+  outfitBase: OutfitId;
   faceAccessory?: FaceAccessoryId;
-  neckAccessory?: NeckAccessoryId;
-  handProp?: HandPropId;
   background: BackgroundId;
   foregroundEffect?: ForegroundEffectId;
   palette: PaletteId;
+  avatarSelection?: AvatarSelection;
   seed: string;
   version: number;
 };
@@ -89,13 +104,41 @@ export type CharacterAnchor = {
   rotation?: number;
 };
 
+export type FacePoint = { x: number; y: number };
+
+export type FaceTransform = {
+  x?: number; y?: number; scale?: number; rotation?: number;
+};
+
+export type ExpressionTransformOverride = {
+  eyes?: FaceTransform;
+  eyebrows?: FaceTransform;
+  mouth?: FaceTransform;
+};
+
+export type FaceRig = {
+  family: "round-muzzle";
+  leftEye: FacePoint;
+  rightEye: FacePoint;
+  eyebrowCenter: FacePoint;
+  mouthCenter: FacePoint;
+  eyeScale: number;
+  eyebrowScale: number;
+  mouthScale: number;
+  eyeRotation?: number;
+  eyebrowRotation?: number;
+  mouthRotation?: number;
+  eyeColor: string;
+  eyebrowColor: string;
+  mouthColor: string;
+  glasses?: FaceTransform;
+  expressionTransformOverrides?: Partial<Record<"gentle" | "bright" | "chic" | "confident" | "playful", ExpressionTransformOverride>>;
+};
+
 export type AnimalAnchors = {
   leftEye: CharacterAnchor;
   rightEye: CharacterAnchor;
   eyebrows: CharacterAnchor;
   mouth: CharacterAnchor;
-  headAccessory: CharacterAnchor;
   faceAccessory: CharacterAnchor;
-  neckAccessory: CharacterAnchor;
-  handProp: CharacterAnchor;
 };

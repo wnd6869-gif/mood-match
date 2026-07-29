@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="cream" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff6df"/><stop offset="1" stop-color="#ead2a5"/></linearGradient>
+    <linearGradient id="coral" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f6a18d"/><stop offset="1" stop-color="#d86f64"/></linearGradient>
+    <linearGradient id="navy" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#2f4566"/><stop offset="1" stop-color="#192b48"/></linearGradient>
+    <linearGradient id="cup" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f7e4c8"/><stop offset="1" stop-color="#d8a679"/></linearGradient>
+    <linearGradient id="park" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e4f0d9"/><stop offset="1" stop-color="#9fc7a6"/></linearGradient>
+    <linearGradient id="cafe" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f9e8cf"/><stop offset="1" stop-color="#caa784"/></linearGradient>
+    <linearGradient id="creamBg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff8e6"/><stop offset="1" stop-color="#f4e6cc"/></linearGradient>
+  </defs>
+
+  <rect width="1024" height="1024" fill="url(#park)"/>
+  <circle cx="170" cy="245" r="210" fill="#cfe5b6" opacity=".55"/><circle cx="835" cy="210" r="250" fill="#8db88e" opacity=".36"/>
+  <circle cx="760" cy="612" r="280" fill="#78ab82" opacity=".28"/><circle cx="250" cy="690" r="230" fill="#e9efb8" opacity=".32"/>
+  <circle cx="615" cy="170" r="70" fill="#fff4bd" opacity=".58"/><path d="M0 800 Q280 748 512 804 Q760 748 1024 800 V1024 H0 Z" fill="#7da77d" opacity=".36"/>
+
+</svg>

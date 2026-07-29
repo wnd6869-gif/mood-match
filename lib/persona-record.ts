@@ -2,9 +2,14 @@ import {
   parsePersonaAnalysisResult,
   type PersonaAnalysisResult,
 } from "@/lib/persona-analysis";
+import { mapAnalysisToCharacter } from "@/lib/character/character-mapper";
+import type {
+  AvatarSelection,
+  CharacterComposition,
+} from "@/lib/character/character-types";
 
 export const PERSONA_SELECT_COLUMNS =
-  "id, user_id, photo_path, animal_types, mood_keywords, persona_title, persona_description, nickname_candidates, visual_traits, model_name, input_tokens, output_tokens, total_tokens, analysis_source, created_at";
+  "*";
 
 export type PersonaRecord = {
   id: string;
@@ -22,6 +27,8 @@ export type PersonaRecord = {
   total_tokens: number | null;
   analysis_source: string;
   created_at: string;
+  character_composition?: unknown;
+  avatar_selection?: unknown;
 };
 
 const LEGACY_ID_ADJECTIVE_PAIRS = [
@@ -80,4 +87,40 @@ export function getPersonaResultFromRecord(
       record.animal_types,
     ),
   });
+}
+
+function isAvatarSelection(value: unknown): value is AvatarSelection {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as Record<string, unknown>;
+  return typeof candidate.animalId === "string"
+    && typeof candidate.outfitBaseId === "string"
+    && typeof candidate.faceRigVersion === "string"
+    && typeof candidate.expressionId === "string"
+    && typeof candidate.backgroundId === "string";
+}
+
+/**
+ * Rebuild legacy recipe fields only when necessary. A saved AvatarSelection is
+ * then attached unchanged, so cards, chat, and result pages resolve the same
+ * locked FaceRig version instead of independently re-rolling a character.
+ */
+export function getCharacterCompositionFromRecord(
+  value: unknown,
+): CharacterComposition | null {
+  const persona = getPersonaResultFromRecord(value);
+  if (!persona || !value || typeof value !== "object") return null;
+  const record = value as Record<string, unknown>;
+  const userId = typeof record.user_id === "string" ? record.user_id : "persona";
+  const fallback = mapAnalysisToCharacter(persona, userId);
+  const saved = isAvatarSelection(record.avatar_selection)
+    ? record.avatar_selection
+    : isAvatarSelection(
+      record.character_composition
+        && typeof record.character_composition === "object"
+        ? (record.character_composition as Record<string, unknown>).avatarSelection
+        : null,
+    )
+      ? (record.character_composition as Record<string, unknown>).avatarSelection as AvatarSelection
+      : undefined;
+  return saved ? { ...fallback, avatarSelection: saved } : fallback;
 }

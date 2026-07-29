@@ -1,0 +1,23 @@
+{
+  "version": "round-muzzle-v1",
+  "animalId": "golden-retriever",
+  "outfitBaseId": "golden-retriever-navy-cardigan",
+  "faceFamily": "round-muzzle",
+  "sourceAssets": {
+    "base": "/character-assets/approval/golden-retriever-v2/mvp/png/fixed-bases/golden-retriever-navy-cardigan-base.png",
+    "sharedExpressionFamily": "round-muzzle",
+    "expressionAssetVersion": "v1",
+    "roundGlasses": "/character-assets/approval/golden-retriever-v2/mvp/png/accessories/round-glasses.png"
+  },
+  "anchors": {
+    "noseCenter": { "x": 512, "y": 404 },
+    "eyes": { "x": 400, "y": 276, "scaleX": 1, "scaleY": 1, "rotation": 0 },
+    "eyebrows": { "x": 400, "y": 242, "scaleX": 1, "scaleY": 1, "rotation": 0 },
+    "mouth": { "x": 448, "y": 427, "scaleX": 1, "scaleY": 1, "rotation": 0 },
+    "glasses": { "x": 0, "y": -88, "scaleX": 1, "scaleY": 1, "rotation": 0 }
+  },
+  "colors": { "eyes": "#32140c", "eyebrows": "#793805", "mouth": "#5b2615" },
+  "expressionTransformOverrides": {},
+  "approvedAt": "2026-07-28",
+  "qaSnapshotId": "golden-navy-round-muzzle-v1"
+}

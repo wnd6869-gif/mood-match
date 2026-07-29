@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="cream" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff6df"/><stop offset="1" stop-color="#ead2a5"/></linearGradient>
+    <linearGradient id="coral" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f6a18d"/><stop offset="1" stop-color="#d86f64"/></linearGradient>
+    <linearGradient id="navy" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#2f4566"/><stop offset="1" stop-color="#192b48"/></linearGradient>
+    <linearGradient id="cup" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f7e4c8"/><stop offset="1" stop-color="#d8a679"/></linearGradient>
+    <linearGradient id="park" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e4f0d9"/><stop offset="1" stop-color="#9fc7a6"/></linearGradient>
+    <linearGradient id="cafe" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f9e8cf"/><stop offset="1" stop-color="#caa784"/></linearGradient>
+    <linearGradient id="creamBg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff8e6"/><stop offset="1" stop-color="#f4e6cc"/></linearGradient>
+  </defs>
+
+  <path d="M354 778 Q342 726 358 676 Q374 620 432 594 Q466 615 512 621 Q558 615 592 594 Q650 620 666 676 Q682 726 670 778 Q646 798 616 790 Q584 778 556 786 L468 786 Q440 778 408 790 Q378 798 354 778 Z" fill="url(#cream)" stroke="#d3b47d" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M438 606 Q459 642 512 648 Q565 642 586 606" fill="none" stroke="#d3b47d" stroke-width="13" stroke-linecap="round"/>
+  <path d="M438 653 Q462 679 438 707 Q414 735 438 760 M485 647 Q509 675 485 704 Q461 733 485 766 M539 647 Q515 675 539 704 Q563 733 539 766 M586 653 Q562 679 586 707 Q610 735 586 760" fill="none" stroke="#e0c08d" stroke-width="10" stroke-linecap="round" opacity=".85"/>
+  <path d="M406 682 Q512 693 618 682 M393 731 Q512 741 631 731 M382 769 Q512 779 642 769" fill="none" stroke="#fff7e6" stroke-width="5" opacity=".7"/>
+
+</svg>

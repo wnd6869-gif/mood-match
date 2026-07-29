@@ -4,7 +4,7 @@ The production character is a deterministic composition of versioned 1024×1024 
 
 ## Layer order
 
-`background → background-decoration → animal-base → face-pattern → eyes → eyebrows → mouth → blush → outfit → head-accessory → face-accessory → neck-accessory → hand-prop → foreground-effect`
+`background → background-decoration → outfit-base → face-pattern → eyes → eyebrows → mouth → blush → face-accessory → foreground-effect`
 
 The order is declared in `lib/character/character-types.ts`. Asset paths and animal anchors are declared in `lib/character/character-manifest.ts`.
 
@@ -15,7 +15,9 @@ The order is declared in `lib/character/character-types.ts`. Asset paths and ani
 - Mouths: small smile, warm smile, big smile, neutral, playful smirk, shy smile
 - Face effects: soft blush, bright blush, freckles, sparkle cheeks
 - Outfits: cream knit, coral hoodie, navy shirt, sage cardigan, charcoal jacket, lavender sweater
-- Accessories: round glasses, thin glasses, headphones, beret, beanie, hairpin, bow tie, scarf
+- Face accessories: round glasses, thin glasses (sunglasses reserved)
+- Neck accessories: thin scarf, ribbon tie
+- Deprecated head accessories (beret, beanie, hairpin) are retained for audit only and never exposed to users.
 - Props: coffee, book, camera, smartphone, flower, music player
 - Backgrounds: warm cafe, cozy room, green park, evening sky, quiet library, minimal coral, minimal sage, minimal lavender
 - Foreground effects: soft hearts, tiny stars, floating leaves, music notes, warm sparkles

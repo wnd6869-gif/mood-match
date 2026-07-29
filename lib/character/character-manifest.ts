@@ -3,6 +3,7 @@ import type {
   CharacterDisplayTransforms,
   AnimalId,
   CharacterComposition,
+  FaceRig,
 } from "@/lib/character/character-types";
 
 export const CHARACTER_ASSET_VERSION = 1;
@@ -22,12 +23,57 @@ const anchors = (
   rightEye: { x: 604, y: 330 },
   eyebrows: { x: 512, y: 285 },
   mouth: { x: 512, y: 485 },
-  headAccessory: { x: 512, y: 180, scale: 1 },
   faceAccessory: { x: 512, y: 345, scale: 1 },
-  neckAccessory: { x: 512, y: 640, scale: 1 },
-  handProp: { x: 680, y: 750, scale: 1 },
   ...overrides,
 });
+
+export const GOLDEN_RETRIEVER_FACE_RIG: FaceRig = {
+  family: "round-muzzle",
+  leftEye: { x: 436, y: 414 },
+  rightEye: { x: 588, y: 414 },
+  eyebrowCenter: { x: 512, y: 352 },
+  mouthCenter: { x: 512, y: 548 },
+  eyeScale: 1,
+  eyebrowScale: 1,
+  mouthScale: 1,
+  eyeColor: "#32140c",
+  eyebrowColor: "#793805",
+  mouthColor: "#5b2615",
+};
+
+export const OTTER_FACE_RIG: FaceRig = {
+  family: "round-muzzle",
+  leftEye: { x: 446, y: 365 }, rightEye: { x: 578, y: 365 },
+  eyebrowCenter: { x: 512, y: 338 }, mouthCenter: { x: 512, y: 500 },
+  eyeScale: 0.98, eyebrowScale: 1.22, mouthScale: 1.18,
+  eyeRotation: 0, eyebrowRotation: 0, mouthRotation: 0,
+  eyeColor: "#2b1a13", eyebrowColor: "#3c2015", mouthColor: "#542a1d",
+  expressionTransformOverrides: {
+    gentle: { eyebrows: { y: -4, scale: 0.82 }, mouth: { y: 2, scale: 1.05 } },
+    bright: { eyes: { y: -3, scale: 1.08 }, eyebrows: { y: -13, rotation: 3, scale: 0.85 }, mouth: { y: 0, scale: 1.22, rotation: 0 } },
+    chic: { eyes: { scale: 0.92 }, eyebrows: { y: -7, rotation: 0, scale: 0.8 }, mouth: { y: 4, scale: 0.94 } },
+    confident: { eyes: { y: -1, scale: 1.02 }, eyebrows: { y: -12, rotation: -4, scale: 0.84 }, mouth: { y: 3, scale: 1.12 } },
+    playful: { eyes: { y: -2, scale: 1.08 }, eyebrows: { y: -18, rotation: 5, scale: 0.86 }, mouth: { x: 6, y: 1, rotation: -5, scale: 1.22 } },
+  },
+};
+
+export const BROWN_BEAR_FACE_RIG: FaceRig = {
+  // noseCenter: { x: 512, y: 376 }. Keep features compact around the short,
+  // wide muzzle: eyes/brows stay in the brown forehead and mouth retains a
+  // small cream-fur gap below the nose.
+  family: "round-muzzle", leftEye:{x:452,y:278}, rightEye:{x:572,y:278}, eyebrowCenter:{x:512,y:228}, mouthCenter:{x:512,y:388}, eyeScale:0.96, eyebrowScale:0.84, mouthScale:0.96,
+  eyeColor:"#2b1a13", eyebrowColor:"#3c2015", mouthColor:"#542a1d",
+  // 1.2x of the previous .85 placement. Keep the lens midpoint centered on
+  // the eyes, then lower it by 15px so the eyes sit inside each lens.
+  glasses:{x:-10,y:-145,scale:1.02},
+  expressionTransformOverrides: {
+    gentle:{eyebrows:{y:-10,scale:1.08},mouth:{y:3,scale:1.08}},
+    bright:{eyes:{y:-2,scale:1.07},eyebrows:{y:-14,scale:1.12,rotation:3},mouth:{y:2,scale:1.16}},
+    chic:{eyebrows:{y:-8,scale:1.06},mouth:{y:5,scale:1.02}},
+    confident:{eyebrows:{y:-12,scale:1.12,rotation:-3},mouth:{y:4,scale:1.12}},
+    playful:{eyebrows:{y:-15,scale:1.14,rotation:5},mouth:{x:4,y:3,scale:1.16,rotation:-4}},
+  },
+};
 
 export const ANIMAL_MANIFEST: Record<
   AnimalId,
@@ -36,6 +82,7 @@ export const ANIMAL_MANIFEST: Record<
     base: string;
     anchors: AnimalAnchors;
     displayTransforms: CharacterDisplayTransforms;
+    faceRig?: FaceRig;
     ready: true;
   }
 > = {
@@ -44,13 +91,13 @@ export const ANIMAL_MANIFEST: Record<
     base: `${ROOT}/animals/golden-retriever/web/base-v1.webp`,
     anchors: anchors(),
     displayTransforms: defaultDisplayTransforms(),
+    faceRig: GOLDEN_RETRIEVER_FACE_RIG,
     ready: true,
   },
   "russian-blue": {
     label: "러시안블루",
     base: `${ROOT}/animals/russian-blue/web/base-v1.webp`,
     anchors: anchors({
-      headAccessory: { x: 512, y: 160, scale: 0.86 },
       faceAccessory: { x: 512, y: 350, scale: 0.9 },
     }),
     displayTransforms: defaultDisplayTransforms(),
@@ -58,16 +105,16 @@ export const ANIMAL_MANIFEST: Record<
   },
   otter: {
     label: "수달",
-    base: `${ROOT}/animals/otter/web/base-v1.webp`,
+    base: `${ROOT}/animals/otter/sage-green-hoodie/otter-sage-green-hoodie-base.png`,
     anchors: anchors({ faceAccessory: { x: 512, y: 360, scale: 0.92 } }),
     displayTransforms: defaultDisplayTransforms(),
+    faceRig: OTTER_FACE_RIG,
     ready: true,
   },
   "red-fox": {
     label: "붉은여우",
     base: `${ROOT}/animals/red-fox/web/base-v1.webp`,
     anchors: anchors({
-      headAccessory: { x: 512, y: 175, scale: 0.88 },
       faceAccessory: { x: 512, y: 350, scale: 0.92 },
     }),
     displayTransforms: defaultDisplayTransforms(),
@@ -77,7 +124,6 @@ export const ANIMAL_MANIFEST: Record<
     label: "흰토끼",
     base: `${ROOT}/animals/white-rabbit/web/base-v1.webp`,
     anchors: anchors({
-      headAccessory: { x: 512, y: 250, scale: 0.72 },
       faceAccessory: { x: 512, y: 390, scale: 0.86 },
     }),
     displayTransforms: defaultDisplayTransforms(),
@@ -90,6 +136,21 @@ export const ANIMAL_MANIFEST: Record<
     displayTransforms: defaultDisplayTransforms(),
     ready: true,
   },
+  "brown-bear": {
+    label: "불곰",
+    base: `${ROOT}/animals/brown-bear/sage-green-hoodie/brown-bear-sage-hoodie-base.png`,
+    anchors: anchors(),
+    displayTransforms: defaultDisplayTransforms(),
+    faceRig: BROWN_BEAR_FACE_RIG,
+    ready: true,
+  },
+  "welsh-corgi": {
+    label: "웰시코기",
+    base: `${ROOT}/animals/welsh-corgi/coral-hoodie/welsh-corgi-coral-hoodie-base.png`,
+    anchors: anchors({ faceAccessory: { x: 512, y: 350, scale: 0.9 } }),
+    displayTransforms: defaultDisplayTransforms(),
+    ready: true,
+  },
 };
 
 export const APPROVED_GOLDEN_RETRIEVER_LAYERS = [
@@ -98,6 +159,34 @@ export const APPROVED_GOLDEN_RETRIEVER_LAYERS = [
   `${ROOT}/approval/golden-retriever-v2/eyebrows-default.png`,
   `${ROOT}/approval/golden-retriever-v2/mouth-default.png`,
 ] as const;
+
+export const GOLDEN_RETRIEVER_EXPRESSION_IDS = [
+  "gentle",
+  "bright",
+  "chic",
+  "confident",
+  "playful",
+] as const;
+
+export type GoldenRetrieverExpressionId =
+  (typeof GOLDEN_RETRIEVER_EXPRESSION_IDS)[number];
+
+const GOLDEN_EXPRESSION_ROOT =
+  `${ROOT}/approval/golden-retriever-v2/expressions/png`;
+
+export const GOLDEN_RETRIEVER_EXPRESSION_ASSETS = Object.fromEntries(
+  GOLDEN_RETRIEVER_EXPRESSION_IDS.map((expression) => [
+    expression,
+    {
+      eyes: `${GOLDEN_EXPRESSION_ROOT}/eyes-${expression}.png`,
+      eyebrows: `${GOLDEN_EXPRESSION_ROOT}/eyebrows-${expression}.png`,
+      mouth: `${GOLDEN_EXPRESSION_ROOT}/mouth-${expression}.png`,
+    },
+  ]),
+) as Record<
+  GoldenRetrieverExpressionId,
+  { eyes: string; eyebrows: string; mouth: string }
+>;
 
 export const EYE_ASSETS = Object.fromEntries(
   ["gentle", "bright", "chic", "confident", "focused", "cozy", "curious", "delicate"]
@@ -122,7 +211,8 @@ export const OUTFIT_ASSETS = webAssets(
   "outfits",
   ["cream-knit", "coral-hoodie", "navy-shirt", "sage-cardigan", "charcoal-jacket", "lavender-sweater"] as const,
 );
-export const PROP_ASSETS = webAssets(
+/** Retained only for audit/migration; never expose in a CharacterComposition. */
+export const DEPRECATED_HAND_PROP_ASSETS = webAssets(
   "props",
   ["coffee", "book", "camera", "smartphone", "flower", "music-player"] as const,
 );
@@ -138,15 +228,23 @@ export const FOREGROUND_ASSETS = webAssets(
 const accessory = (id: string) =>
   `${ROOT}/accessories/all/web/${id}-v1.webp`;
 
-export const ACCESSORY_ASSETS = {
+export const FACE_ACCESSORY_ASSETS = {
   "round-glasses": accessory("round-glasses"),
   "thin-glasses": accessory("thin-glasses"),
-  headphones: accessory("headphones"),
+  sunglasses: accessory("sunglasses"),
+} as const;
+
+/** Retained only for audit/migration; never expose in a CharacterComposition. */
+export const DEPRECATED_NECK_ACCESSORY_ASSETS = {
+  "thin-scarf": `${ROOT}/approval/golden-retriever-v2/mvp/png/neck-accessories/thin-scarf.png`,
+  "ribbon-tie": `${ROOT}/approval/golden-retriever-v2/mvp/png/neck-accessories/ribbon-tie.png`,
+} as const;
+
+/** Retained only for migration/audit; never expose in a CharacterComposition. */
+export const DEPRECATED_HEAD_ACCESSORY_ASSETS = {
   beret: accessory("beret"),
   beanie: accessory("beanie"),
   hairpin: accessory("hairpin"),
-  "bow-tie": accessory("bow-tie"),
-  scarf: accessory("scarf"),
 } as const;
 
 export const DEFAULT_COMPOSITION: CharacterComposition = {
@@ -154,7 +252,7 @@ export const DEFAULT_COMPOSITION: CharacterComposition = {
   eyes: "gentle",
   eyebrows: "gentle",
   mouth: "warm-smile",
-  outfit: "cream-knit",
+  outfitBase: "cream-knit",
   background: "minimal-coral",
   palette: "coral-cream",
   seed: "mood-match-default",

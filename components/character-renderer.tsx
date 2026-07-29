@@ -10,6 +10,7 @@ import type {
 export type CharacterRenderLayer = {
   src: string;
   transform?: string;
+  rigPlacement?: { x: number; y: number; width: number; height: number; rotation?: number };
 };
 
 type Props = {
@@ -63,7 +64,7 @@ export default function CharacterRenderer({
           transformOrigin: "50% 50%",
         }}
       >
-        {layers.map(({ src, transform }, index) => (
+        {layers.map(({ src, transform, rigPlacement }, index) => (
           // All layer files retain the approved 1024×1024 coordinate system.
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -71,8 +72,15 @@ export default function CharacterRenderer({
             src={src}
             alt=""
             aria-hidden="true"
-            className="absolute inset-0 size-full object-contain"
-            style={{ transform }}
+            className={rigPlacement ? "absolute object-fill" : "absolute inset-0 size-full object-contain"}
+            style={rigPlacement ? {
+              left: `${(rigPlacement.x / DESIGN_SIZE) * 100}%`,
+              top: `${(rigPlacement.y / DESIGN_SIZE) * 100}%`,
+              width: `${(rigPlacement.width / DESIGN_SIZE) * 100}%`,
+              height: `${(rigPlacement.height / DESIGN_SIZE) * 100}%`,
+              transform: `rotate(${rigPlacement.rotation ?? 0}deg) ${transform ?? ""}`,
+              transformOrigin: "50% 50%",
+            } : { transform }}
             draggable={false}
             onError={() => setFailed(true)}
           />

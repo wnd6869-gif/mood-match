@@ -1,0 +1,14 @@
+{
+  "version": "round-muzzle-v1", "animalId": "brown-bear", "outfitBaseId": "brown-bear-sage-green-hoodie", "faceFamily": "round-muzzle",
+  "sourceAssets": { "base": "/character-assets/animals/brown-bear/sage-green-hoodie/brown-bear-sage-hoodie-base.png", "sharedExpressionFamily": "round-muzzle", "expressionAssetVersion": "v1", "roundGlasses": "/character-assets/approval/golden-retriever-v2/mvp/png/accessories/round-glasses.png" },
+  "anchors": { "noseCenter": { "x": 512, "y": 376 }, "eyes": { "x": 410, "y": 230, "scaleX": 0.91, "scaleY": 0.92, "rotation": 0 }, "eyebrows": { "x": 414, "y": 190, "scaleX": 0.875, "scaleY": 0.9, "rotation": 0 }, "mouth": { "x": 454, "y": 379, "scaleX": 0.906, "scaleY": 0.886, "rotation": 0 }, "glasses": { "x": -10, "y": -145, "scaleX": 1.02, "scaleY": 1.02, "rotation": 0 } },
+  "colors": { "eyes": "#2b1a13", "eyebrows": "#3c2015", "mouth": "#542a1d" },
+  "expressionTransformOverrides": {
+    "bright": { "eyes": { "y": -7, "scaleX": 1.18, "scaleY": 1.18 }, "eyebrows": { "y": -11, "scaleX": 1.13, "scaleY": 1.13, "rotation": 4 }, "mouth": { "y": -4, "scaleX": 1.27, "scaleY": 1.27 } },
+    "chic": { "eyes": { "y": 5, "scaleX": 0.86, "scaleY": 0.86 }, "eyebrows": { "y": 6, "scaleX": 0.88, "scaleY": 0.88 }, "mouth": { "y": 6, "scaleX": 0.82, "scaleY": 0.82 } },
+    "confident": { "eyes": { "y": -3, "scaleX": 1.06, "scaleY": 1.06 }, "eyebrows": { "y": -5, "scaleX": 1.22, "scaleY": 1.18, "rotation": -6 }, "mouth": { "y": 0, "scaleX": 1.17, "scaleY": 1.17 } },
+    "playful": { "eyes": { "y": -6, "scaleX": 1.14, "scaleY": 1.12 }, "eyebrows": { "y": -10, "scaleX": 1.22, "scaleY": 1.16, "rotation": 9 }, "mouth": { "x": 8, "y": -3, "scaleX": 1.28, "scaleY": 1.25, "rotation": -8 } }
+  },
+  "approvedAt": null,
+  "qaSnapshotId": "brown-bear-round-muzzle-v1-candidate"
+}

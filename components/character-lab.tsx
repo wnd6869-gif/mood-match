@@ -57,11 +57,8 @@ export default function CharacterLab() {
           <Select label="눈·눈썹" value={draft.eyes} values={eyes} onChange={(v) => { update("eyes", v as EyeStyleId); update("eyebrows", v as EyeStyleId); }} />
           <Select label="입" value={draft.mouth} values={mouths} onChange={(v) => update("mouth", v as MouthStyleId)} />
           <Select label="얼굴 효과" value={draft.faceEffect ?? ""} values={["","soft-blush","bright-blush","freckles","sparkle-cheeks"]} onChange={(v) => update("faceEffect", (v || undefined) as CharacterComposition["faceEffect"])} />
-          <Select label="의상" value={draft.outfit} values={["cream-knit","coral-hoodie","navy-shirt","sage-cardigan","charcoal-jacket","lavender-sweater"]} onChange={(v) => update("outfit", v as CharacterComposition["outfit"])} />
+          <Select label="의상" value={draft.outfitBase} values={["cream-knit","coral-hoodie","navy-shirt","sage-cardigan","charcoal-jacket","lavender-sweater"]} onChange={(v) => update("outfitBase", v as CharacterComposition["outfitBase"])} />
           <Select label="얼굴 액세서리" value={draft.faceAccessory ?? ""} values={["","round-glasses","thin-glasses"]} onChange={(v) => update("faceAccessory", (v || undefined) as CharacterComposition["faceAccessory"])} />
-          <Select label="머리 액세서리" value={draft.headAccessory ?? ""} values={["","beret","beanie","hairpin"]} onChange={(v) => update("headAccessory", (v || undefined) as CharacterComposition["headAccessory"])} />
-          <Select label="목 액세서리" value={draft.neckAccessory ?? ""} values={["","headphones","bow-tie","scarf"]} onChange={(v) => update("neckAccessory", (v || undefined) as CharacterComposition["neckAccessory"])} />
-          <Select label="손 소품" value={draft.handProp ?? ""} values={["","coffee","book","camera","smartphone","flower","music-player"]} onChange={(v) => update("handProp", (v || undefined) as CharacterComposition["handProp"])} />
           <Select label="배경" value={draft.background} values={["minimal-coral","minimal-sage","minimal-lavender","warm-cafe","cozy-room","green-park","evening-sky","quiet-library"]} onChange={(v) => update("background", v as CharacterComposition["background"])} />
           <Select label="전경 효과" value={draft.foregroundEffect ?? ""} values={["","soft-hearts","tiny-stars","floating-leaves","music-notes","warm-sparkles"]} onChange={(v) => update("foregroundEffect", (v || undefined) as CharacterComposition["foregroundEffect"])} />
           <pre className="overflow-auto rounded-2xl bg-neutral-100 p-3 text-xs">{JSON.stringify(composition, null, 2)}</pre>

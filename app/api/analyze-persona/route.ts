@@ -24,6 +24,7 @@ import {
   type PhotoEligibility,
 } from "@/lib/photo-eligibility";
 import { getModerationStateFromRecord } from "@/lib/moderation";
+import { mapAnalysisToCharacter } from "@/lib/character/character-mapper";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -207,6 +208,13 @@ function safeErrorDetails(error: unknown) {
         ? candidate.request_id
         : undefined,
   };
+}
+
+function isMissingAvatarRecipeColumn(error: { code?: string; message?: string } | null) {
+  if (!error) return false;
+  return error.code === "PGRST204"
+    || error.code === "42703"
+    || /avatar_selection|character_composition|character_asset_version/i.test(error.message ?? "");
 }
 
 async function requestPersonaAnalysis(
@@ -656,8 +664,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { error: saveError } = await supabase.from("personas").upsert(
-      {
+    const personaFields = {
         user_id: user.id,
         photo_path: objectPath,
         animal_types: analysis.result.animalTypes,
@@ -671,9 +678,27 @@ export async function POST(request: Request) {
         output_tokens: analysis.outputTokens,
         total_tokens: analysis.totalTokens,
         analysis_source: "openai",
+      };
+    const composition = mapAnalysisToCharacter(analysis.result, user.id);
+    let { error: saveError } = await supabase.from("personas").upsert(
+      {
+        ...personaFields,
+        character_composition: composition,
+        character_asset_version: composition.version,
+        avatar_selection: composition.avatarSelection ?? null,
       },
       { onConflict: "user_id" },
     );
+
+    // Older projects can run analysis before the additive migration is
+    // applied. Keep that safe while making the migration the source of truth
+    // for reproducible avatars once available.
+    if (isMissingAvatarRecipeColumn(saveError)) {
+      ({ error: saveError } = await supabase.from("personas").upsert(
+        personaFields,
+        { onConflict: "user_id" },
+      ));
+    }
 
     if (saveError) {
       if (process.env.NODE_ENV === "development") {

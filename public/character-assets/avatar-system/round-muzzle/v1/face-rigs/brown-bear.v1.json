@@ -1,0 +1,32 @@
+{
+  "version": "round-muzzle-v1",
+  "animalId": "brown-bear",
+  "faceFamily": "round-muzzle",
+  "coordinateSystem": "face-centers-v1",
+  "sourceAssets": {
+    "sharedExpressionFamily": "round-muzzle",
+    "expressionAssetVersion": "v1",
+    "roundGlasses": "/character-assets/approval/golden-retriever-v2/mvp/png/accessories/round-glasses.png"
+  },
+  "anchors": {
+    "noseCenter": { "x": 512, "y": 376 },
+    "eyeCenter": { "x": 512, "y": 284 },
+    "browCenter": { "x": 512, "y": 220 },
+    "mouthCenter": { "x": 512, "y": 393 }
+  },
+  "layers": {
+    "eyes": { "offsetX": 0, "offsetY": 0, "scaleX": 0.91, "scaleY": 0.92, "rotation": 0 },
+    "eyebrows": { "offsetX": 0, "offsetY": 0, "scaleX": 0.875, "scaleY": 0.9, "rotation": 0 },
+    "mouth": { "offsetX": 0, "offsetY": 0, "scaleX": 0.906, "scaleY": 0.886, "rotation": 0 },
+    "glasses": { "offsetX": 0, "offsetY": 0, "scaleX": 1.12, "scaleY": 1.12, "rotation": 0 }
+  },
+  "colors": { "eyes": "#2b1a13", "eyebrows": "#3c2015", "mouth": "#542a1d" },
+  "expressionTransformOverrides": {
+    "bright": { "eyes": { "deltaY": -7, "scaleX": 1.18, "scaleY": 1.18 }, "eyebrows": { "deltaY": -11, "scaleX": 1.13, "scaleY": 1.13, "rotation": 4 }, "mouth": { "deltaY": -4, "scaleX": 1.27, "scaleY": 1.27 } },
+    "chic": { "eyes": { "deltaY": 5, "scaleX": 0.86, "scaleY": 0.86 }, "eyebrows": { "deltaY": 6, "scaleX": 0.88, "scaleY": 0.88 }, "mouth": { "deltaY": 6, "scaleX": 0.82, "scaleY": 0.82 } },
+    "confident": { "eyes": { "deltaY": -3, "scaleX": 1.06, "scaleY": 1.06 }, "eyebrows": { "deltaY": -5, "scaleX": 1.22, "scaleY": 1.18, "rotation": -6 }, "mouth": { "deltaY": 0, "scaleX": 1.17, "scaleY": 1.17 } },
+    "playful": { "eyes": { "deltaY": -6, "scaleX": 1.14, "scaleY": 1.12 }, "eyebrows": { "deltaY": -10, "scaleX": 1.22, "scaleY": 1.16, "rotation": 9 }, "mouth": { "deltaX": 8, "deltaY": -3, "scaleX": 1.28, "scaleY": 1.25, "rotation": -8 } }
+  },
+  "approvedAt": "2026-07-29",
+  "qaSnapshotId": "brown-bear-round-muzzle-v1-approved"
+}

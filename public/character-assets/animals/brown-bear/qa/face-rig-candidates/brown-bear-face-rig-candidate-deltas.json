@@ -1,0 +1,140 @@
+{
+  "current": {
+    "noseCenter": {
+      "x": 512,
+      "y": 376
+    },
+    "eyes": {
+      "x": 410,
+      "y": 230,
+      "scaleX": 0.91,
+      "scaleY": 0.92,
+      "rotation": 0
+    },
+    "eyebrows": {
+      "x": 414,
+      "y": 190,
+      "scaleX": 0.875,
+      "scaleY": 0.9,
+      "rotation": 0
+    },
+    "mouth": {
+      "x": 454,
+      "y": 379,
+      "scaleX": 0.906,
+      "scaleY": 0.886,
+      "rotation": 0
+    },
+    "glasses": {
+      "x": -10,
+      "y": -145,
+      "scaleX": 1.02,
+      "scaleY": 1.02,
+      "rotation": 0
+    }
+  },
+  "candidates": {
+    "A-current": {
+      "noseCenter": {
+        "x": 512,
+        "y": 376
+      },
+      "eyes": {
+        "x": 410,
+        "y": 230,
+        "scaleX": 0.91,
+        "scaleY": 0.92,
+        "rotation": 0
+      },
+      "eyebrows": {
+        "x": 414,
+        "y": 190,
+        "scaleX": 0.875,
+        "scaleY": 0.9,
+        "rotation": 0
+      },
+      "mouth": {
+        "x": 454,
+        "y": 379,
+        "scaleX": 0.906,
+        "scaleY": 0.886,
+        "rotation": 0
+      },
+      "glasses": {
+        "x": -10,
+        "y": -145,
+        "scaleX": 1.02,
+        "scaleY": 1.02,
+        "rotation": 0
+      }
+    },
+    "B-compact-face": {
+      "noseCenter": {
+        "x": 512,
+        "y": 376
+      },
+      "eyes": {
+        "x": 410,
+        "y": 238,
+        "scaleX": 0.91,
+        "scaleY": 0.92,
+        "rotation": 0
+      },
+      "eyebrows": {
+        "x": 414,
+        "y": 198,
+        "scaleX": 0.875,
+        "scaleY": 0.9,
+        "rotation": 0
+      },
+      "mouth": {
+        "x": 454,
+        "y": 367,
+        "scaleX": 0.906,
+        "scaleY": 0.886,
+        "rotation": 0
+      },
+      "glasses": {
+        "x": -10,
+        "y": -145,
+        "scaleX": 1.02,
+        "scaleY": 1.02,
+        "rotation": 0
+      }
+    },
+    "C-glasses-fit": {
+      "noseCenter": {
+        "x": 512,
+        "y": 376
+      },
+      "eyes": {
+        "x": 410,
+        "y": 238,
+        "scaleX": 0.91,
+        "scaleY": 0.92,
+        "rotation": 0
+      },
+      "eyebrows": {
+        "x": 414,
+        "y": 198,
+        "scaleX": 0.875,
+        "scaleY": 0.9,
+        "rotation": 0
+      },
+      "mouth": {
+        "x": 454,
+        "y": 367,
+        "scaleX": 0.906,
+        "scaleY": 0.886,
+        "rotation": 0
+      },
+      "glasses": {
+        "x": -61,
+        "y": -180,
+        "scaleX": 1.12,
+        "scaleY": 1.12,
+        "rotation": 0
+      }
+    }
+  }
+}

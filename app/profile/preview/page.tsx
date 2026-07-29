@@ -5,6 +5,7 @@ import BackLink from "@/components/back-link";
 import PublicProfileVisual from "@/components/public-profile-visual";
 import {
   getPersonaResultFromRecord,
+  getCharacterCompositionFromRecord,
   PERSONA_SELECT_COLUMNS,
   type PersonaRecord,
 } from "@/lib/persona-record";
@@ -91,6 +92,9 @@ export default async function PublicProfilePreviewPage() {
       ? profileResponse.data.birth_date
       : null;
   const persona = getPersonaResultFromRecord(
+    personaResponse.data as PersonaRecord | null,
+  );
+  const composition = getCharacterCompositionFromRecord(
     personaResponse.data as PersonaRecord | null,
   );
   const ageDisplay = getAgeDisplay(
@@ -194,6 +198,7 @@ export default async function PublicProfilePreviewPage() {
           <PublicProfileVisual
             personaTitle={persona.personaTitle}
             animalTypes={persona.animalTypes}
+            composition={composition ?? undefined}
             photoVisibility={profile.photo_visibility}
             photoUrl={null}
           />

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import PersonaResultView from "@/components/persona-result-view";
 import {
   getPersonaResultFromRecord,
+  getCharacterCompositionFromRecord,
   PERSONA_SELECT_COLUMNS,
   type PersonaRecord,
 } from "@/lib/persona-record";
@@ -39,11 +40,15 @@ export default async function ResultPage() {
   const serverResult = getPersonaResultFromRecord(
     data as PersonaRecord | null,
   );
+  const serverComposition = getCharacterCompositionFromRecord(
+    data as PersonaRecord | null,
+  );
 
   return (
     <PersonaResultView
       userId={user.id}
       serverResult={serverResult}
+      serverComposition={serverComposition}
       personaIdentity={
         profileData &&
         typeof profileData.public_nickname === "string"

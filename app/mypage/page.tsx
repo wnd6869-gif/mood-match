@@ -6,6 +6,7 @@ import LogoutButton from "@/components/logout-button";
 import MobileNav from "@/components/mobile-nav";
 import {
   getPersonaResultFromRecord,
+  getCharacterCompositionFromRecord,
   PERSONA_SELECT_COLUMNS,
   type PersonaRecord,
 } from "@/lib/persona-record";
@@ -125,6 +126,9 @@ export default async function MyPage() {
   const persona = getPersonaResultFromRecord(
     personaResponse.data as PersonaRecord | null,
   );
+  const personaComposition = getCharacterCompositionFromRecord(
+    personaResponse.data as PersonaRecord | null,
+  );
   const publicProfile = getPublicChatProfileFromRecord(
     profileResponse.data,
   );
@@ -143,6 +147,7 @@ export default async function MyPage() {
           <CharacterAvatar
             animalTypes={persona.animalTypes}
             personaTitle={persona.personaTitle}
+            composition={personaComposition ?? undefined}
             className="size-24 shrink-0 rounded-[1.5rem]"
           />
         ) : (
