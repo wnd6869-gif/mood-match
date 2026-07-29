@@ -9,6 +9,9 @@ import brownBearRig from "@/public/character-assets/avatar-system/round-muzzle/v
 import welshCorgiRig from "@/public/character-assets/avatar-system/round-muzzle/v1/face-rigs/welsh-corgi.v1.json";
 import capybaraRig from "@/public/character-assets/avatar-system/round-muzzle/v1/face-rigs/capybara.v1.json";
 import roundMuzzleFamilyDefaults from "@/public/character-assets/avatar-system/round-muzzle/v1/family-defaults.json";
+import { catAvatarSelectionFromComposition, isCatAvatarSelection, resolveCatFixedAvatarLayers } from "@/lib/character/cat-avatar-system";
+import { isPointedMuzzleAvatarSelection, pointedMuzzleAvatarSelectionFromComposition, resolvePointedMuzzleFixedAvatarLayers } from "@/lib/character/pointed-muzzle-avatar-system";
+import { AVATAR_FOREGROUND_EFFECTS } from "@/lib/avatar-effects";
 
 export const ROUND_MUZZLE_VERSION = "v1" as const;
 export const ROUND_MUZZLE_EXPRESSIONS = ["gentle", "bright", "chic", "confident", "playful"] as const;
@@ -284,6 +287,8 @@ function expressionPath(
 }
 
 export function resolveFixedAvatarLayers(selection: AvatarSelection): ResolvedAvatarLayer[] {
+  if (isCatAvatarSelection(selection)) return resolveCatFixedAvatarLayers(selection);
+  if (isPointedMuzzleAvatarSelection(selection)) return resolvePointedMuzzleFixedAvatarLayers(selection);
   const preset = AVATAR_FACE_RIG_PRESETS[selection.animalId];
   if (!preset || selection.faceRigVersion !== preset.version) throw new Error("AvatarSelection FaceRig preset is unavailable.");
   if (!Object.hasOwn(AVATAR_BACKGROUNDS, selection.backgroundId)) throw new Error("AvatarSelection background is unavailable.");
@@ -313,7 +318,7 @@ export function resolveFixedAvatarLayers(selection: AvatarSelection): ResolvedAv
     { src: FIXED_OUTFIT_BASES[selection.outfitBaseId as FixedOutfitBaseId] },
     partLayer("eyes"), partLayer("eyebrows"), partLayer("mouth"),
     ...(selection.glassesId && resolvedRig.anchors.glasses ? [{ src: resolvedRig.sourceAssets.roundGlasses ?? ROUND_GLASSES, rigPlacement: { x: resolvedRig.anchors.glasses.x, y: resolvedRig.anchors.glasses.y, width: 1024 * resolvedRig.anchors.glasses.scaleX, height: 1024 * resolvedRig.anchors.glasses.scaleY, rotation: resolvedRig.anchors.glasses.rotation } }] : []),
-    ...(selection.effectId ? [{ src: WARM_SPARKLES }] : []),
+    ...(selection.effectId ? [{ src: AVATAR_FOREGROUND_EFFECTS[selection.effectId] }] : []),
   ];
 }
 
@@ -334,9 +339,15 @@ export function expressionFromComposition(composition: CharacterComposition): Ro
 export function avatarSelectionFromComposition(composition: CharacterComposition): AvatarSelection | undefined {
   if (composition.avatarSelection) {
     const stored = composition.avatarSelection;
+    if (isCatAvatarSelection(stored)) return stored;
+    if (isPointedMuzzleAvatarSelection(stored)) return stored;
     const preset = AVATAR_FACE_RIG_PRESETS[stored.animalId];
     if (preset && preset.animalId === stored.animalId && preset.version === stored.faceRigVersion) return stored;
   }
+  const catSelection = catAvatarSelectionFromComposition(composition);
+  if (catSelection) return catSelection;
+  const pointedMuzzleSelection = pointedMuzzleAvatarSelectionFromComposition(composition);
+  if (pointedMuzzleSelection) return pointedMuzzleSelection;
   const outfitBaseId = getFixedOutfitBaseId(composition.animal, composition.outfitBase);
   if (!outfitBaseId) return undefined;
   return {

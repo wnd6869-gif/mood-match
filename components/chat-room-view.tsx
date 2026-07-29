@@ -20,6 +20,8 @@ import {
 } from "@/lib/chat";
 import type { PhotoRevealStatus } from "@/lib/photo-reveal";
 import { createClient } from "@/lib/supabase/client";
+import AvatarRenderer from "@/components/avatar-renderer";
+import { isCharacterRecipe } from "@/lib/persona-record";
 
 type ChatRoomViewProps = {
   currentUserId: string;
@@ -281,6 +283,10 @@ export default function ChatRoomView({
           ariaLabel="채팅 목록으로 돌아가기"
           label=""
         />
+        {/*
+        {context.conversationType === "direct" && isCharacterRecipe(context.otherCharacterRecipe) && (
+          <AvatarRenderer recipe={context.otherCharacterRecipe} size={40} shape="circle" className="size-10" alt="상대 캐릭터" />
+        )}
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-base font-bold text-neutral-900">
             {roomTitle}
@@ -310,6 +316,39 @@ export default function ChatRoomView({
         </p>
       )}
 
+      <>{context.conversationType === "direct" && (
+        <MutualPhotoReveal
+          conversationId={context.conversationId}
+          otherNickname={context.otherPublicNickname}
+          initialStatus={initialPhotoRevealStatus}
+          initialPhotoUrl={initialOtherPhotoUrl}
+        />
+        {context.conversationType === "direct" && isCharacterRecipe(context.otherCharacterRecipe) && (
+          <AvatarRenderer recipe={context.otherCharacterRecipe} size={40} shape="circle" className="size-10" alt={`${roomTitle} 캐릭터`} />
+        )}
+
+      )}</>
+
+        */}
+        {context.conversationType === "direct" && isCharacterRecipe(context.otherCharacterRecipe) && (
+          <AvatarRenderer recipe={context.otherCharacterRecipe} size={40} shape="circle" className="size-10" alt="상대 캐릭터" />
+        )}
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-base font-bold text-neutral-900">{roomTitle}</h1>
+          <p className="truncate text-xs font-semibold text-coral-600">{roomSubtitle}</p>
+        </div>
+        <ChatRoomMenu context={context} />
+      </header>
+      {realtimeMessage && (
+        <p role="status" className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-800">
+          {realtimeMessage}
+        </p>
+      )}
+      {safetyFeedback && (
+        <p role="status" className="mt-3 rounded-xl bg-coral-50 px-3 py-2 text-xs leading-5 text-coral-800">
+          {safetyFeedback}
+        </p>
+      )}
       {context.conversationType === "direct" && (
         <MutualPhotoReveal
           conversationId={context.conversationId}
@@ -318,7 +357,6 @@ export default function ChatRoomView({
           initialPhotoUrl={initialOtherPhotoUrl}
         />
       )}
-
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}

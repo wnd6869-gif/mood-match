@@ -9,6 +9,8 @@ import {
   getDiscoverableProfileFromRecord,
   type DiscoverableProfile,
 } from "@/lib/conversation-request";
+import { isCharacterRecipe } from "@/lib/persona-record";
+import type { CharacterRecipe } from "@/lib/character-casting";
 import {
   calculateRecommendationScore,
   getMatchPreferenceFromRecord,
@@ -134,7 +136,28 @@ export default async function DiscoverPage({
             profile !== null,
         )
     : [];
-  const scoredProfiles = profiles.map((profile) => ({
+  // The RPC is added by avatar-recipes.sql. On projects that have not applied
+  // it yet cards keep their existing composition fallback instead of failing.
+  const recipeResponse = profiles.length > 0
+    ? await supabase.rpc("get_visible_avatar_recipes", {
+      p_user_ids: profiles.map((profile) => profile.userId),
+    })
+    : { data: [], error: null };
+  const recipes = new Map(
+    Array.isArray(recipeResponse.data)
+      ? recipeResponse.data
+          .filter((row): row is { user_id: string; character_recipe: unknown } => Boolean(row && typeof row === "object" && "user_id" in row && typeof row.user_id === "string"))
+          .map((row) => [row.user_id, row.character_recipe])
+      : [],
+  );
+  const profilesWithRecipes: Array<DiscoverableProfile & { characterRecipe: CharacterRecipe | null }> = profiles.map((profile) => {
+    const candidateRecipe = recipes.get(profile.userId);
+    return {
+      ...profile,
+      characterRecipe: isCharacterRecipe(candidateRecipe) ? candidateRecipe : null,
+    };
+  });
+  const scoredProfiles = profilesWithRecipes.map((profile) => ({
     profile,
     score:
       matchPreference && ownSettings
@@ -262,6 +285,8 @@ export default async function DiscoverPage({
                   <CharacterAvatar
                     animalTypes={profile.animalTypes}
                     personaTitle={profile.personaTitle}
+                    recipe={profile.characterRecipe ?? undefined}
+                    variant="avatar"
                     className="aspect-square"
                   />
                 </Link>

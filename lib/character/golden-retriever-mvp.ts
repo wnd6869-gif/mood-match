@@ -14,8 +14,6 @@ export const GOLDEN_MVP_OUTFITS = [
   "coral-hoodie",
 ] as const;
 export const GOLDEN_MVP_FACE_ACCESSORIES = ["round-glasses"] as const;
-/** Retained for audit only; no longer selectable in user-facing compositions. */
-export const DEPRECATED_GOLDEN_MVP_HAND_PROPS = ["coffee", "book"] as const;
 export const GOLDEN_MVP_BACKGROUNDS = [
   "minimal-cream",
   "warm-cafe",
@@ -25,8 +23,6 @@ export const GOLDEN_MVP_BACKGROUNDS = [
 export type GoldenMvpOutfit = (typeof GOLDEN_MVP_OUTFITS)[number];
 export type GoldenMvpFaceAccessory =
   (typeof GOLDEN_MVP_FACE_ACCESSORIES)[number];
-export type DeprecatedGoldenMvpHandProp =
-  (typeof DEPRECATED_GOLDEN_MVP_HAND_PROPS)[number];
 export type GoldenMvpBackground = (typeof GOLDEN_MVP_BACKGROUNDS)[number];
 export type GoldenFixedBaseId =
   | "golden-retriever-cream-knit"
@@ -64,33 +60,12 @@ export const GOLDEN_MVP_ASSETS = {
   faceAccessories: {
     "round-glasses": `${MVP_ROOT}/accessories/round-glasses.png`,
   } as Record<GoldenMvpFaceAccessory, string>,
-  /** Retained for audit only; never expose in a new selection. */
-  deprecatedHeadAccessories: {
-    beret: `${MVP_ROOT}/accessories/beret.png`,
-  },
-  /** Retained for audit only; never use for a new composition. */
-  deprecatedHandProps: {
-    coffee: {
-      behindPaw: `${MVP_ROOT}/props/coffee-behind-paw.png`,
-      frontPaws: [`${MVP_ROOT}/props/paw-front-coffee.png`],
-    },
-    book: {
-      behindPaw: `${MVP_ROOT}/props/book-behind-paw.png`,
-      frontPaws: [
-        `${MVP_ROOT}/props/paw-front-left-book.png`,
-        `${MVP_ROOT}/props/paw-front-right-book.png`,
-      ],
-    },
-  } as Record<DeprecatedGoldenMvpHandProp, { behindPaw: string; frontPaws: string[] }>,
 };
 
 export const GOLDEN_MVP_COMBINATION_RULES = {
   maxOutfits: 1,
   maxFaceAccessories: 1,
   maxBackgrounds: 1,
-  handProps: "deprecated-and-never-selectable",
-  neckAccessories: "deprecated-and-never-selectable",
-  headAccessories: "deprecated-and-never-selectable",
   roundGlassesCompatibleWithExpressions: true,
   contrastAdvisory: {
     "cream-knit-sweater": ["minimal-cream"],

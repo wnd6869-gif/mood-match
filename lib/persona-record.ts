@@ -7,6 +7,10 @@ import type {
   AvatarSelection,
   CharacterComposition,
 } from "@/lib/character/character-types";
+import {
+  recipeToComposition,
+  type CharacterRecipe,
+} from "@/lib/character-casting";
 
 export const PERSONA_SELECT_COLUMNS =
   "*";
@@ -29,6 +33,9 @@ export type PersonaRecord = {
   created_at: string;
   character_composition?: unknown;
   avatar_selection?: unknown;
+  character_recipe?: unknown;
+  avatar_system_version?: string | null;
+  avatar_updated_at?: string | null;
 };
 
 const LEGACY_ID_ADJECTIVE_PAIRS = [
@@ -99,6 +106,25 @@ function isAvatarSelection(value: unknown): value is AvatarSelection {
     && typeof candidate.backgroundId === "string";
 }
 
+export function isCharacterRecipe(value: unknown): value is CharacterRecipe {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as Record<string, unknown>;
+  return candidate.systemVersion === "avatar-v1"
+    && typeof candidate.animalId === "string"
+    && typeof candidate.outfitBaseId === "string"
+    && typeof candidate.faceFamily === "string"
+    && typeof candidate.faceRigVersion === "string"
+    && typeof candidate.expressionId === "string"
+    && typeof candidate.backgroundId === "string"
+    && typeof candidate.castingSeed === "string";
+}
+
+export function getCharacterRecipeFromRecord(value: unknown): CharacterRecipe | null {
+  if (!value || typeof value !== "object") return null;
+  const record = value as Record<string, unknown>;
+  return isCharacterRecipe(record.character_recipe) ? record.character_recipe : null;
+}
+
 /**
  * Rebuild legacy recipe fields only when necessary. A saved AvatarSelection is
  * then attached unchanged, so cards, chat, and result pages resolve the same
@@ -110,6 +136,8 @@ export function getCharacterCompositionFromRecord(
   const persona = getPersonaResultFromRecord(value);
   if (!persona || !value || typeof value !== "object") return null;
   const record = value as Record<string, unknown>;
+  const savedRecipe = getCharacterRecipeFromRecord(record);
+  if (savedRecipe) return recipeToComposition(savedRecipe);
   const userId = typeof record.user_id === "string" ? record.user_id : "persona";
   const fallback = mapAnalysisToCharacter(persona, userId);
   const saved = isAvatarSelection(record.avatar_selection)

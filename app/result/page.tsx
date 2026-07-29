@@ -3,6 +3,7 @@ import PersonaResultView from "@/components/persona-result-view";
 import {
   getPersonaResultFromRecord,
   getCharacterCompositionFromRecord,
+  getCharacterRecipeFromRecord,
   PERSONA_SELECT_COLUMNS,
   type PersonaRecord,
 } from "@/lib/persona-record";
@@ -43,12 +44,14 @@ export default async function ResultPage() {
   const serverComposition = getCharacterCompositionFromRecord(
     data as PersonaRecord | null,
   );
+  const serverRecipe = getCharacterRecipeFromRecord(data as PersonaRecord | null);
 
   return (
     <PersonaResultView
       userId={user.id}
       serverResult={serverResult}
       serverComposition={serverComposition}
+      serverRecipe={serverRecipe}
       personaIdentity={
         profileData &&
         typeof profileData.public_nickname === "string"

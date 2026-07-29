@@ -7,7 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:avatar-rig": "node scripts/verify-avatar-face-rig-regression.mjs"
+    "test:avatar-rig": "node scripts/verify-avatar-face-rig-regression.mjs",
+    "test:cat-v1": "node scripts/verify-cat-v1.mjs",
+    "test:pointed-muzzle-v1": "node scripts/verify-pointed-muzzle-v1.mjs",
+    "test:avatar-casting": "node scripts/verify-avatar-casting.mjs",
+    "render:pointed-muzzle-fox-qa": "node scripts/render-pointed-muzzle-red-fox-qa.mjs",
+    "render:pointed-muzzle-border-collie-qa": "node scripts/render-pointed-muzzle-red-fox-qa.mjs border-collie"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.3",

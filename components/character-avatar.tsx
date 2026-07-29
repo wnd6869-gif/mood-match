@@ -8,6 +8,8 @@ import ComposedCharacter from "@/components/composed-character";
 import type { CharacterComposition } from "@/lib/character/character-types";
 import type { CharacterDisplayVariant } from "@/lib/character/character-types";
 import { mapAvatarInputToCharacter } from "@/lib/character/character-mapper";
+import AvatarRenderer from "@/components/avatar-renderer";
+import type { CharacterRecipe } from "@/lib/character-casting";
 
 type CharacterAvatarProps = {
   animalTypes?: readonly { name: string; score?: number }[];
@@ -19,6 +21,7 @@ type CharacterAvatarProps = {
   imageClassName?: string;
   composition?: CharacterComposition;
   variant?: CharacterDisplayVariant;
+  recipe?: CharacterRecipe;
 };
 
 export default function CharacterAvatar({
@@ -31,7 +34,12 @@ export default function CharacterAvatar({
   imageClassName = "",
   composition,
   variant = "full",
+  recipe,
 }: CharacterAvatarProps) {
+  if (recipe) {
+    const size = variant === "avatar-small" ? 40 : variant === "avatar" ? 64 : variant === "card" ? 128 : 256;
+    return <AvatarRenderer recipe={recipe} size={size} shape="square" priority={priority} className={className} alt={alt ?? `${personaTitle || "AI"} 동물 캐릭터`} />;
+  }
   if (composition) {
     return (
       <ComposedCharacter

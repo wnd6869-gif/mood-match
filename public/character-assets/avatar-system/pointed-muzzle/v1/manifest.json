@@ -1,0 +1,24 @@
+{
+  "id": "pointed-muzzle",
+  "version": "v1",
+  "status": "approved",
+  "expressions": ["gentle", "bright", "chic", "confident", "playful"],
+  "layers": ["eyes", "eyebrows", "snout-mark"],
+  "sourceExpressionRoot": "/character-assets/avatar-system/pointed-muzzle/v1/expressions",
+  "accessories": { "roundGlasses": "/character-assets/avatar-system/pointed-muzzle/v1/accessories/round-glasses.svg" },
+  "outfitBases": {
+    "shiba-inu-olive-hoodie": { "animalId": "shiba-inu", "file": "/character-assets/animals/shiba-inu/olive-hoodie/shiba-inu.olive-hoodie-base.v2.png" },
+    "red-fox-olive-hoodie": { "animalId": "red-fox", "file": "/character-assets/animals/red-fox/olive-hoodie/red-fox.olive-hoodie-base.png" },
+    "border-collie-charcoal-jacket": { "animalId": "border-collie", "file": "/character-assets/animals/border-collie/charcoal-jacket/border-collie.charcoal-jacket-base.png" }
+  },
+  "faceRigPresets": {
+    "shiba-inu.olive-hoodie.v1.json": "5baa6e960c49fcba0e18641c049e52a294d2078b5d4807f9b435a654049cb196",
+    "red-fox.olive-hoodie.v1.json": "db8ad1c8c4ffd1edac8f3e06a862e28be85fa2b1c1d0d009a99825dfc43dbb1a",
+    "border-collie.charcoal-jacket.v1.json": "0e66e4195073f855b0fda46c43e1567805caf64d980d00712966001a1b6f58e2"
+  },
+  "invariants": [
+    "Pointed-muzzle v1 is isolated from round-muzzle v1 and cat v1 source assets.",
+    "A snout-mark SVG owns only the short philtrum and mouth below a fixed base nose.",
+    "An animal-outfit base is a complete fixed illustration with a blank eye/brow/mouth rigging area and a fixed nose."
+  ]
+}

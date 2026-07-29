@@ -1,0 +1,34 @@
+{
+  "version": "cat-v1",
+  "animalId": "scottish-fold",
+  "outfitBaseId": "scottish-fold-olive-knit",
+  "faceFamily": "cat",
+  "coordinateSystem": "face-centers-v1",
+  "sourceAssets": {
+    "sharedExpressionFamily": "cat",
+    "expressionAssetVersion": "v1",
+    "roundGlasses": "/character-assets/avatar-system/cat/v1/accessories/round-glasses.svg"
+  },
+  "anchors": {
+    "noseCenter": { "x": 512, "y": 411 },
+    "eyeCenter": { "x": 512, "y": 320 },
+    "browCenter": { "x": 512, "y": 258 },
+    "noseMouth": { "x": 512, "y": 411 }
+  },
+  "layers": {
+    "eyes": { "offsetX": 0, "offsetY": 0, "scaleX": 1.06, "scaleY": 1.06, "rotation": 0 },
+    "eyebrows": { "offsetX": 0, "offsetY": 0, "scaleX": 0.96, "scaleY": 0.96, "rotation": 0 },
+    "noseMouth": { "offsetX": 0, "offsetY": 0, "scaleX": 0.98, "scaleY": 0.98, "rotation": 0 },
+    "glasses": { "offsetX": 0, "offsetY": 0, "scaleX": 1.06, "scaleY": 1.06, "rotation": 0 }
+  },
+  "colors": { "eyes": "#38414a", "eyebrows": "#50565d", "noseMouth": "#59606b" },
+  "expressionTransformOverrides": {
+    "gentle": {},
+    "bright": { "eyes": { "deltaY": -3, "scaleX": 1.08, "scaleY": 1.08 }, "eyebrows": { "deltaY": -5, "rotation": 2 }, "noseMouth": { "deltaY": -1, "scaleX": 1.02, "scaleY": 1.02 } },
+    "chic": { "eyes": { "deltaY": 1, "scaleX": 0.94, "scaleY": 0.90 }, "eyebrows": { "deltaY": 2, "scaleX": 0.94, "scaleY": 0.94 }, "noseMouth": { "deltaY": 1, "scaleX": 0.98, "scaleY": 0.98 } },
+    "confident": { "eyes": { "deltaY": -1, "scaleX": 1.02, "scaleY": 0.98 }, "eyebrows": { "deltaY": -3, "scaleX": 1.05, "rotation": -3 }, "noseMouth": { "deltaY": 1, "scaleX": 1 } },
+    "playful": { "eyes": { "deltaY": -2, "scaleX": 1.04, "scaleY": 1.02 }, "eyebrows": { "deltaY": -6, "scaleX": 1.06, "rotation": 4 }, "noseMouth": { "deltaX": 2, "deltaY": 0, "scaleX": 1.02, "rotation": -2 } }
+  },
+  "approvedAt": "2026-07-29",
+  "qaSnapshotId": "scottish-fold-cat-v1-approved"
+}

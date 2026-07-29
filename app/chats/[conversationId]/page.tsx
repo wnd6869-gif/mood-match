@@ -10,6 +10,7 @@ import {
 } from "@/lib/photo-reveal";
 import { createProfilePhotoSignedUrl } from "@/lib/supabase/profile-photo";
 import { createClient } from "@/lib/supabase/server";
+import { isCharacterRecipe } from "@/lib/persona-record";
 
 export const dynamic = "force-dynamic";
 
@@ -52,6 +53,14 @@ export default async function ChatRoomPage({
   if (!context) {
     notFound();
   }
+  const recipeResponse = context.otherUserId
+    ? await supabase.rpc("get_visible_avatar_recipes", { p_user_ids: [context.otherUserId] })
+    : { data: [], error: null };
+  const recipeRow = Array.isArray(recipeResponse.data) ? recipeResponse.data[0] : null;
+  const otherCharacterRecipe = recipeRow && typeof recipeRow === "object" && "character_recipe" in recipeRow && isCharacterRecipe(recipeRow.character_recipe)
+    ? recipeRow.character_recipe
+    : undefined;
+  context.otherCharacterRecipe = otherCharacterRecipe;
 
   const { data: messageData, error: messageError } = await supabase
     .from("messages")

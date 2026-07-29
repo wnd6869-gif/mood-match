@@ -1,0 +1,188 @@
+{
+  "rig": {
+    "version": "pointed-muzzle-v1",
+    "animalId": "border-collie",
+    "outfitBaseId": "border-collie-charcoal-jacket",
+    "faceFamily": "pointed-muzzle",
+    "coordinateSystem": "face-centers-v1",
+    "sourceAssets": {
+      "sharedExpressionFamily": "pointed-muzzle",
+      "expressionAssetVersion": "v1",
+      "roundGlasses": "/character-assets/avatar-system/pointed-muzzle/v1/accessories/round-glasses.svg"
+    },
+    "anchors": {
+      "noseCenter": {
+        "x": 518,
+        "y": 342
+      },
+      "eyeCenter": {
+        "x": 518,
+        "y": 259
+      },
+      "browCenter": {
+        "x": 518,
+        "y": 205
+      },
+      "snoutMark": {
+        "x": 518,
+        "y": 381
+      }
+    },
+    "layers": {
+      "eyes": {
+        "offsetX": 0,
+        "offsetY": 0,
+        "scaleX": 0.82,
+        "scaleY": 0.82,
+        "rotation": 0
+      },
+      "eyebrows": {
+        "offsetX": 0,
+        "offsetY": 0,
+        "scaleX": 0.78,
+        "scaleY": 0.78,
+        "rotation": 0
+      },
+      "snoutMark": {
+        "offsetX": 0,
+        "offsetY": 0,
+        "scaleX": 0.72,
+        "scaleY": 0.72,
+        "rotation": 0
+      },
+      "glasses": {
+        "offsetX": 0,
+        "offsetY": 0,
+        "scaleX": 0.78,
+        "scaleY": 0.78,
+        "rotation": 0
+      }
+    },
+    "colors": {
+      "eyes": "#261c1a",
+      "eyebrows": "#4a3029",
+      "snoutMark": "#3d2924"
+    },
+    "expressionTransformOverrides": {
+      "gentle": {},
+      "bright": {
+        "eyes": {
+          "deltaY": -3,
+          "scaleX": 1.08,
+          "scaleY": 1.1
+        },
+        "eyebrows": {
+          "deltaY": -5,
+          "rotation": 2
+        },
+        "snoutMark": {
+          "deltaY": -1,
+          "scaleX": 1.02,
+          "scaleY": 1.02
+        }
+      },
+      "chic": {
+        "eyes": {
+          "deltaY": 1,
+          "scaleX": 0.94,
+          "scaleY": 0.9
+        },
+        "eyebrows": {
+          "deltaY": 2,
+          "scaleX": 0.94,
+          "scaleY": 0.94
+        },
+        "snoutMark": {
+          "deltaY": 1,
+          "scaleX": 0.98,
+          "scaleY": 0.98
+        }
+      },
+      "confident": {
+        "eyes": {
+          "deltaY": -1,
+          "scaleX": 1.02,
+          "scaleY": 0.98
+        },
+        "eyebrows": {
+          "deltaY": -3,
+          "scaleX": 1.05,
+          "rotation": -3
+        },
+        "snoutMark": {
+          "deltaY": 1,
+          "scaleX": 1
+        }
+      },
+      "playful": {
+        "eyes": {
+          "deltaY": -2,
+          "scaleX": 1.04,
+          "scaleY": 1.02
+        },
+        "eyebrows": {
+          "deltaY": -6,
+          "scaleX": 1.06,
+          "rotation": 4
+        },
+        "snoutMark": {
+          "deltaX": 2,
+          "deltaY": 0,
+          "scaleX": 1.02,
+          "rotation": -2
+        }
+      }
+    },
+    "approvedAt": null,
+    "qaSnapshotId": "border-collie-pointed-muzzle-v1-candidate"
+  },
+  "sharedExpressionAssets": {
+    "public/character-assets/avatar-system/pointed-muzzle/v1/expressions/gentle/eyes.svg": "3f14673d10533d8fc504121f05c1055fa675a12d4638f64cd1871936bb64b456",
+    "public/character-assets/avatar-system/pointed-muzzle/v1/expressions/gentle/eyebrows.svg": "eeac0e3e24c925363674d92c45de4f66c7884c5dc581d3c6a696b1521f86eec4",
+    "public/character-assets/avatar-system/pointed-muzzle/v1/expressions/gentle/snout-mark.svg": "1c9a7814923840d9e35d6e1855455dcb199440305259101093e90ba2a8e97c42",
+    "public/character-assets/avatar-system/pointed-muzzle/v1/expressions/bright/eyes.svg": "b2b49bac20b448fd5efb2c668f97446dc61e55e63229a3397702f25195f659db",
+    "public/character-assets/avatar-system/pointed-muzzle/v1/expressions/bright/eyebrows.svg": "98417ac95f1b9d67f2159dc2bac204e7ce428ad6d4447bb5b0f6bf4c3fb9aea4",
+    "public/character-assets/avatar-system/pointed-muzzle/v1/expressions/bright/snout-mark.svg": "4235e70fb46819df432c3a065934939f4963793da93b87bb295cb51a569246f4",
+    "public/character-assets/avatar-system/pointed-muzzle/v1/expressions/chic/eyes.svg": "846a8d69479b78deea9e9e11984146ecf7f87caf91de3cbd39f9c1afeabb908a",
+    "public/character-assets/avatar-system/pointed-muzzle/v1/expressions/chic/eyebrows.svg": "f449416b546f20ac5318b7143dfe542960b296fe1a52d363e56d3f774aaa3fe9",
+    "public/character-assets/avatar-system/pointed-muzzle/v1/expressions/chic/snout-mark.svg": "cb6403d5b122700eddfa9068a75467f62c4f1c3452b566b7ce9d172b30c92b25",
+    "public/character-assets/avatar-system/pointed-muzzle/v1/expressions/confident/eyes.svg": "47e0b9241473394a3d02b380fb3ad39b9d3715021f2c948cdefb179603a9bae1",
+    "public/character-assets/avatar-system/pointed-muzzle/v1/expressions/confident/eyebrows.svg": "fe6315ced87b91e5d487a15fd75133efda708f9c401c3e6ede542f42a460dad9",
+    "public/character-assets/avatar-system/pointed-muzzle/v1/expressions/confident/snout-mark.svg": "252e5f2c83b9fcab2f466c1edc99a3b6565b76e7e31f4961d01a0f0fa5069124",
+    "public/character-assets/avatar-system/pointed-muzzle/v1/expressions/playful/eyes.svg": "e970723cc14dc4dfc4c81996e6b2f0f108b6c516c924bed3257e5df8bfa64501",
+    "public/character-assets/avatar-system/pointed-muzzle/v1/expressions/playful/eyebrows.svg": "0816fb320b88b7ecd3f7e28f1520cdc350c837026bae49d0db4813b08857adfa",
+    "public/character-assets/avatar-system/pointed-muzzle/v1/expressions/playful/snout-mark.svg": "ddd30d75e1b1054d34cb65f85fad1d079657ae056b5c91685591cea8c965abd7"
+  },
+  "cases": [
+    {
+      "expression": "gentle",
+      "background": "minimal-cream",
+      "glasses": false,
+      "sparkles": false
+    },
+    {
+      "expression": "bright",
+      "background": "green-park",
+      "glasses": false,
+      "sparkles": false
+    },
+    {
+      "expression": "chic",
+      "background": "warm-cafe",
+      "glasses": true,
+      "sparkles": false
+    },
+    {
+      "expression": "confident",
+      "background": "warm-cafe",
+      "glasses": false,
+      "sparkles": false
+    },
+    {
+      "expression": "playful",
+      "background": "minimal-cream",
+      "glasses": false,
+      "sparkles": true
+    }
+  ]
+}

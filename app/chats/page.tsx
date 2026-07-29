@@ -10,6 +10,7 @@ import {
   type ChatListItem,
 } from "@/lib/chat";
 import { createClient } from "@/lib/supabase/server";
+import { isCharacterRecipe } from "@/lib/persona-record";
 
 export const dynamic = "force-dynamic";
 
@@ -38,6 +39,19 @@ export default async function ChatsPage() {
           (item): item is ChatListItem => item !== null,
         )
     : [];
+  const otherUserIds = conversations.flatMap((item) => item.otherUserId ? [item.otherUserId] : []);
+  const recipesResponse = otherUserIds.length > 0
+    ? await supabase.rpc("get_visible_avatar_recipes", { p_user_ids: otherUserIds })
+    : { data: [], error: null };
+  const recipes = new Map<string, unknown>(
+    Array.isArray(recipesResponse.data)
+      ? recipesResponse.data
+          .filter((row): row is { user_id: string; character_recipe: unknown } => Boolean(
+            row && typeof row === "object" && "user_id" in row && typeof row.user_id === "string",
+          ))
+          .map((row) => [row.user_id, row.character_recipe] as const)
+      : [],
+  );
 
   return (
     <AppShell>
@@ -101,7 +115,14 @@ export default async function ChatsPage() {
       ) : (
         <div className="mt-6 space-y-3">
           {conversations.map((conversation) => (
-            <Link
+            (() => {
+              const candidateRecipe = conversation.otherUserId
+                ? recipes.get(conversation.otherUserId)
+                : undefined;
+              const recipe = isCharacterRecipe(candidateRecipe)
+                ? candidateRecipe
+                : undefined;
+              return <Link
               key={conversation.conversationId}
               href={`/chats/${conversation.conversationId}`}
               className="block cursor-pointer rounded-3xl border border-neutral-200/80 bg-white p-4 shadow-sm transition-all hover:border-neutral-300 hover:shadow-md active:scale-[0.99]"
@@ -110,6 +131,8 @@ export default async function ChatsPage() {
                 {conversation.conversationType === "direct" ? (
                   <CharacterAvatar
                     personaTitle={conversation.otherPersonaTitle}
+                    recipe={recipe}
+                    variant="avatar-small"
                     className="size-14 shrink-0 rounded-2xl"
                   />
                 ) : (
@@ -194,7 +217,8 @@ export default async function ChatsPage() {
                     )}
                 </div>
               </div>
-            </Link>
+              </Link>;
+            })()
           ))}
         </div>
       )}

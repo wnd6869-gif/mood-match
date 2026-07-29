@@ -20,9 +20,13 @@ export type AnimalId =
   | "white-rabbit"
   | "capybara"
   | "brown-bear"
-  | "welsh-corgi";
+  | "welsh-corgi"
+  | "ragdoll"
+  | "scottish-fold"
+  | "shiba-inu"
+  | "border-collie";
 export type EyeStyleId =
-  | "gentle" | "bright" | "chic" | "confident"
+  | "gentle" | "bright" | "chic" | "confident" | "playful"
   | "focused" | "cozy" | "curious" | "delicate";
 export type EyebrowStyleId = EyeStyleId;
 export type MouthStyleId =
@@ -32,7 +36,7 @@ export type FaceEffectId =
   | "soft-blush" | "bright-blush" | "freckles" | "sparkle-cheeks";
 export type OutfitId =
   | "cream-knit" | "coral-hoodie" | "navy-shirt"
-  | "sage-cardigan" | "charcoal-jacket" | "lavender-sweater";
+  | "sage-cardigan" | "charcoal-jacket" | "lavender-sweater" | "olive-knit" | "olive-hoodie";
 export type FaceAccessoryId = "round-glasses" | "thin-glasses" | "sunglasses";
 export type BackgroundId =
   | "warm-cafe" | "cozy-room" | "green-park" | "evening-sky"
@@ -78,7 +82,7 @@ export type AvatarSelection = {
   expressionId: AvatarExpressionId;
   backgroundId: string;
   glassesId?: "round-glasses";
-  effectId?: "warm-sparkles";
+  effectId?: ForegroundEffectId;
 };
 
 export type CharacterComposition = {

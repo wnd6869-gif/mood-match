@@ -103,6 +103,31 @@ export const ANIMAL_MANIFEST: Record<
     displayTransforms: defaultDisplayTransforms(),
     ready: true,
   },
+  ragdoll: {
+    label: "랙돌",
+    base: `${ROOT}/animals/ragdoll/dusty-lavender-cardigan/ragdoll-dusty-lavender-cardigan-base.v2.png`,
+    anchors: anchors({
+      faceAccessory: { x: 512, y: 244, scale: 1.03 },
+    }),
+    displayTransforms: defaultDisplayTransforms(),
+    ready: true,
+  },
+  "scottish-fold": {
+    label: "스코티쉬폴드",
+    base: `${ROOT}/animals/scottish-fold/olive-knit/scottish-fold-olive-knit-base.png`,
+    anchors: anchors({
+      faceAccessory: { x: 512, y: 322, scale: 1.03 },
+    }),
+    displayTransforms: defaultDisplayTransforms(),
+    ready: true,
+  },
+  "shiba-inu": {
+    label: "시바견",
+    base: `${ROOT}/animals/shiba-inu/olive-hoodie/shiba-inu.olive-hoodie-base.v2.png`,
+    anchors: anchors({ faceAccessory: { x: 512, y: 300, scale: 0.92 } }),
+    displayTransforms: defaultDisplayTransforms(),
+    ready: true,
+  },
   otter: {
     label: "수달",
     base: `${ROOT}/animals/otter/sage-green-hoodie/otter-sage-green-hoodie-base.png`,
@@ -113,10 +138,17 @@ export const ANIMAL_MANIFEST: Record<
   },
   "red-fox": {
     label: "붉은여우",
-    base: `${ROOT}/animals/red-fox/web/base-v1.webp`,
+    base: `${ROOT}/animals/red-fox/olive-hoodie/red-fox.olive-hoodie-base.png`,
     anchors: anchors({
       faceAccessory: { x: 512, y: 350, scale: 0.92 },
     }),
+    displayTransforms: defaultDisplayTransforms(),
+    ready: true,
+  },
+  "border-collie": {
+    label: "보더콜리",
+    base: `${ROOT}/animals/border-collie/charcoal-jacket/border-collie.charcoal-jacket-base.png`,
+    anchors: anchors({ faceAccessory: { x: 518, y: 259, scale: 0.78 } }),
     displayTransforms: defaultDisplayTransforms(),
     ready: true,
   },
@@ -209,12 +241,7 @@ export const FACE_EFFECT_ASSETS = webAssets(
 );
 export const OUTFIT_ASSETS = webAssets(
   "outfits",
-  ["cream-knit", "coral-hoodie", "navy-shirt", "sage-cardigan", "charcoal-jacket", "lavender-sweater"] as const,
-);
-/** Retained only for audit/migration; never expose in a CharacterComposition. */
-export const DEPRECATED_HAND_PROP_ASSETS = webAssets(
-  "props",
-  ["coffee", "book", "camera", "smartphone", "flower", "music-player"] as const,
+  ["cream-knit", "coral-hoodie", "navy-shirt", "sage-cardigan", "charcoal-jacket", "lavender-sweater", "olive-knit", "olive-hoodie"] as const,
 );
 export const BACKGROUND_ASSETS = webAssets(
   "backgrounds",
@@ -232,19 +259,6 @@ export const FACE_ACCESSORY_ASSETS = {
   "round-glasses": accessory("round-glasses"),
   "thin-glasses": accessory("thin-glasses"),
   sunglasses: accessory("sunglasses"),
-} as const;
-
-/** Retained only for audit/migration; never expose in a CharacterComposition. */
-export const DEPRECATED_NECK_ACCESSORY_ASSETS = {
-  "thin-scarf": `${ROOT}/approval/golden-retriever-v2/mvp/png/neck-accessories/thin-scarf.png`,
-  "ribbon-tie": `${ROOT}/approval/golden-retriever-v2/mvp/png/neck-accessories/ribbon-tie.png`,
-} as const;
-
-/** Retained only for migration/audit; never expose in a CharacterComposition. */
-export const DEPRECATED_HEAD_ACCESSORY_ASSETS = {
-  beret: accessory("beret"),
-  beanie: accessory("beanie"),
-  hairpin: accessory("hairpin"),
 } as const;
 
 export const DEFAULT_COMPOSITION: CharacterComposition = {

@@ -24,7 +24,7 @@ import {
   type PhotoEligibility,
 } from "@/lib/photo-eligibility";
 import { getModerationStateFromRecord } from "@/lib/moderation";
-import { mapAnalysisToCharacter } from "@/lib/character/character-mapper";
+import { castCharacter, parsePhotoCastingSignals, recipeToComposition } from "@/lib/character-casting";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -34,6 +34,7 @@ const OPENAI_MODEL = "gpt-5.6";
 
 type AnalysisOutput = {
   result: PersonaAnalysisResult;
+  castingSignals: ReturnType<typeof parsePhotoCastingSignals>;
   photoEligibility: PhotoEligibility;
   modelName: string;
   inputTokens: number | null;
@@ -129,6 +130,15 @@ const PERSONA_RESULT_SCHEMA = {
       ],
       additionalProperties: false,
     },
+    castingSignals: {
+      type: "object",
+      properties: {
+        warmth: { type: "integer", minimum: 0, maximum: 100 }, energy: { type: "integer", minimum: 0, maximum: 100 }, polish: { type: "integer", minimum: 0, maximum: 100 }, softness: { type: "integer", minimum: 0, maximum: 100 }, confidence: { type: "integer", minimum: 0, maximum: 100 }, playfulness: { type: "integer", minimum: 0, maximum: 100 },
+        expression: { type: "string", enum: ["soft", "smiling", "neutral", "focused", "playful"] }, palette: { type: "string", enum: ["warm", "cool", "neutral"] }, settingMood: { type: "string", enum: ["clean", "cozy", "natural", "urban"] }, wearsGlasses: { type: "boolean" }, confidenceScore: { type: "integer", minimum: 0, maximum: 100 },
+      },
+      required: ["warmth", "energy", "polish", "softness", "confidence", "playfulness", "expression", "palette", "settingMood", "wearsGlasses", "confidenceScore"],
+      additionalProperties: false,
+    },
   },
   required: [
     "photoEligibility",
@@ -137,7 +147,7 @@ const PERSONA_RESULT_SCHEMA = {
     "personaTitle",
     "personaDescription",
     "nicknameCandidates",
-    "visualTraits",
+    "visualTraits", "castingSignals",
   ],
   additionalProperties: false,
 } as const;
@@ -214,7 +224,7 @@ function isMissingAvatarRecipeColumn(error: { code?: string; message?: string } 
   if (!error) return false;
   return error.code === "PGRST204"
     || error.code === "42703"
-    || /avatar_selection|character_composition|character_asset_version/i.test(error.message ?? "");
+    || /avatar_selection|character_composition|character_asset_version|character_recipe|avatar_system_version|avatar_updated_at/i.test(error.message ?? "");
 }
 
 async function requestPersonaAnalysis(
@@ -284,6 +294,7 @@ async function requestPersonaAnalysis(
       if (photoEligibility && !isPhotoEligible(photoEligibility)) {
         return {
           result: SAFE_PERSONA_RESULT,
+          castingSignals: parsePhotoCastingSignals({}),
           photoEligibility,
           modelName,
           inputTokens: hasUsage ? inputTokens : null,
@@ -299,6 +310,7 @@ async function requestPersonaAnalysis(
       if (photoEligibility && parsed) {
         return {
           result: parsed,
+          castingSignals: parsePhotoCastingSignals((rawOutput as Record<string, unknown>).castingSignals),
           photoEligibility,
           modelName,
           inputTokens: hasUsage ? inputTokens : null,
@@ -679,13 +691,20 @@ export async function POST(request: Request) {
         total_tokens: analysis.totalTokens,
         analysis_source: "openai",
       };
-    const composition = mapAnalysisToCharacter(analysis.result, user.id);
+    const castingSeed = createHash("sha256").update(`${user.id}:${objectPath}:${Date.now()}`).digest("hex").slice(0, 32);
+    const recipe = castCharacter(analysis.castingSignals, castingSeed);
+    // Keep the legacy composition column populated for older readers, but make
+    // it a lossless adapter of the persisted avatar-v1 recipe.
+    const composition = recipeToComposition(recipe);
     let { error: saveError } = await supabase.from("personas").upsert(
       {
         ...personaFields,
         character_composition: composition,
         character_asset_version: composition.version,
         avatar_selection: composition.avatarSelection ?? null,
+        character_recipe: recipe,
+        avatar_system_version: recipe.systemVersion,
+        avatar_updated_at: new Date().toISOString(),
       },
       { onConflict: "user_id" },
     );
