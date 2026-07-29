@@ -6,6 +6,7 @@ import {
 } from "@/lib/character-avatar";
 import ComposedCharacter from "@/components/composed-character";
 import type { CharacterComposition } from "@/lib/character/character-types";
+import type { CharacterDisplayVariant } from "@/lib/character/character-types";
 import { mapAvatarInputToCharacter } from "@/lib/character/character-mapper";
 
 type CharacterAvatarProps = {
@@ -17,6 +18,7 @@ type CharacterAvatarProps = {
   className?: string;
   imageClassName?: string;
   composition?: CharacterComposition;
+  variant?: CharacterDisplayVariant;
 };
 
 export default function CharacterAvatar({
@@ -28,11 +30,13 @@ export default function CharacterAvatar({
   className = "",
   imageClassName = "",
   composition,
+  variant = "full",
 }: CharacterAvatarProps) {
   if (composition) {
     return (
       <ComposedCharacter
         composition={composition}
+        variant={variant}
         alt={alt ?? `${personaTitle || "AI"} 동물 캐릭터`}
         className={className}
       />
@@ -43,6 +47,7 @@ export default function CharacterAvatar({
     return (
       <ComposedCharacter
         composition={mapAvatarInputToCharacter(animalTypes, personaTitle)}
+        variant={variant}
         alt={alt ?? `${personaTitle || "AI"} 동물 캐릭터`}
         className={className}
       />

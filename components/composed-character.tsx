@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import CharacterRenderer from "@/components/character-renderer";
 import {
   ACCESSORY_ASSETS,
   ANIMAL_LAYER_TRANSFORMS,
@@ -13,7 +14,10 @@ import {
   OUTFIT_ASSETS,
   PROP_ASSETS,
 } from "@/lib/character/character-manifest";
-import type { CharacterComposition } from "@/lib/character/character-types";
+import type {
+  CharacterComposition,
+  CharacterDisplayVariant,
+} from "@/lib/character/character-types";
 
 const FALLBACK_BACKGROUNDS: Record<CharacterComposition["background"], string> = {
   "warm-cafe": "linear-gradient(145deg,#f6d5b9,#fff7ea)",
@@ -28,16 +32,17 @@ const FALLBACK_BACKGROUNDS: Record<CharacterComposition["background"], string> =
 
 type Props = {
   composition: CharacterComposition;
+  variant?: CharacterDisplayVariant;
   className?: string;
   alt?: string;
 };
 
 export default function ComposedCharacter({
   composition,
+  variant = "full",
   className = "",
   alt = "AI 동물 캐릭터",
 }: Props) {
-  const [failed, setFailed] = useState(false);
   const layers = useMemo(() => {
     const transforms = ANIMAL_LAYER_TRANSFORMS[composition.animal];
     return [
@@ -55,36 +60,14 @@ export default function ComposedCharacter({
     ].filter((value): value is { src: string; transform?: string } => Boolean(value.src));
   }, [composition]);
 
-  if (failed) {
-    return (
-      <div className={`grid place-items-center bg-coral-50 text-5xl ${className}`} role="img" aria-label={alt}>
-        🐾
-      </div>
-    );
-  }
-
   return (
-    <div
-      className={`relative isolate overflow-hidden ${className}`}
-      style={{ background: FALLBACK_BACKGROUNDS[composition.background] }}
-      role="img"
-      aria-label={alt}
-    >
-      {layers.map(({ src, transform }, index) => (
-        // Fixed 1024px layers share a coordinate system; native img avoids Next
-        // optimization changing alpha edges between overlays.
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          key={`${src}-${index}`}
-          src={src}
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 size-full object-contain"
-          style={{ transform }}
-          draggable={false}
-          onError={() => setFailed(true)}
-        />
-      ))}
-    </div>
+    <CharacterRenderer
+      animal={composition.animal}
+      layers={layers}
+      variant={variant}
+      className={className}
+      alt={alt}
+      background={FALLBACK_BACKGROUNDS[composition.background]}
+    />
   );
 }

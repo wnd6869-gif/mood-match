@@ -1,11 +1,19 @@
 import type {
   AnimalAnchors,
+  CharacterDisplayTransforms,
   AnimalId,
   CharacterComposition,
 } from "@/lib/character/character-types";
 
 export const CHARACTER_ASSET_VERSION = 1;
 const ROOT = "/character-assets";
+
+const defaultDisplayTransforms = (): CharacterDisplayTransforms => ({
+  full: { scale: 1, x: 0, y: 0 },
+  card: { scale: 1.18, x: 0, y: 35 },
+  avatar: { scale: 1.5, x: 0, y: 105 },
+  "avatar-small": { scale: 1.9, x: 0, y: 140 },
+});
 
 const anchors = (
   overrides: Partial<AnimalAnchors> = {},
@@ -23,12 +31,19 @@ const anchors = (
 
 export const ANIMAL_MANIFEST: Record<
   AnimalId,
-  { label: string; base: string; anchors: AnimalAnchors; ready: true }
+  {
+    label: string;
+    base: string;
+    anchors: AnimalAnchors;
+    displayTransforms: CharacterDisplayTransforms;
+    ready: true;
+  }
 > = {
   "golden-retriever": {
     label: "골든리트리버",
     base: `${ROOT}/animals/golden-retriever/web/base-v1.webp`,
     anchors: anchors(),
+    displayTransforms: defaultDisplayTransforms(),
     ready: true,
   },
   "russian-blue": {
@@ -38,12 +53,14 @@ export const ANIMAL_MANIFEST: Record<
       headAccessory: { x: 512, y: 160, scale: 0.86 },
       faceAccessory: { x: 512, y: 350, scale: 0.9 },
     }),
+    displayTransforms: defaultDisplayTransforms(),
     ready: true,
   },
   otter: {
     label: "수달",
     base: `${ROOT}/animals/otter/web/base-v1.webp`,
     anchors: anchors({ faceAccessory: { x: 512, y: 360, scale: 0.92 } }),
+    displayTransforms: defaultDisplayTransforms(),
     ready: true,
   },
   "red-fox": {
@@ -53,6 +70,7 @@ export const ANIMAL_MANIFEST: Record<
       headAccessory: { x: 512, y: 175, scale: 0.88 },
       faceAccessory: { x: 512, y: 350, scale: 0.92 },
     }),
+    displayTransforms: defaultDisplayTransforms(),
     ready: true,
   },
   "white-rabbit": {
@@ -62,15 +80,24 @@ export const ANIMAL_MANIFEST: Record<
       headAccessory: { x: 512, y: 250, scale: 0.72 },
       faceAccessory: { x: 512, y: 390, scale: 0.86 },
     }),
+    displayTransforms: defaultDisplayTransforms(),
     ready: true,
   },
   capybara: {
     label: "카피바라",
     base: `${ROOT}/animals/capybara/web/base-v1.webp`,
     anchors: anchors({ faceAccessory: { x: 512, y: 345, scale: 0.96 } }),
+    displayTransforms: defaultDisplayTransforms(),
     ready: true,
   },
 };
+
+export const APPROVED_GOLDEN_RETRIEVER_LAYERS = [
+  `${ROOT}/approval/golden-retriever-v2/b-animal-base.png`,
+  `${ROOT}/approval/golden-retriever-v2/eyes-default.png`,
+  `${ROOT}/approval/golden-retriever-v2/eyebrows-default.png`,
+  `${ROOT}/approval/golden-retriever-v2/mouth-default.png`,
+] as const;
 
 export const EYE_ASSETS = Object.fromEntries(
   ["gentle", "bright", "chic", "confident", "focused", "cozy", "curious", "delicate"]

@@ -47,6 +47,23 @@ export type ForegroundEffectId =
   | "music-notes" | "warm-sparkles";
 export type PaletteId = "coral-cream" | "sage-cream" | "lavender-cream";
 
+export type CharacterDisplayVariant =
+  | "full"
+  | "card"
+  | "avatar"
+  | "avatar-small";
+
+export type CharacterDisplayTransform = {
+  scale: number;
+  x: number;
+  y: number;
+};
+
+export type CharacterDisplayTransforms = Record<
+  CharacterDisplayVariant,
+  CharacterDisplayTransform
+>;
+
 export type CharacterComposition = {
   animal: AnimalId;
   eyes: EyeStyleId;
