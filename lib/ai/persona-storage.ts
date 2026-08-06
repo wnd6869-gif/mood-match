@@ -20,17 +20,6 @@ export async function downloadStoredProfilePhoto(supabase: Supabase, userId: str
   return null;
 }
 
-function isAvatarPersistenceIncompatible(error: { code?: string; message?: string; constraint?: string } | null) {
-  if (!error) return false;
-  // A production database may be between the legacy persona schema and the
-  // avatar-v1 migration. The core analysis columns are still valid, so retry
-  // without only the optional renderer columns instead of discarding a valid
-  // OpenAI result. The migration restores full recipe persistence.
-  return error.code === "PGRST204" || error.code === "42703" ||
-    (error.code === "23514" && /persona.*(avatar|character)|(?:avatar|character).*persona/i.test(`${error.constraint ?? ""} ${error.message ?? ""}`)) ||
-    /avatar_selection|character_composition|character_asset_version|character_recipe|avatar_system_version|avatar_updated_at/i.test(error.message ?? "");
-}
-
 function isCheckConstraintViolation(error: { code?: string } | null) {
   return error?.code === "23514";
 }
@@ -41,24 +30,12 @@ export async function persistPersonaAnalysis(
   recipe: ReturnType<typeof castCharacter>,
   composition: ReturnType<typeof recipeToComposition>,
 ) {
-  let { error } = await supabase.from("personas").upsert(
-    {
-      ...personaFields,
-      character_composition: composition,
-      character_asset_version: composition.version,
-      avatar_selection: composition.avatarSelection ?? null,
-      character_recipe: recipe,
-      avatar_system_version: recipe.systemVersion,
-      avatar_updated_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id" },
-  );
-
-  if (isAvatarPersistenceIncompatible(error)) {
-    ({ error } = await supabase.from("personas").upsert(personaFields, {
-      onConflict: "user_id",
-    }));
-  }
+  // The analysis result is the source of truth. Persist it before optional
+  // renderer metadata so an avatar-v1 constraint cannot turn a valid OpenAI
+  // response into a failed character creation.
+  let { error } = await supabase.from("personas").upsert(personaFields, {
+    onConflict: "user_id",
+  });
 
   // Older production databases can have a stricter visual_traits check than
   // the current JSON schema. Traits are display-only and can be deterministically
@@ -70,5 +47,22 @@ export async function persistPersonaAnalysis(
     ));
   }
 
-  return error;
+  if (error) return { error, avatarError: null };
+
+  const { error: avatarError } = await supabase
+    .from("personas")
+    .update({
+      character_composition: composition,
+      character_asset_version: composition.version,
+      avatar_selection: composition.avatarSelection ?? null,
+      character_recipe: recipe,
+      avatar_system_version: recipe.systemVersion,
+      avatar_updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", String(personaFields.user_id));
+
+  // Metadata can be unavailable while a production database is being
+  // migrated. The core result stays usable and the caller records the safe
+  // error code for follow-up instead of failing the user-visible analysis.
+  return { error: null, avatarError };
 }
