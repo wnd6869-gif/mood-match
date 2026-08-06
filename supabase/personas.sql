@@ -207,7 +207,7 @@ begin
     v_log_id,
     'remaining',
     case
-      when v_is_reanalysis then pg_catalog.greatest(0, 1 - v_force_count)
+      when v_is_reanalysis then greatest(0, 1 - v_force_count)
       else 2
     end
   );
