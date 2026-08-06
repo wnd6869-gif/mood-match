@@ -170,7 +170,11 @@ export default function ProfilePhotoUpload({
     }
 
     if (!processedPhoto) {
+      // This path represents an already stored photo (for example after a
+      // refresh or returning to /upload). Clicking the explicit analysis
+      // action must not silently reuse a prior persona cache.
       prepareForNewPersonaAnalysis();
+      window.sessionStorage.setItem(CHARACTER_REROLL_SESSION_KEY, "true");
       router.push("/analyzing");
       return;
     }
