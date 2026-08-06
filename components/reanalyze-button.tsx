@@ -3,8 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ActionButton } from "@/components/action";
-import { FORCE_REANALYSIS_SESSION_KEY } from "@/lib/persona-analysis";
-import { prepareForNewPersonaAnalysis } from "@/lib/prototype-storage";
+import { CHARACTER_REROLL_SESSION_KEY } from "@/lib/persona-analysis";
+import { prepareForNewPersonaAnalysis } from "@/lib/onboarding-draft-storage";
 
 export default function ReanalyzeButton() {
   const router = useRouter();
@@ -25,7 +25,7 @@ export default function ReanalyzeButton() {
 
     setIsNavigating(true);
     window.sessionStorage.setItem(
-      FORCE_REANALYSIS_SESSION_KEY,
+      CHARACTER_REROLL_SESSION_KEY,
       "true",
     );
     prepareForNewPersonaAnalysis();
@@ -43,7 +43,7 @@ export default function ReanalyzeButton() {
         {isNavigating ? "재분석 화면으로 이동 중..." : "현재 사진 재분석하기"}
       </ActionButton>
       <p className="mt-2 text-center text-xs leading-5 text-neutral-400">
-        재분석은 OpenAI 호출 비용이 발생할 수 있으며 하루 최대 1회 가능해요.
+        캐릭터 다시 만들기는 OpenAI 호출 비용이 발생할 수 있으며 하루 최대 2회 가능해요.
       </p>
     </div>
   );

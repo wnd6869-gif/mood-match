@@ -27,6 +27,8 @@ type ChatRoomViewProps = {
   currentUserId: string;
   context: ConversationContext;
   initialMessages: ChatMessage[];
+  initialHasOlderMessages: boolean;
+  initialOldestCursor: { createdAt: string; id: string } | null;
   initialPhotoRevealStatus: PhotoRevealStatus | null;
   initialOtherPhotoUrl: string | null;
 };
@@ -54,11 +56,16 @@ export default function ChatRoomView({
   currentUserId,
   context,
   initialMessages,
+  initialHasOlderMessages,
+  initialOldestCursor,
   initialPhotoRevealStatus,
   initialOtherPhotoUrl,
 }: ChatRoomViewProps) {
   const supabase = useMemo(() => createClient(), []);
   const [messages, setMessages] = useState(initialMessages);
+  const [hasOlderMessages, setHasOlderMessages] = useState(initialHasOlderMessages);
+  const [oldestCursor, setOldestCursor] = useState(initialOldestCursor);
+  const [isLoadingOlder, setIsLoadingOlder] = useState(false);
   const [draft, setDraft] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(
@@ -214,6 +221,52 @@ export default function ChatRoomView({
     }
   }
 
+  async function loadOlderMessages() {
+    if (!oldestCursor || isLoadingOlder) return;
+    const container = scrollContainerRef.current;
+    const previousHeight = container?.scrollHeight ?? 0;
+    const previousTop = container?.scrollTop ?? 0;
+    setIsLoadingOlder(true);
+    try {
+      const response = await fetch("/api/chats", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "history",
+          conversationId: context.conversationId,
+          cursor: oldestCursor,
+        }),
+      });
+      const payload = (await response.json().catch(() => null)) as {
+        messages?: ChatMessage[];
+        hasOlderMessages?: boolean;
+        nextCursor?: { createdAt: string; id: string } | null;
+        error?: string;
+      } | null;
+      if (!response.ok || !payload?.messages) {
+        setErrorMessage(payload?.error ?? "이전 메시지를 불러오지 못했어요.");
+        return;
+      }
+      const olderMessages = payload.messages;
+      setMessages((current) => {
+        const existing = new Set(current.map((message) => message.id));
+        return [
+          ...olderMessages.filter((message) => !existing.has(message.id)),
+          ...current,
+        ];
+      });
+      setHasOlderMessages(payload.hasOlderMessages === true);
+      setOldestCursor(payload.nextCursor ?? null);
+      window.requestAnimationFrame(() => {
+        if (container) {
+          container.scrollTop = previousTop + (container.scrollHeight - previousHeight);
+        }
+      });
+    } finally {
+      setIsLoadingOlder(false);
+    }
+  }
+
   async function sendMessage() {
     const messageBody = draft.trim();
 
@@ -283,53 +336,6 @@ export default function ChatRoomView({
           ariaLabel="채팅 목록으로 돌아가기"
           label=""
         />
-        {/*
-        {context.conversationType === "direct" && isCharacterRecipe(context.otherCharacterRecipe) && (
-          <AvatarRenderer recipe={context.otherCharacterRecipe} size={40} shape="circle" className="size-10" alt="상대 캐릭터" />
-        )}
-        <div className="min-w-0 flex-1">
-          <h1 className="truncate text-base font-bold text-neutral-900">
-            {roomTitle}
-          </h1>
-          <p className="truncate text-xs font-semibold text-coral-600">
-            {roomSubtitle}
-          </p>
-        </div>
-        <ChatRoomMenu context={context} />
-      </header>
-
-      {realtimeMessage && (
-        <p
-          role="status"
-          className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-800"
-        >
-          {realtimeMessage}
-        </p>
-      )}
-
-      {safetyFeedback && (
-        <p
-          role="status"
-          className="mt-3 rounded-xl bg-coral-50 px-3 py-2 text-xs leading-5 text-coral-800"
-        >
-          {safetyFeedback}
-        </p>
-      )}
-
-      <>{context.conversationType === "direct" && (
-        <MutualPhotoReveal
-          conversationId={context.conversationId}
-          otherNickname={context.otherPublicNickname}
-          initialStatus={initialPhotoRevealStatus}
-          initialPhotoUrl={initialOtherPhotoUrl}
-        />
-        {context.conversationType === "direct" && isCharacterRecipe(context.otherCharacterRecipe) && (
-          <AvatarRenderer recipe={context.otherCharacterRecipe} size={40} shape="circle" className="size-10" alt={`${roomTitle} 캐릭터`} />
-        )}
-
-      )}</>
-
-        */}
         {context.conversationType === "direct" && isCharacterRecipe(context.otherCharacterRecipe) && (
           <AvatarRenderer recipe={context.otherCharacterRecipe} size={40} shape="circle" className="size-10" alt="상대 캐릭터" />
         )}
@@ -363,6 +369,18 @@ export default function ChatRoomView({
         className="mt-3 flex min-h-0 flex-1 flex-col overscroll-contain overflow-y-auto rounded-3xl bg-white px-3 py-4 shadow-sm"
         aria-live="polite"
       >
+        {hasOlderMessages && (
+          <div className="mb-4 text-center">
+            <button
+              type="button"
+              onClick={loadOlderMessages}
+              disabled={isLoadingOlder}
+              className="rounded-full border border-neutral-200 px-3 py-2 text-xs font-semibold text-neutral-600 disabled:opacity-50"
+            >
+              {isLoadingOlder ? "불러오는 중..." : "이전 메시지 보기"}
+            </button>
+          </div>
+        )}
         <p className="mb-5 text-center text-[0.68rem] leading-5 text-neutral-400">
           최근 메시지 50개를 표시하고 있어요.
         </p>

@@ -1,0 +1,105 @@
+import { PHOTO_ELIGIBILITY_REASON_CODES } from "@/lib/photo-eligibility";
+
+export const PERSONA_RESULT_SCHEMA = {
+  type: "object",
+  properties: {
+    photoEligibility: {
+      type: "object",
+      properties: {
+        isEligible: { type: "boolean" },
+        personCount: { type: "integer", minimum: 0, maximum: 10 },
+        faceLargeEnough: { type: "boolean" },
+        faceSharpEnough: { type: "boolean" },
+        faceFrontFacing: { type: "boolean" },
+        leftEyeVisible: { type: "boolean" },
+        rightEyeVisible: { type: "boolean" },
+        noseVisible: { type: "boolean" },
+        mouthVisible: { type: "boolean" },
+        reasonCode: {
+          type: "string",
+          enum: PHOTO_ELIGIBILITY_REASON_CODES,
+        },
+      },
+      required: [
+        "isEligible",
+        "personCount",
+        "faceLargeEnough",
+        "faceSharpEnough",
+        "faceFrontFacing",
+        "leftEyeVisible",
+        "rightEyeVisible",
+        "noseVisible",
+        "mouthVisible",
+        "reasonCode",
+      ],
+      additionalProperties: false,
+    },
+    animalTypes: {
+      type: "array",
+      minItems: 3,
+      maxItems: 3,
+      items: {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          score: { type: "integer", minimum: 0, maximum: 100 },
+        },
+        required: ["name", "score"],
+        additionalProperties: false,
+      },
+    },
+    moodKeywords: {
+      type: "array",
+      minItems: 5,
+      maxItems: 5,
+      items: { type: "string" },
+    },
+    personaTitle: { type: "string" },
+    personaDescription: { type: "string" },
+    nicknameCandidates: {
+      type: "array",
+      minItems: 3,
+      maxItems: 3,
+      items: { type: "string" },
+    },
+    visualTraits: {
+      type: "object",
+      properties: {
+        friendly: { type: "integer", minimum: 0, maximum: 100 },
+        cute: { type: "integer", minimum: 0, maximum: 100 },
+        calm: { type: "integer", minimum: 0, maximum: 100 },
+        playful: { type: "integer", minimum: 0, maximum: 100 },
+        stylish: { type: "integer", minimum: 0, maximum: 100 },
+        reliable: { type: "integer", minimum: 0, maximum: 100 },
+      },
+      required: [
+        "friendly",
+        "cute",
+        "calm",
+        "playful",
+        "stylish",
+        "reliable",
+      ],
+      additionalProperties: false,
+    },
+    castingSignals: {
+      type: "object",
+      properties: {
+        warmth: { type: "integer", minimum: 0, maximum: 100 }, energy: { type: "integer", minimum: 0, maximum: 100 }, polish: { type: "integer", minimum: 0, maximum: 100 }, softness: { type: "integer", minimum: 0, maximum: 100 }, confidence: { type: "integer", minimum: 0, maximum: 100 }, playfulness: { type: "integer", minimum: 0, maximum: 100 },
+        expression: { type: "string", enum: ["soft", "smiling", "neutral", "focused", "playful"] }, palette: { type: "string", enum: ["warm", "cool", "neutral"] }, settingMood: { type: "string", enum: ["clean", "cozy", "natural", "urban"] }, wearsGlasses: { type: "boolean" }, confidenceScore: { type: "integer", minimum: 0, maximum: 100 },
+      },
+      required: ["warmth", "energy", "polish", "softness", "confidence", "playfulness", "expression", "palette", "settingMood", "wearsGlasses", "confidenceScore"],
+      additionalProperties: false,
+    },
+  },
+  required: [
+    "photoEligibility",
+    "animalTypes",
+    "moodKeywords",
+    "personaTitle",
+    "personaDescription",
+    "nicknameCandidates",
+    "visualTraits", "castingSignals",
+  ],
+  additionalProperties: false,
+} as const;

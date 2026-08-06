@@ -1,5 +1,6 @@
 import { isReportReason } from "@/lib/safety";
-import { createClient } from "@/lib/supabase/server";
+import { requireRouteUser } from "@/lib/api/route-guard";
+import { logger } from "@/lib/server/logger";
 
 export const runtime = "nodejs";
 
@@ -20,6 +21,12 @@ function isUuid(value: unknown): value is string {
 }
 
 function jsonResponse(body: Record<string, unknown>, status = 200) {
+  if (status >= 500) {
+    logger.error("safety_action_failed", {
+      route: "/api/safety",
+      code: `http_${status}`,
+    });
+  }
   return Response.json(body, {
     status,
     headers: { "Cache-Control": "no-store" },
@@ -59,29 +66,11 @@ function rpcErrorResponse(message: string | undefined) {
 }
 
 export async function POST(request: Request) {
-  const requestOrigin = request.headers.get("origin");
-
-  if (requestOrigin && requestOrigin !== new URL(request.url).origin) {
-    return jsonResponse({ error: "허용되지 않은 요청이에요." }, 403);
-  }
-
-  const supabase = await createClient();
-
-  if (!supabase) {
-    return jsonResponse(
-      { error: "서버의 Supabase 설정을 확인해주세요." },
-      503,
-    );
-  }
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return jsonResponse({ error: "로그인이 필요해요." }, 401);
-  }
-
+  const routeGuard = await requireRouteUser(request, {
+    unauthorizedMessage: "로그인이 필요해요.",
+  });
+  if (!routeGuard.ok) return routeGuard.response;
+  const { supabase, user } = routeGuard;
   const body = (await request.json().catch(() => null)) as
     | SafetyRequestBody
     | null;

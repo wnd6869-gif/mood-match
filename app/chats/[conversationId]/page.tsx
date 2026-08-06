@@ -69,20 +69,23 @@ export default async function ChatRoomPage({
     )
     .eq("conversation_id", conversationId)
     .order("created_at", { ascending: false })
-    .limit(50);
+    .order("id", { ascending: false })
+    .limit(51);
 
   if (messageError) {
     notFound();
   }
 
-  const initialMessages = Array.isArray(messageData)
-    ? messageData
+  const initialMessageRows = Array.isArray(messageData) ? messageData : [];
+  const hasOlderMessages = initialMessageRows.length > 50;
+  const initialMessages = initialMessageRows
+        .slice(0, 50)
         .map(getChatMessageFromRecord)
         .filter(
           (message): message is ChatMessage => message !== null,
         )
-        .reverse()
-    : [];
+        .reverse();
+  const oldestMessage = initialMessages[0] ?? null;
   const { data: photoRevealData } =
     context.conversationType === "direct"
       ? await supabase.rpc("get_photo_reveal_status", {
@@ -104,6 +107,12 @@ export default async function ChatRoomPage({
       currentUserId={user.id}
       context={context}
       initialMessages={initialMessages}
+      initialHasOlderMessages={hasOlderMessages}
+      initialOldestCursor={
+        oldestMessage
+          ? { createdAt: oldestMessage.createdAt, id: oldestMessage.id }
+          : null
+      }
       initialPhotoRevealStatus={photoRevealStatus}
       initialOtherPhotoUrl={otherPhotoUrl}
     />

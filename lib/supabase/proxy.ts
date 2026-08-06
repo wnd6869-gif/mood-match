@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseConfig } from "@/lib/supabase/env";
+import { shouldRedirectModeratedUser } from "@/lib/moderation-redirect.mjs";
 
 export async function updateSession(request: NextRequest) {
   const config = getSupabaseConfig();
@@ -58,7 +59,7 @@ export async function updateSession(request: NextRequest) {
         ? record.status
         : null;
 
-    if (status === "suspended" || status === "banned") {
+    if (shouldRedirectModeratedUser(status)) {
       const redirectResponse = NextResponse.redirect(
         new URL("/restricted", request.url),
       );
