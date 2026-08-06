@@ -18,8 +18,11 @@ export type PersonaAnalysisResult = {
   visualTraits: VisualTraits;
 };
 
-export const FORCE_REANALYSIS_SESSION_KEY =
-  "mood-match:force-persona-analysis";
+export const CHARACTER_REROLL_SESSION_KEY =
+  "mood-match:character-reroll";
+
+/** @deprecated Use CHARACTER_REROLL_SESSION_KEY for explicit rerolls only. */
+export const FORCE_REANALYSIS_SESSION_KEY = CHARACTER_REROLL_SESSION_KEY;
 
 export const SAFE_PERSONA_RESULT: PersonaAnalysisResult = {
   animalTypes: [

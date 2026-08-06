@@ -17,7 +17,7 @@ import {
   processProfilePhoto,
 } from "@/lib/image-preview";
 import {
-  FORCE_REANALYSIS_SESSION_KEY,
+  CHARACTER_REROLL_SESSION_KEY,
 } from "@/lib/persona-analysis";
 import {
   PROFILE_PHOTO_BUCKET,
@@ -25,7 +25,7 @@ import {
   PROFILE_PHOTO_MAX_SIZE_LABEL,
   type ProcessedProfilePhoto,
 } from "@/lib/profile-photo";
-import { prepareForNewPersonaAnalysis } from "@/lib/prototype-storage";
+import { prepareForNewPersonaAnalysis } from "@/lib/onboarding-draft-storage";
 import { createClient } from "@/lib/supabase/client";
 
 type ProfilePhotoUploadProps = {
@@ -306,7 +306,7 @@ export default function ProfilePhotoUpload({
 
     if (shouldForceReanalysis) {
       window.sessionStorage.setItem(
-        FORCE_REANALYSIS_SESSION_KEY,
+        CHARACTER_REROLL_SESSION_KEY,
         "true",
       );
     }
@@ -383,7 +383,7 @@ export default function ProfilePhotoUpload({
   return (
     <AppShell>
       <BackLink href="/" ariaLabel="랜딩 화면으로 돌아가기" />
-      <StepProgress current={1} total={5} label="사진 선택" />
+      <StepProgress current={2} total={5} label="사진 선택" />
 
       <header className="mt-7">
         <p className="text-sm font-semibold text-coral-600">

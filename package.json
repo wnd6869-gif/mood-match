@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test:proxy": "node scripts/verify-proxy.mjs",
+    "test:persona-seed": "node scripts/verify-persona-seed.mjs",
     "test:avatar-rig": "node scripts/verify-avatar-face-rig-regression.mjs",
     "test:cat-v1": "node scripts/verify-cat-v1.mjs",
     "test:pointed-muzzle-v1": "node scripts/verify-pointed-muzzle-v1.mjs",

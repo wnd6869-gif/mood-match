@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import AppShell from "@/components/app-shell";
-import CharacterAvatar from "@/components/character-avatar";
-import ConversationRequestButton from "@/components/conversation-request-button";
 import DiscoverFilterSheet from "@/components/discover-filter-sheet";
+import DiscoverSwipeDeck, {
+  type DiscoverSwipeDeckItem,
+} from "@/components/discover-swipe-deck";
 import MobileNav from "@/components/mobile-nav";
 import {
   getDiscoverableProfileFromRecord,
@@ -16,10 +17,6 @@ import {
   getMatchPreferenceFromRecord,
 } from "@/lib/match-preference";
 import {
-  AVAILABLE_TIME_OPTIONS,
-  CONVERSATION_GOAL_OPTIONS,
-  CONVERSATION_TOPIC_OPTIONS,
-  findOptionLabel,
   getPublicChatProfileFromRecord,
   PUBLIC_CHAT_PROFILE_SELECT_COLUMNS,
 } from "@/lib/public-chat-profile";
@@ -41,7 +38,7 @@ type DiscoverSearchParams = {
 const TABS: { value: DiscoverTab; label: string }[] = [
   { value: "recommended", label: "추천" },
   { value: "new", label: "새로 가입" },
-  { value: "available", label: "지금 대화 가능" },
+  { value: "available", label: "대화 선호 시간대" },
 ];
 
 function firstValue(value: string | string[] | undefined) {
@@ -183,6 +180,23 @@ export default async function DiscoverPage({
     );
   }
 
+  const swipeDeckItems: DiscoverSwipeDeckItem[] = scoredProfiles.map(
+    ({ profile, score }) => ({
+      userId: profile.userId,
+      publicNickname: profile.public_nickname,
+      personaTitle: profile.personaTitle,
+      animalTypes: profile.animalTypes,
+      characterRecipe: profile.characterRecipe,
+      conversationGoal: profile.conversation_goal,
+      conversationTopics: profile.conversation_topics,
+      availableTimeSlots: profile.available_time_slots,
+      preferredGroupSize: profile.preferred_group_size,
+      requestStatus: profile.requestStatus,
+      requestDirection: profile.requestDirection,
+      score: score?.total ?? null,
+    }),
+  );
+
   return (
     <AppShell>
       <header className="pt-2">
@@ -229,6 +243,44 @@ export default async function DiscoverPage({
           계산해요.
         </p>
       )}
+      {tab === "available" && (
+        <p className="mt-3 text-xs leading-5 text-neutral-400">
+          프로필에서 선택한 대화 선호 시간대가 지금과 맞는 캐릭터예요.
+          실제 접속 상태를 뜻하지는 않아요.
+        </p>
+      )}
+      {tab === "recommended" && (!matchPreference || !ownSettings) && (
+        <section className="mt-5 rounded-[1.5rem] border border-coral-100 bg-coral-50/70 p-4">
+          <p className="text-sm font-bold text-neutral-900">
+            취향을 설정하면 더 잘 맞는 캐릭터를 추천해드려요.
+          </p>
+          <p className="mt-1 text-xs leading-5 text-neutral-600">
+            관심 스타일과 대화 취향을 바탕으로 추천 점수를 계산해요.
+          </p>
+          <Link
+            href="/ideal"
+            className="mt-3 inline-flex min-h-10 items-center rounded-xl bg-neutral-900 px-3.5 text-xs font-bold text-white"
+          >
+            취향 설정하고 맞춤 추천 받기
+          </Link>
+        </section>
+      )}
+      <Link
+        href="/chats/new-group"
+        className="mt-5 flex items-center justify-between gap-4 rounded-[1.5rem] border border-[#dce8dd] bg-[#f3f8f3] p-4 transition-colors hover:bg-[#eaf4eb]"
+      >
+        <span>
+          <span className="block text-sm font-bold text-neutral-900">
+            혼자 시작하기 부담스럽다면, 소규모 단체방
+          </span>
+          <span className="mt-1 block text-xs leading-5 text-neutral-600">
+            3~6명이 가볍게 인사하고 대화를 이어갈 수 있어요.
+          </span>
+        </span>
+        <span className="shrink-0 text-xs font-bold text-[#35705a]">
+          단체방 만들기 →
+        </span>
+      </Link>
 
       {profilesResponse.error && (
         <p
@@ -240,7 +292,7 @@ export default async function DiscoverPage({
         </p>
       )}
 
-      {scoredProfiles.length === 0 ? (
+      {swipeDeckItems.length === 0 ? (
         <section className="mt-6 rounded-[2rem] bg-white px-5 py-12 text-center shadow-sm">
           <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-coral-50 text-2xl">
             ◌
@@ -253,83 +305,13 @@ export default async function DiscoverPage({
           </p>
         </section>
       ) : (
-        <div className="mt-6 grid grid-cols-2 gap-3">
-          {scoredProfiles.map(({ profile, score }) => {
-            const goalLabel = findOptionLabel(
-              profile.conversation_goal,
-              CONVERSATION_GOAL_OPTIONS,
-            );
-            const topicLabels = profile.conversation_topics
-              .slice(0, 3)
-              .map(
-                (value) =>
-                  findOptionLabel(
-                    value,
-                    CONVERSATION_TOPIC_OPTIONS,
-                  ) ?? value,
-              );
-            const timeLabels = profile.available_time_slots
-              .slice(0, 2)
-              .map(
-                (value) =>
-                  findOptionLabel(value, AVAILABLE_TIME_OPTIONS) ??
-                  value,
-              );
-
-            return (
-              <article
-                key={profile.userId}
-                className="min-w-0 overflow-hidden rounded-[1.6rem] bg-white shadow-[0_10px_28px_rgba(23,23,23,0.07)]"
-              >
-                <Link href={`/discover/${profile.userId}`}>
-                  <CharacterAvatar
-                    animalTypes={profile.animalTypes}
-                    personaTitle={profile.personaTitle}
-                    recipe={profile.characterRecipe ?? undefined}
-                    variant="avatar"
-                    className="aspect-square"
-                  />
-                </Link>
-                <div className="p-3.5">
-                  {score && tab === "recommended" && (
-                    <span className="inline-flex rounded-full bg-[#eef7f2] px-2.5 py-1 text-[0.65rem] font-bold text-[#35705a]">
-                      추천 {score.total}%
-                    </span>
-                  )}
-                  <Link href={`/discover/${profile.userId}`}>
-                    <h2 className="mt-2 truncate text-sm font-bold text-neutral-900">
-                      @{profile.public_nickname}
-                    </h2>
-                    <p className="mt-1 line-clamp-2 text-xs font-semibold leading-5 text-coral-600">
-                      {profile.personaTitle}
-                    </p>
-                  </Link>
-                  <p className="mt-2 line-clamp-2 text-xs leading-5 text-neutral-500">
-                    {goalLabel}
-                  </p>
-                  <p className="mt-2 line-clamp-2 text-[0.68rem] leading-5 text-neutral-400">
-                    {topicLabels.join(" · ")}
-                  </p>
-                  <p className="mt-1 truncate text-[0.68rem] text-neutral-400">
-                    {timeLabels.length > 0
-                      ? `${timeLabels.join(" · ")} 접속`
-                      : "접속 시간 미설정"}
-                  </p>
-                  <div className="mt-3">
-                    <ConversationRequestButton
-                      targetUserId={profile.userId}
-                      targetNickname={profile.public_nickname}
-                      preferredGroupSize={profile.preferred_group_size}
-                      requestStatus={profile.requestStatus}
-                      requestDirection={profile.requestDirection}
-                      compact
-                    />
-                  </div>
-                </div>
-              </article>
-            );
-          })}
-        </div>
+        <DiscoverSwipeDeck
+          items={swipeDeckItems}
+          showRecommendationScore={tab === "recommended"}
+          showSetupHint={
+            tab === "recommended" && (!matchPreference || !ownSettings)
+          }
+        />
       )}
 
       <MobileNav current="discover" />

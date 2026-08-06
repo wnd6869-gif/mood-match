@@ -1,6 +1,6 @@
 "use client";
 
-import usePrototypeData from "@/hooks/use-prototype-data";
+import useOnboardingDraft from "@/hooks/use-onboarding-draft";
 import {
   calculateVisualMatchScore,
   VISUAL_ARCHETYPES,
@@ -14,7 +14,7 @@ export default function StoredIdealSummary({
   candidateTraits: VisualTraits;
   candidateAnimalTypes: { name: string; score: number }[];
 }) {
-  const { idealSelections } = usePrototypeData();
+  const { idealSelections } = useOnboardingDraft();
   const archetype = idealSelections.visualArchetype;
   const matchScore = archetype
     ? calculateVisualMatchScore({

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ActionButton } from "@/components/action";
-import { clearPrototypeData } from "@/lib/prototype-storage";
+import { clearPrototypeData } from "@/lib/onboarding-draft-storage";
 
 type ResetFlowButtonProps = {
   className?: string;

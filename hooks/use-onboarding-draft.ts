@@ -5,13 +5,13 @@ import {
   getPrototypeStorageSnapshot,
   parsePrototypeStorage,
   subscribePrototypeStorage,
-} from "@/lib/prototype-storage";
+} from "@/lib/onboarding-draft-storage";
 
 function getServerSnapshot() {
   return null;
 }
 
-export default function usePrototypeData() {
+export default function useOnboardingDraft() {
   const rawValue = useSyncExternalStore(
     subscribePrototypeStorage,
     getPrototypeStorageSnapshot,

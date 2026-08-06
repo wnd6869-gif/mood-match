@@ -8,7 +8,7 @@ import AvatarRenderer from "@/components/avatar-renderer";
 import ResetFlowButton from "@/components/reset-flow-button";
 import ReanalyzeButton from "@/components/reanalyze-button";
 import StepProgress from "@/components/step-progress";
-import usePrototypeData from "@/hooks/use-prototype-data";
+import useOnboardingDraft from "@/hooks/use-onboarding-draft";
 import type { PersonaAnalysisResult } from "@/lib/persona-analysis";
 import { mapAnalysisToCharacter } from "@/lib/character/character-mapper";
 import type { CharacterComposition } from "@/lib/character/character-types";
@@ -29,7 +29,7 @@ export default function PersonaResultView({
   serverComposition,
   serverRecipe,
 }: PersonaResultViewProps) {
-  const { personaAnalysis } = usePrototypeData();
+  const { personaAnalysis } = useOnboardingDraft();
   const result =
     serverResult ??
     (personaAnalysis?.ownerId === userId

@@ -2,6 +2,8 @@ import {
   getAdminSession,
   isModerationStatus,
 } from "@/lib/admin";
+import { verifySameOriginRequest } from "@/lib/api/verify-origin";
+import { logger } from "@/lib/server/logger";
 
 export const runtime = "nodejs";
 
@@ -29,6 +31,12 @@ function isUuid(value: unknown): value is string {
 }
 
 function jsonResponse(body: Record<string, unknown>, status = 200) {
+  if (status >= 500) {
+    logger.error("admin_action_failed", {
+      route: "/api/admin",
+      code: `http_${status}`,
+    });
+  }
   return Response.json(body, {
     status,
     headers: { "Cache-Control": "no-store" },
@@ -71,12 +79,8 @@ function rpcErrorResponse(message: string | undefined) {
 }
 
 export async function POST(request: Request) {
-  const origin = request.headers.get("origin");
-
-  if (origin && origin !== new URL(request.url).origin) {
-    return jsonResponse({ error: "허용되지 않은 요청이에요." }, 403);
-  }
-
+  const originCheck = verifySameOriginRequest(request);
+  if (!originCheck.ok) return originCheck.response;
   const admin = await getAdminSession();
 
   if (!admin) {

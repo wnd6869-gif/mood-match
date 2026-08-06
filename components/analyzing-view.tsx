@@ -7,7 +7,7 @@ import AppShell from "@/components/app-shell";
 import StepProgress from "@/components/step-progress";
 import StoredImagePreview from "@/components/stored-image-preview";
 import {
-  FORCE_REANALYSIS_SESSION_KEY,
+  CHARACTER_REROLL_SESSION_KEY,
   parsePersonaAnalysisResult,
 } from "@/lib/persona-analysis";
 import {
@@ -15,7 +15,7 @@ import {
   parsePrototypeStorage,
   prepareForNewPersonaAnalysis,
   savePersonaAnalysis,
-} from "@/lib/prototype-storage";
+} from "@/lib/onboarding-draft-storage";
 
 const ANALYSIS_STEPS = [
   "한 명의 얼굴과 눈·코·입을 확인하는 중",
@@ -71,7 +71,7 @@ export default function AnalyzingView({
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ force }),
+      body: JSON.stringify({ reroll: force }),
       });
       const payload = (await response.json().catch(() => null)) as {
         result?: unknown;
@@ -137,9 +137,9 @@ export default function AnalyzingView({
       getPrototypeStorageSnapshot(),
     );
     const force =
-      window.sessionStorage.getItem(FORCE_REANALYSIS_SESSION_KEY) ===
+      window.sessionStorage.getItem(CHARACTER_REROLL_SESSION_KEY) ===
       "true";
-    window.sessionStorage.removeItem(FORCE_REANALYSIS_SESSION_KEY);
+    window.sessionStorage.removeItem(CHARACTER_REROLL_SESSION_KEY);
     forceRef.current = force;
 
     if (!force && storedData.personaAnalysis?.ownerId === userId) {
@@ -169,7 +169,7 @@ export default function AnalyzingView({
 
   return (
     <AppShell className="flex min-h-[calc(100dvh-3rem)] flex-col sm:min-h-[calc(100dvh-4rem)]">
-      <StepProgress current={2} total={5} label="분위기 분석" />
+      <StepProgress current={3} total={5} label="분위기 분석" />
 
       <div
         className="flex flex-1 flex-col items-center justify-center pb-10 text-center"
