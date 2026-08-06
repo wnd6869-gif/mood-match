@@ -1,6 +1,6 @@
--- Repairs the analysis-claim RPC used by /api/analyze-persona.
--- Run this in the cacamioeisdhizvpspzf Supabase SQL Editor.
--- Prerequisite: supabase/personas.sql was run at least once.
+-- Run this after admin.sql and personas.sql in the Supabase SQL Editor.
+-- It preserves logging but removes the daily reroll cap only for accounts in
+-- public.admin_users.
 
 create or replace function public.claim_persona_analysis(
   p_force boolean default false
@@ -23,8 +23,6 @@ begin
     raise exception 'Authentication required';
   end if;
 
-  -- Requires admin.sql. Admin accounts are exempt from the public daily
-  -- reroll limit while every analysis remains logged.
   v_is_admin := public.is_admin();
 
   perform pg_catalog.pg_advisory_xact_lock(
@@ -96,6 +94,7 @@ $$;
 
 revoke all on function public.claim_persona_analysis(boolean) from public;
 revoke all on function public.claim_persona_analysis(boolean) from anon;
-grant execute on function public.claim_persona_analysis(boolean) to authenticated;
+grant execute on function public.claim_persona_analysis(boolean)
+to authenticated;
 
 notify pgrst, 'reload schema';

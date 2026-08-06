@@ -127,12 +127,17 @@ declare
   v_log_id uuid;
   v_force_count integer;
   v_is_reanalysis boolean;
+  v_is_admin boolean := false;
   v_day_start timestamptz;
   v_day_end timestamptz;
 begin
   if v_user_id is null then
     raise exception 'Authentication required';
   end if;
+
+  -- Administrator accounts retain logging but do not consume the public
+  -- daily reroll allowance. public.is_admin() is defined in admin.sql.
+  v_is_admin := public.is_admin();
 
   perform pg_catalog.pg_advisory_xact_lock(
     pg_catalog.hashtextextended(v_user_id::text, 0)
@@ -180,7 +185,7 @@ begin
       and requested_at >= v_day_start
       and requested_at < v_day_end;
 
-    if v_force_count >= 2 then
+    if not v_is_admin and v_force_count >= 2 then
       return pg_catalog.jsonb_build_object(
         'status',
         'rate_limited',
@@ -207,6 +212,7 @@ begin
     v_log_id,
     'remaining',
     case
+      when v_is_admin then null
       when v_is_reanalysis then greatest(0, 1 - v_force_count)
       else 2
     end
