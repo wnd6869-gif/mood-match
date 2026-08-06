@@ -162,10 +162,15 @@ language plpgsql
 security definer
 set search_path = ''
 as $$
+declare
+  v_previous_identity text;
+  v_next_candidates jsonb;
 begin
-  update public.profiles
-  set public_nickname = null
-  where id = target_user_id;
+  select public_nickname
+  into v_previous_identity
+  from public.profiles
+  where id = target_user_id
+  for update;
 
   if not found then
     raise exception using
@@ -173,9 +178,25 @@ begin
       message = 'profile_required';
   end if;
 
+  update public.profiles
+  set public_nickname = null
+  where id = target_user_id;
+
+  select coalesce(
+    pg_catalog.jsonb_agg(candidate.value),
+    '[]'::jsonb
+  )
+  into v_next_candidates
+  from pg_catalog.jsonb_array_elements_text(
+    coalesce(identity_candidates, '[]'::jsonb)
+  ) as candidate(value)
+  where v_previous_identity is null
+    or lower(pg_catalog.regexp_replace(candidate.value, '\s+', '', 'g'))
+      <> lower(pg_catalog.regexp_replace(v_previous_identity, '\s+', '', 'g'));
+
   return public.assign_persona_identity(
     target_user_id,
-    identity_candidates
+    v_next_candidates
   );
 end;
 $$;
@@ -191,12 +212,10 @@ set search_path = ''
 as $$
 begin
   if TG_OP = 'UPDATE' then
-    if new.nickname_candidates is distinct from old.nickname_candidates then
-      perform public.refresh_persona_identity(
-        new.user_id,
-        new.nickname_candidates
-      );
-    end if;
+    perform public.refresh_persona_identity(
+      new.user_id,
+      new.nickname_candidates
+    );
   else
     perform public.assign_persona_identity(
       new.user_id,
