@@ -12,6 +12,9 @@ where id = 'profile-photos';
 drop policy if exists "Authenticated users can view public profile photos"
 on storage.objects;
 
+drop policy if exists "Authenticated users can view mutually revealed profile photos"
+on storage.objects;
+
 create policy "Authenticated users can view mutually revealed profile photos"
 on storage.objects
 for select
