@@ -10,6 +10,8 @@ import {
   getDiscoverableProfileFromRecord,
   type DiscoverableProfile,
 } from "@/lib/conversation-request";
+import { isCharacterRecipe } from "@/lib/persona-record";
+import type { CharacterRecipe } from "@/lib/character-casting";
 import {
   calculateRecommendationScore,
   getMatchPreferenceFromRecord,
@@ -100,7 +102,38 @@ export default async function MatchPreviewPage() {
             profile !== null,
         )
     : [];
-  const recommendations = profiles
+  const recipeResponse = profiles.length > 0
+    ? await supabase.rpc("get_visible_avatar_recipes", {
+        p_user_ids: profiles.map((profile) => profile.userId),
+      })
+    : { data: [], error: null };
+  const recipes = new Map(
+    Array.isArray(recipeResponse.data)
+      ? recipeResponse.data
+          .filter(
+            (row): row is { user_id: string; character_recipe: unknown } =>
+              Boolean(
+                row &&
+                  typeof row === "object" &&
+                  "user_id" in row &&
+                  typeof row.user_id === "string",
+              ),
+          )
+          .map((row) => [row.user_id, row.character_recipe])
+      : [],
+  );
+  const profilesWithRecipes: Array<
+    DiscoverableProfile & { characterRecipe: CharacterRecipe | null }
+  > = profiles.map((profile) => {
+    const candidateRecipe = recipes.get(profile.userId);
+    return {
+      ...profile,
+      characterRecipe: isCharacterRecipe(candidateRecipe)
+        ? candidateRecipe
+        : null,
+    };
+  });
+  const recommendations = profilesWithRecipes
     .map((profile) => ({
       profile,
       score: calculateRecommendationScore({
@@ -196,10 +229,12 @@ export default async function MatchPreviewPage() {
                 key={profile.userId}
                 className="overflow-hidden rounded-[2rem] border border-neutral-200 bg-white shadow-[0_14px_35px_rgba(23,23,23,0.07)]"
               >
-                <div className="grid grid-cols-[8rem_1fr]">
+                <div className="grid grid-cols-[7rem_minmax(0,1fr)] sm:grid-cols-[8rem_minmax(0,1fr)]">
                   <CharacterAvatar
                     animalTypes={profile.animalTypes}
                     personaTitle={profile.personaTitle}
+                    recipe={profile.characterRecipe ?? undefined}
+                    variant="card"
                     className="min-h-40"
                   />
                   <div className="min-w-0 p-4">

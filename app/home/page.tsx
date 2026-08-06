@@ -16,6 +16,7 @@ import {
   getPersonaResultFromRecord,
   getCharacterCompositionFromRecord,
   getCharacterRecipeFromRecord,
+  isCharacterRecipe,
   PERSONA_SELECT_COLUMNS,
   type PersonaRecord,
 } from "@/lib/persona-record";
@@ -103,6 +104,25 @@ export default async function HomePage() {
             profile !== null,
         ) ?? null
     : null;
+  const recommendationRecipeResponse = recommendation
+    ? await supabase.rpc("get_visible_avatar_recipes", {
+        p_user_ids: [recommendation.userId],
+      })
+    : { data: [], error: null };
+  const recommendationRecipe = Array.isArray(recommendationRecipeResponse.data)
+    ? recommendationRecipeResponse.data
+        .filter(
+          (row): row is { user_id: string; character_recipe: unknown } =>
+            Boolean(
+              row &&
+                typeof row === "object" &&
+                "user_id" in row &&
+                typeof row.user_id === "string",
+            ),
+        )
+        .find((row) => row.user_id === recommendation?.userId)
+        ?.character_recipe
+    : null;
 
   return (
     <AppShell>
@@ -117,15 +137,16 @@ export default async function HomePage() {
 
       <section className="mt-6 overflow-hidden rounded-[2rem] bg-neutral-900 text-white shadow-lg">
         {persona ? (
-          <div className="grid grid-cols-[7.5rem_1fr]">
+          <div className="grid grid-cols-[6.5rem_minmax(0,1fr)] sm:grid-cols-[7.5rem_minmax(0,1fr)]">
             <CharacterAvatar
               animalTypes={persona.animalTypes}
               personaTitle={persona.personaTitle}
               composition={personaComposition ?? undefined}
               recipe={characterRecipe ?? undefined}
+              variant="card"
               className="min-h-44"
             />
-            <div className="flex flex-col justify-center p-5">
+            <div className="min-w-0 flex flex-col justify-center p-4 sm:p-5">
               <p className="text-xs font-bold text-coral-300">
                 내 동물 캐릭터
               </p>
@@ -210,14 +231,20 @@ export default async function HomePage() {
           <article className="mt-4 overflow-hidden rounded-[2rem] bg-white shadow-sm ring-1 ring-neutral-200/70">
             <Link
               href={`/discover/${recommendation.userId}`}
-              className="grid grid-cols-[8rem_1fr]"
+              className="grid grid-cols-[7rem_minmax(0,1fr)] sm:grid-cols-[8rem_minmax(0,1fr)]"
             >
               <CharacterAvatar
                 animalTypes={recommendation.animalTypes}
                 personaTitle={recommendation.personaTitle}
+                recipe={
+                  isCharacterRecipe(recommendationRecipe)
+                    ? recommendationRecipe
+                    : undefined
+                }
+                variant="card"
                 className="min-h-40"
               />
-              <div className="p-5">
+              <div className="min-w-0 p-4 sm:p-5">
                 <p className="text-xs font-bold text-coral-600">
                   @{recommendation.public_nickname}
                 </p>
