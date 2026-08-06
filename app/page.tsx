@@ -1,6 +1,9 @@
 import Link from "next/link";
-import { ActionLink } from "@/components/action";
 import CharacterAvatar from "@/components/character-avatar";
+import {
+  LandingCtaAuthAction,
+  LandingNavAuthAction,
+} from "@/components/landing-auth-actions";
 import LegalFooter from "@/components/legal-footer";
 
 const EXAMPLES = [
@@ -39,12 +42,7 @@ export default function LandingPage() {
         <Link href="/" className="text-lg font-black tracking-tight">
           Mood Match
         </Link>
-        <Link
-          href="/login"
-          className="rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm font-bold text-neutral-700"
-        >
-          로그인
-        </Link>
+        <LandingNavAuthAction />
       </nav>
 
       <section className="mx-auto grid w-full max-w-6xl items-center gap-10 px-5 pb-20 pt-8 sm:px-8 lg:grid-cols-[1fr_0.9fr] lg:py-24">
@@ -64,12 +62,7 @@ export default function LandingPage() {
             목적과 취향이 맞는 사람을 캐릭터로 먼저 만나보세요.
           </p>
           <div className="mt-8 max-w-sm">
-            <ActionLink
-              href="/login?next=/upload"
-              ariaLabel="로그인하고 내 동물 캐릭터 만들기"
-            >
-              내 캐릭터 만들기
-            </ActionLink>
+            <LandingCtaAuthAction />
           </div>
           <p className="mt-3 text-xs text-neutral-400">
             실제 사진은 기본 비공개이며 서로 동의한 경우에만 공개돼요.
@@ -238,12 +231,7 @@ export default function LandingPage() {
             로그인 후 사진 한 장으로 바로 시작할 수 있어요.
           </p>
           <div className="mx-auto mt-6 max-w-sm">
-            <ActionLink
-              href="/login?next=/upload"
-              ariaLabel="로그인하고 내 동물 캐릭터 만들기"
-            >
-              내 캐릭터 만들기
-            </ActionLink>
+            <LandingCtaAuthAction />
           </div>
         </div>
       </section>
