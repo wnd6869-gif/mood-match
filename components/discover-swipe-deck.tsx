@@ -102,12 +102,17 @@ export default function DiscoverSwipeDeck({
         <p className="mt-2 text-sm leading-6 text-neutral-500">
           필터를 바꾸거나 잠시 뒤 새로운 캐릭터를 다시 만나보세요.
         </p>
-        <Link
-          href="/discover"
+        <button
+          type="button"
+          onClick={() => {
+            setCurrentIndex(0);
+            setDragOffset(0);
+            pointerStartX.current = null;
+          }}
           className="mt-5 inline-flex min-h-11 items-center rounded-xl border border-neutral-200 bg-white px-4 text-sm font-bold text-neutral-700"
         >
           처음부터 다시 보기
-        </Link>
+        </button>
       </section>
     );
   }
