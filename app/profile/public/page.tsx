@@ -14,11 +14,16 @@ import {
   getPublicChatProfileFromRecord,
   PUBLIC_CHAT_PROFILE_SELECT_COLUMNS,
 } from "@/lib/public-chat-profile";
+import { getSafeNextPath } from "@/lib/safe-navigation";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function PublicProfilePage() {
+export default async function PublicProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string | string[] }>;
+}) {
   const supabase = await createClient();
 
   if (!supabase) {
@@ -63,6 +68,15 @@ export default async function PublicProfilePage() {
       id: user.id,
       ...DEFAULT_PUBLIC_CHAT_PROFILE,
     };
+  const query = await searchParams;
+  const requestedNext = Array.isArray(query.next)
+    ? query.next[0]
+    : query.next;
+  const nextPath = getSafeNextPath(requestedNext, "/home");
+  const conversationPreferencesPath =
+    nextPath === "/home"
+      ? "/profile/conversation-preferences"
+      : `/profile/conversation-preferences?next=${encodeURIComponent(nextPath)}`;
 
   return (
     <AppShell>
@@ -112,6 +126,7 @@ export default async function PublicProfilePage() {
           persona={persona}
           composition={composition}
           initialLoadFailed={Boolean(settingsResponse.error)}
+          successPath={conversationPreferencesPath}
         />
       )}
     </AppShell>

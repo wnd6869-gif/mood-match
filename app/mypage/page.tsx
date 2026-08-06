@@ -179,6 +179,24 @@ export default async function MyPage() {
         </Link>
       )}
 
+      {persona && !publicProfile?.is_public && (
+        <section className="mt-4 rounded-[1.75rem] border border-coral-200 bg-coral-50 p-5 shadow-sm">
+          <p className="text-sm font-bold text-coral-800">
+            내 캐릭터를 공개하고 대화를 시작해보세요
+          </p>
+          <p className="mt-2 text-sm leading-6 text-neutral-700">
+            공개하면 추천과 둘러보기에서 캐릭터와 기본 ID가 보여요. 실제
+            사진은 기본 비공개이고, 상호 동의했을 때만 공개돼요.
+          </p>
+          <Link
+            href="/profile/public?next=/discover"
+            className="mt-4 flex min-h-12 items-center justify-center rounded-2xl bg-neutral-900 px-4 text-sm font-bold text-white"
+          >
+            공개 프로필 설정하기
+          </Link>
+        </section>
+      )}
+
       <MenuGroup title="내 프로필" items={PROFILE_MENU} />
       <MenuGroup title="설정" items={SETTINGS_MENU} />
 

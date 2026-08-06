@@ -22,6 +22,7 @@ type PublicProfileFormProps = {
   persona: PersonaAnalysisResult | null;
   composition?: CharacterComposition | null;
   initialLoadFailed?: boolean;
+  successPath?: string;
 };
 
 const PHOTO_GUIDANCE: Record<PhotoVisibility, string> = {
@@ -37,6 +38,7 @@ export default function PublicProfileForm({
   persona,
   composition,
   initialLoadFailed = false,
+  successPath = "/profile/conversation-preferences",
 }: PublicProfileFormProps) {
   const router = useRouter();
   const personaIdentity = initialSettings.public_nickname;
@@ -151,7 +153,7 @@ export default function PublicProfileForm({
       "공개 프로필을 저장했어요. 대화 분위기 설정으로 이동할게요.",
     );
     window.setTimeout(() => {
-      router.replace("/profile/conversation-preferences");
+      router.replace(successPath);
       router.refresh();
     }, 650);
   }

@@ -177,6 +177,26 @@ export default async function MatchPreviewPage() {
         </p>
       </header>
 
+      {!settings.is_public && (
+        <section className="mt-5 rounded-3xl border border-coral-200 bg-coral-50 p-5 shadow-sm">
+          <p className="text-sm font-bold text-coral-800">
+            내 캐릭터도 다른 사람에게 보여줄까요?
+          </p>
+          <p className="mt-2 text-sm leading-6 text-neutral-700">
+            공개하면 둘러보기와 맞춤 추천에 나타나고 대화 요청을 받을 수
+            있어요. 실제 사진은 기본 비공개이며, 상호 동의한 채팅에서만
+            공개할 수 있어요.
+          </p>
+          <ActionLink
+            href="/profile/public?next=/match-preview"
+            className="mt-4"
+            ariaLabel="공개 캐릭터 프로필 설정으로 이동하기"
+          >
+            내 캐릭터 공개하고 대화 받기
+          </ActionLink>
+        </section>
+      )}
+
       {profilesResponse.error && (
         <p
           role="alert"
