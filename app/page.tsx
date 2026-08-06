@@ -5,234 +5,231 @@ import {
   LandingNavAuthAction,
 } from "@/components/landing-auth-actions";
 import LegalFooter from "@/components/legal-footer";
+import type { CharacterRecipe } from "@/lib/character-casting";
 
-const EXAMPLES = [
+type LandingCharacter = {
+  name: string;
+  handle: string;
+  mood: string;
+  topics: string;
+  accent: string;
+  recipe: CharacterRecipe;
+};
+
+const SIGNALS: CharacterRecipe["signals"] = {
+  warmth: 70,
+  energy: 55,
+  polish: 58,
+  softness: 72,
+  confidence: 62,
+  playfulness: 60,
+  expression: "smiling",
+  palette: "warm",
+  settingMood: "cozy",
+  wearsGlasses: false,
+  confidenceScore: 68,
+};
+
+const LANDING_CHARACTERS: LandingCharacter[] = [
   {
-    key: "otter" as const,
     name: "다정한 수달형",
-    description: "편안한 일상 대화를 좋아하는 포근한 캐릭터",
+    handle: "@느긋한수달",
+    mood: "가벼운 일상 대화",
+    topics: "영화 · 맛집 · 여행",
+    accent: "bg-[#dff2e7] text-[#267257]",
+    recipe: {
+      systemVersion: "avatar-v1",
+      animalId: "otter",
+      outfitBaseId: "otter-sage-green-hoodie",
+      faceFamily: "round-muzzle",
+      faceRigVersion: "round-muzzle-v1",
+      expressionId: "gentle",
+      backgroundId: "minimal-cream",
+      castingSeed: "landing-otter-v1",
+      signals: SIGNALS,
+      rationale: "Landing character example.",
+    },
   },
   {
-    key: "cat" as const,
     name: "시크한 고양이형",
-    description: "차분한 취향 이야기에 끌리는 세련된 캐릭터",
+    handle: "@차분한러시안블루",
+    mood: "취향 깊은 대화",
+    topics: "전시 · 음악 · 카페",
+    accent: "bg-[#ede8ff] text-[#6852aa]",
+    recipe: {
+      systemVersion: "avatar-v1",
+      animalId: "russian-blue",
+      outfitBaseId: "russian-blue-navy-cardigan",
+      faceFamily: "cat",
+      faceRigVersion: "cat-v1",
+      expressionId: "chic",
+      backgroundId: "warm-cafe",
+      glassesId: "round-glasses",
+      castingSeed: "landing-russian-blue-v1",
+      signals: { ...SIGNALS, polish: 84, palette: "cool", expression: "neutral" },
+      rationale: "Landing character example.",
+    },
   },
   {
-    key: "dog" as const,
-    name: "활기찬 강아지형",
-    description: "가벼운 농담과 새로운 경험을 즐기는 캐릭터",
+    name: "활기찬 리트리버형",
+    handle: "@밝은골든리트리버",
+    mood: "새로운 사람과 수다",
+    topics: "산책 · 취미 · 주말",
+    accent: "bg-[#fff0dc] text-[#b46525]",
+    recipe: {
+      systemVersion: "avatar-v1",
+      animalId: "golden-retriever",
+      outfitBaseId: "golden-retriever-coral-hoodie",
+      faceFamily: "round-muzzle",
+      faceRigVersion: "round-muzzle-v1",
+      expressionId: "bright",
+      backgroundId: "green-park",
+      castingSeed: "landing-golden-v1",
+      signals: { ...SIGNALS, energy: 82, expression: "smiling", settingMood: "natural" },
+      rationale: "Landing character example.",
+    },
   },
-] as const;
+];
 
 const STEPS = [
-  ["01", "사진 분석", "한 명의 얼굴이 선명한 사진으로 분위기를 분석해요."],
-  ["02", "캐릭터 생성", "대표 동물과 분위기로 나만의 동물 아바타를 만들어요."],
-  ["03", "취향으로 연결", "대화 목적과 관심사가 가까운 실제 사용자를 찾아요."],
-  [
-    "04",
-    "대화",
-    "캐릭터로 먼저 인사하거나 3~6명 소규모 단체방에서 편하게 이야기를 이어가요.",
-  ],
+  ["01", "사진 분석", "한 명의 얼굴과 눈·코·입이 잘 보이는 사진으로 분위기를 분석해요."],
+  ["02", "내 캐릭터", "분석 결과를 바탕으로 나만의 동물 캐릭터와 ID가 완성돼요."],
+  ["03", "대화 취향", "친구·가벼운 대화·취미처럼 원하는 연결 방식을 고릅니다."],
+  ["04", "둘러보기·대화", "실제 공개 캐릭터를 만나거나 3~6명 소규모 대화에 참여해요."],
 ] as const;
 
 export default function LandingPage() {
+  const [otter, cat, dog] = LANDING_CHARACTERS;
+
   return (
-    <main className="overflow-x-hidden bg-[#fbfaf8] text-neutral-900">
+    <main className="overflow-x-hidden bg-[#fcfbf8] text-neutral-900">
       <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-5 sm:px-8">
-        <Link href="/" className="text-lg font-black tracking-tight">
-          Mood Match
-        </Link>
+        <Link href="/" className="text-lg font-black tracking-tight">Mood Match</Link>
         <LandingNavAuthAction />
       </nav>
 
-      <section className="mx-auto grid w-full max-w-6xl items-center gap-10 px-5 pb-20 pt-8 sm:px-8 lg:grid-cols-[1fr_0.9fr] lg:py-24">
+      <section className="mx-auto grid w-full max-w-6xl items-center gap-10 px-5 pb-16 pt-7 sm:px-8 lg:grid-cols-[1fr_0.94fr] lg:pb-24 lg:pt-16">
         <div>
           <span className="inline-flex rounded-full bg-coral-50 px-3 py-1.5 text-xs font-bold text-coral-700">
-            얼굴 대신, 나를 닮은 동물 캐릭터
+            사진의 분위기가 나만의 동물 캐릭터가 돼요
           </span>
-          <h1 className="mt-5 text-4xl font-black leading-[1.12] tracking-[-0.04em] sm:text-6xl">
-            내 분위기를 담은
+          <h1 className="mt-5 text-4xl font-black leading-[1.1] tracking-[-0.045em] sm:text-6xl">
+            사진은 캐릭터로,
             <br />
-            동물 캐릭터로
-            <br />
-            먼저 인사해요
+            대화는 부담 없이.
           </h1>
           <p className="mt-6 max-w-xl text-base leading-7 text-neutral-600 sm:text-lg">
-            사진에서 느껴지는 분위기를 실제 동물 아바타로 만들고, 대화
-            목적과 취향이 맞는 사람을 캐릭터로 먼저 만나보세요.
+            AI가 사진의 분위기를 바탕으로 동물 캐릭터를 만들고, 대화 목적과 취향이 맞는 사람을 연결해요.
           </p>
-          <div className="mt-8 max-w-sm">
-            <LandingCtaAuthAction />
-          </div>
-          <p className="mt-3 text-xs text-neutral-400">
-            실제 사진은 기본 비공개이며 서로 동의한 경우에만 공개돼요.
+          <div className="mt-8 max-w-sm"><LandingCtaAuthAction /></div>
+          <p className="mt-3 text-xs leading-5 text-neutral-500">
+            처음에는 동물 캐릭터만 보여요. 실제 사진은 서로 동의한 대화에서만 공개할 수 있어요.
           </p>
         </div>
 
         <div className="relative mx-auto w-full max-w-md">
-          <div className="absolute -inset-6 rounded-[3rem] bg-gradient-to-br from-[#dff7ed] via-[#eee7ff] to-[#fff0d9] blur-2xl" />
-          <div className="relative grid grid-cols-2 gap-3 rounded-[2.5rem] border border-white/80 bg-white/75 p-3 shadow-[0_30px_80px_rgba(23,23,23,0.12)] backdrop-blur">
-            <CharacterAvatar
-              avatarKey="otter"
-              priority
-              className="col-span-2 aspect-[16/10] rounded-[2rem]"
-              imageClassName="object-[center_38%]"
-            />
-            <CharacterAvatar
-              avatarKey="cat"
-              priority
-              className="aspect-square rounded-[1.5rem]"
-            />
-            <CharacterAvatar
-              avatarKey="dog"
-              priority
-              className="aspect-square rounded-[1.5rem]"
-            />
+          <div className="absolute -inset-5 rounded-[3rem] bg-gradient-to-br from-[#e9f3dd] via-[#f0eaff] to-[#fff0d8] blur-2xl" />
+          <article className="relative overflow-hidden rounded-[2.25rem] border border-white bg-[#fffaf0] p-3 shadow-[0_28px_70px_rgba(33,30,25,0.16)]">
+            <CharacterAvatar recipe={otter.recipe} priority className="aspect-[1/1] rounded-[1.75rem]" />
+            <div className="absolute inset-x-3 bottom-3 rounded-b-[1.75rem] bg-gradient-to-t from-black/75 via-black/40 to-transparent px-5 pb-5 pt-16 text-white">
+              <p className="text-[10px] font-black tracking-[0.16em] text-white/75">MY ANIMAL CHARACTER</p>
+              <h2 className="mt-1 text-2xl font-black">{otter.name}</h2>
+              <p className="mt-1 text-sm text-white/80">{otter.handle}</p>
+            </div>
+          </article>
+          <div className="absolute -bottom-5 -left-5 rounded-2xl border border-white bg-white px-4 py-3 shadow-lg">
+            <p className="text-xs font-bold text-coral-600">기본은 캐릭터 공개</p>
+            <p className="mt-1 text-xs text-neutral-500">실제 사진은 상호 동의 후</p>
           </div>
         </div>
       </section>
 
-      <section className="bg-white py-20">
+      <section className="border-y border-neutral-100 bg-white py-16 sm:py-20">
         <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
-          <p className="text-sm font-bold text-coral-600">캐릭터 예시</p>
-          <h2 className="mt-2 text-3xl font-black tracking-tight">
-            같은 스타일, 서로 다른 분위기
-          </h2>
-          <div className="mt-8 grid gap-5 sm:grid-cols-3">
-            {EXAMPLES.map((example) => (
-              <article key={example.key} className="group">
-                <CharacterAvatar
-                  avatarKey={example.key}
-                  className="aspect-square rounded-[2rem]"
-                />
-                <h3 className="mt-4 text-xl font-bold">{example.name}</h3>
-                <p className="mt-2 text-sm leading-6 text-neutral-500">
-                  {example.description}
-                </p>
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-sm font-bold text-coral-600">실제 캐릭터 예시</p>
+              <h2 className="mt-2 text-3xl font-black tracking-tight">분위기는 다르게, 대화는 자연스럽게</h2>
+            </div>
+            <Link href="/discover" className="text-sm font-bold text-neutral-600 underline underline-offset-4">캐릭터 둘러보기</Link>
+          </div>
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {LANDING_CHARACTERS.map((character) => (
+              <article key={character.name} className="overflow-hidden rounded-[1.75rem] border border-neutral-100 bg-[#fcfbf8] p-3 shadow-sm">
+                <CharacterAvatar recipe={character.recipe} variant="card" className="aspect-square rounded-[1.25rem]" />
+                <div className="px-2 pb-2 pt-4">
+                  <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${character.accent}`}>{character.mood}</span>
+                  <h3 className="mt-3 text-lg font-black">{character.name}</h3>
+                  <p className="mt-1 text-sm text-neutral-500">{character.topics}</p>
+                </div>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8">
+      <section className="mx-auto w-full max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
         <p className="text-sm font-bold text-coral-600">이용 과정</p>
-        <h2 className="mt-2 text-3xl font-black tracking-tight">
-          사진 한 장에서 대화까지
-        </h2>
+        <h2 className="mt-2 text-3xl font-black tracking-tight">내 캐릭터부터 첫 대화까지</h2>
         <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map(([number, title, description]) => (
-            <article
-              key={number}
-              className="rounded-[1.75rem] bg-white p-5 shadow-sm"
-            >
-              <span className="text-xs font-black text-coral-500">
-                {number}
-              </span>
+            <article key={number} className="rounded-[1.5rem] bg-white p-5 shadow-sm ring-1 ring-neutral-100">
+              <span className="text-xs font-black text-coral-500">{number}</span>
               <h3 className="mt-5 text-lg font-bold">{title}</h3>
-              <p className="mt-2 text-sm leading-6 text-neutral-500">
-                {description}
-              </p>
+              <p className="mt-2 text-sm leading-6 text-neutral-500">{description}</p>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="bg-neutral-900 py-20 text-white">
-        <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 sm:px-8 lg:grid-cols-2">
+      <section className="bg-neutral-900 py-16 text-white sm:py-20">
+        <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 sm:px-8 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
-            <p className="text-sm font-bold text-coral-400">안전한 사진 공개</p>
-            <h2 className="mt-3 text-3xl font-black leading-tight">
-              처음에는 캐릭터만,
-              <br />
-              실제 사진은 서로 선택할 때만
-            </h2>
+            <p className="text-sm font-bold text-coral-400">어떤 대화든 가볍게 시작</p>
+            <h2 className="mt-3 text-3xl font-black leading-tight">친구, 일상, 취미,
+              <br />새로운 인연까지.</h2>
             <p className="mt-5 max-w-lg text-sm leading-7 text-neutral-300">
-              공개 프로필과 추천 카드에는 동물 캐릭터가 기본으로 표시돼요.
-              1:1 대화에서 두 사람이 각각 동의한 경우에만 실제 사진을
-              확인할 수 있고, 한쪽이 철회하면 다시 숨겨집니다.
+              1:1 대화가 부담스럽다면 3~6명 소규모 단체방에서 먼저 함께 이야기할 수 있어요.
             </p>
+            <div className="mt-6 grid grid-cols-2 gap-3 text-sm font-bold">
+              {['친구 찾기', '가벼운 일상', '취미 대화', '소규모 그룹'].map((goal) => (
+                <div key={goal} className="rounded-2xl bg-white/10 px-4 py-3">{goal}</div>
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            {["친구", "가벼운 대화", "취미 대화", "새로운 인연"].map(
-              (goal, index) => (
-                <div
-                  key={goal}
-                  className="flex min-h-28 flex-col justify-between rounded-[1.75rem] bg-white/10 p-4"
-                >
-                  <span className="text-xl" aria-hidden="true">
-                    {["☁", "◡", "✦", "↗"][index]}
-                  </span>
-                  <p className="font-bold">{goal}</p>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <article className="rounded-[1.75rem] bg-[#f8f6f2] p-4 text-neutral-900">
+              <div className="flex gap-3">
+                <CharacterAvatar recipe={cat.recipe} variant="avatar" className="size-16 shrink-0 rounded-2xl" />
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-coral-600">추천 캐릭터</p>
+                  <h3 className="mt-1 font-black">{cat.name}</h3>
+                  <p className="mt-1 text-xs text-neutral-500">{cat.topics}</p>
                 </div>
-              ),
-            )}
+              </div>
+              <button type="button" className="mt-4 min-h-11 w-full rounded-xl bg-neutral-900 text-sm font-bold text-white">대화 요청</button>
+            </article>
+            <article className="rounded-[1.75rem] bg-white/10 p-4">
+              <div className="flex items-center gap-3 border-b border-white/15 pb-3">
+                <CharacterAvatar recipe={dog.recipe} variant="avatar" className="size-11 rounded-full" />
+                <div><p className="text-sm font-bold">{dog.handle}</p><p className="text-xs text-white/60">취미 대화 중</p></div>
+              </div>
+              <div className="mt-4 space-y-2 text-xs leading-5">
+                <p className="mr-auto max-w-[85%] rounded-2xl rounded-bl-md bg-white/15 px-3 py-2.5">이번 주말에 가볍게 갈 만한 곳 있어요?</p>
+                <p className="ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-coral-500 px-3 py-2.5">좋아요. 취향 비슷한 것 같아요!</p>
+              </div>
+            </article>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8">
-        <p className="text-sm font-bold text-coral-600">서비스 미리보기</p>
-        <h2 className="mt-2 text-3xl font-black tracking-tight">
-          캐릭터를 보고, 이유를 확인하고, 대화해요
-        </h2>
-        <div className="mt-8 grid items-stretch gap-6 lg:grid-cols-2">
-          <article className="overflow-hidden rounded-[2.25rem] bg-white p-4 shadow-[0_18px_50px_rgba(23,23,23,0.09)]">
-            <div className="grid grid-cols-[7rem_1fr] gap-4">
-              <CharacterAvatar
-                avatarKey="otter"
-                className="aspect-square rounded-[1.5rem]"
-              />
-              <div className="py-2">
-                <span className="rounded-full bg-[#eef7f2] px-2.5 py-1 text-xs font-bold text-[#35705a]">
-                  추천 82%
-                </span>
-                <h3 className="mt-3 font-bold">@포근한 느긋한 수달</h3>
-                <p className="mt-1 text-xs text-neutral-500">
-                  영화 · 맛집 · 여행
-                </p>
-                <p className="mt-2 text-xs font-semibold text-coral-600">
-                  보통 저녁에 접속
-                </p>
-              </div>
-            </div>
-            <button className="mt-4 min-h-12 w-full rounded-2xl bg-neutral-900 text-sm font-bold text-white">
-              대화 요청
-            </button>
-          </article>
-
-          <article className="rounded-[2.25rem] bg-[#f1eee9] p-5 shadow-[0_18px_50px_rgba(23,23,23,0.07)]">
-            <div className="flex items-center gap-3 border-b border-neutral-300/60 pb-4">
-              <CharacterAvatar
-                avatarKey="cat"
-                className="size-11 rounded-full"
-              />
-              <div>
-                <p className="text-sm font-bold">@조용한 시크한 고양이</p>
-                <p className="text-xs text-neutral-500">차분한 취향 대화</p>
-              </div>
-            </div>
-            <div className="mt-5 space-y-3 text-sm">
-              <p className="mr-auto max-w-[82%] rounded-2xl rounded-bl-md bg-white px-4 py-3">
-                요즘 본 영화 중에 기억에 남는 작품 있어요?
-              </p>
-              <p className="ml-auto max-w-[82%] rounded-2xl rounded-br-md bg-neutral-900 px-4 py-3 text-white">
-                있어요! 취향이 비슷한 것 같아서 반갑네요.
-              </p>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section className="px-5 pb-16 text-center sm:px-8">
+      <section className="px-5 py-16 text-center sm:px-8">
         <div className="mx-auto max-w-3xl rounded-[2.5rem] bg-coral-50 px-6 py-12">
-          <h2 className="text-3xl font-black">내 동물 캐릭터를 만나볼까요?</h2>
-          <p className="mt-3 text-sm leading-6 text-neutral-600">
-            로그인 후 사진 한 장으로 바로 시작할 수 있어요.
-          </p>
-          <div className="mx-auto mt-6 max-w-sm">
-            <LandingCtaAuthAction />
-          </div>
+          <p className="text-sm font-bold text-coral-600">BETA OPEN</p>
+          <h2 className="mt-3 text-3xl font-black">내 분위기의 동물 캐릭터를 만나보세요.</h2>
+          <p className="mt-3 text-sm leading-6 text-neutral-600">사진 한 장으로 시작하고, 대화는 천천히 선택하면 돼요.</p>
+          <div className="mx-auto mt-6 max-w-sm"><LandingCtaAuthAction /></div>
         </div>
       </section>
       <LegalFooter />
