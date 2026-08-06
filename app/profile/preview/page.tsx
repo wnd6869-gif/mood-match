@@ -319,6 +319,12 @@ export default async function PublicProfilePreviewPage() {
         </article>
       )}
 
+      <section className="mt-6 rounded-3xl border border-coral-100 bg-coral-50/60 px-5 py-4">
+        <p className="text-sm font-bold text-neutral-900">오늘의 대화 카드를 더해보세요</p>
+        <p className="mt-2 text-sm leading-6 text-neutral-600">오늘 누가 물어봐 주면 좋은 질문이나 꺼낼 소재를 적으면, 다른 사람이 더 쉽게 말을 걸 수 있어요.</p>
+        <ActionLink href="/home" className="mt-4" ariaLabel="오늘의 대화 카드 열기">오늘의 대화 카드 열기</ActionLink>
+      </section>
+
       <div className="mt-6 space-y-3">
         <ActionLink
           href="/profile/public"

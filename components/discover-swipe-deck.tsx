@@ -27,11 +27,15 @@ export type DiscoverSwipeDeckItem = {
   characterRecipe: CharacterRecipe | null;
   conversationGoal: string | null;
   conversationTopics: string[];
+  commonTopics: string[];
+  sharedTimeSlots: string[];
   availableTimeSlots: string[];
   preferredGroupSize: PreferredGroupSize | null;
   requestStatus: ConversationRequestStatus | null;
   requestDirection: ConversationRequestDirection | null;
   score: number | null;
+  dailyQuestion?: string | null;
+  dailyTopic?: string | null;
 };
 
 type DiscoverSwipeDeckProps = {
@@ -170,12 +174,12 @@ export default function DiscoverSwipeDeck({
               <div className="min-w-0">
                 {showRecommendationScore && activeItem.score !== null && (
                   <span className="inline-flex rounded-full bg-[#eef7f2] px-2.5 py-1 text-[0.65rem] font-bold text-[#35705a]">
-                    추천 {activeItem.score}%
+                    대화 취향 반영
                   </span>
                 )}
                 {showSetupHint && (
                   <span className="inline-flex rounded-full bg-coral-50 px-2.5 py-1 text-[0.65rem] font-bold text-coral-700">
-                    취향 설정 후 맞춤 추천
+                    대화 스타일 설정 후 제안
                   </span>
                 )}
                 <Link href={`/discover/${activeItem.userId}`}>
@@ -207,6 +211,12 @@ export default function DiscoverSwipeDeck({
                 ? `대화 선호: ${timeLabels.join(" · ")}`
                 : "대화 선호 시간 미설정"}
             </p>
+            {(activeItem.dailyQuestion || activeItem.dailyTopic) && (
+              <div className="mt-4 rounded-2xl bg-coral-50 px-3 py-3 text-xs leading-5 text-coral-900">
+                <p className="font-bold">오늘의 한 줄</p>
+                <p className="mt-1">{activeItem.dailyQuestion ?? activeItem.dailyTopic}</p>
+              </div>
+            )}
             <div className="mt-5">
               <ConversationRequestButton
                 targetUserId={activeItem.userId}
@@ -214,6 +224,11 @@ export default function DiscoverSwipeDeck({
                 preferredGroupSize={activeItem.preferredGroupSize}
                 requestStatus={activeItem.requestStatus}
                 requestDirection={activeItem.requestDirection}
+                todayQuestion={activeItem.dailyQuestion}
+                todayTopic={activeItem.dailyTopic}
+                commonTopics={activeItem.commonTopics}
+                sharedTimeSlots={activeItem.sharedTimeSlots}
+                personaTitle={activeItem.personaTitle}
               />
             </div>
           </div>

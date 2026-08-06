@@ -3,7 +3,14 @@ import { redirect } from "next/navigation";
 import AppShell from "@/components/app-shell";
 import CharacterAvatar from "@/components/character-avatar";
 import ConversationRequestButton from "@/components/conversation-request-button";
+import DailyConversationCardPrompt from "@/components/daily-conversation-card-prompt";
 import MobileNav from "@/components/mobile-nav";
+import {
+  getDailyConversationCardFromRecord,
+  getDailyConversationTopicLabel,
+  getKstDate,
+  type DailyConversationCard,
+} from "@/lib/daily-conversation-card";
 import {
   getChatListItemFromRecord,
   type ChatListItem,
@@ -22,6 +29,7 @@ import {
 } from "@/lib/persona-record";
 import {
   getPublicChatProfileFromRecord,
+  hasCompleteConversationPreferences,
   PUBLIC_CHAT_PROFILE_SELECT_COLUMNS,
 } from "@/lib/public-chat-profile";
 import { createClient } from "@/lib/supabase/server";
@@ -49,6 +57,7 @@ export default async function HomePage() {
     requestResponse,
     conversationsResponse,
     recommendationsResponse,
+    dailyCardsResponse,
   ] = await Promise.all([
     supabase
       .from("personas")
@@ -74,7 +83,22 @@ export default async function HomePage() {
       p_one_to_one_only: false,
       p_time_slot: null,
     }),
+    supabase
+      .from("daily_conversation_cards")
+      .select("user_id, card_date, question, topic, custom_topic, skipped")
+      .eq("user_id", user.id)
+      .order("card_date", { ascending: false })
+      .limit(2),
   ]);
+
+  const today = getKstDate();
+  const dailyCards = Array.isArray(dailyCardsResponse.data)
+    ? dailyCardsResponse.data
+        .map(getDailyConversationCardFromRecord)
+        .filter((card): card is DailyConversationCard => card !== null)
+    : [];
+  const todayCard = dailyCards.find((card) => card.cardDate === today) ?? null;
+  const previousCard = dailyCards.find((card) => card.cardDate !== today) ?? null;
 
   const persona = getPersonaResultFromRecord(
     personaResponse.data as PersonaRecord | null,
@@ -87,6 +111,17 @@ export default async function HomePage() {
   );
   const publicProfile = getPublicChatProfileFromRecord(
     profileResponse.data,
+  );
+  const hasCompleteConversationProfile = Boolean(
+    publicProfile &&
+      hasCompleteConversationPreferences({
+        conversation_goal: publicProfile.conversation_goal,
+        conversation_moods: publicProfile.conversation_moods,
+        conversation_topics: publicProfile.conversation_topics,
+        conversation_pace: publicProfile.conversation_pace,
+        preferred_group_size: publicProfile.preferred_group_size,
+        available_time_slots: publicProfile.available_time_slots,
+      }),
   );
   const conversations = Array.isArray(conversationsResponse.data)
     ? conversationsResponse.data
@@ -123,6 +158,29 @@ export default async function HomePage() {
         .find((row) => row.user_id === recommendation?.userId)
         ?.character_recipe
     : null;
+  const recommendationDailyCardResponse = recommendation
+    ? await supabase.rpc("get_visible_daily_conversation_cards", {
+        p_user_ids: [recommendation.userId],
+      })
+    : { data: [], error: null };
+  const recommendationDailyCard = Array.isArray(recommendationDailyCardResponse.data)
+    ? recommendationDailyCardResponse.data
+        .map(getDailyConversationCardFromRecord)
+        .find((card): card is DailyConversationCard => card !== null) ?? null
+    : null;
+  const recommendationTodayTopic = recommendationDailyCard
+    ? getDailyConversationTopicLabel(recommendationDailyCard)
+    : null;
+  const recommendationCommonTopics = recommendation
+    ? recommendation.conversation_topics.filter((topic) =>
+        publicProfile?.conversation_topics.includes(topic),
+      )
+    : [];
+  const recommendationSharedTimeSlots = recommendation
+    ? recommendation.available_time_slots.filter((slot) =>
+        publicProfile?.available_time_slots.includes(slot),
+      )
+    : [];
 
   return (
     <AppShell>
@@ -134,6 +192,28 @@ export default async function HomePage() {
           이야기해볼까요?
         </h1>
       </header>
+
+      {!todayCard && !dailyCardsResponse.error && (
+        <DailyConversationCardPrompt previousCard={previousCard} />
+      )}
+
+      {!hasCompleteConversationProfile && (
+        <section className="mt-5 rounded-[2rem] border border-coral-100 bg-coral-50/70 p-5 shadow-sm">
+          <p className="text-xs font-bold text-coral-700">고정 대화 프로필</p>
+          <h2 className="mt-2 text-lg font-bold text-neutral-900">
+            편한 대화의 기준을 알려주세요
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-neutral-600">
+            관심사와 답장 스타일을 저장하면 공통점이 있는 사람을 먼저 보여드려요.
+          </p>
+          <Link
+            href="/profile/conversation-preferences?next=/home"
+            className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-neutral-900 px-4 text-sm font-bold text-white"
+          >
+            대화 프로필 작성하기
+          </Link>
+        </section>
+      )}
 
       <section className="mt-6 overflow-hidden rounded-[2rem] bg-neutral-900 text-white shadow-lg">
         {persona ? (
@@ -213,7 +293,7 @@ export default async function HomePage() {
         <div className="flex items-end justify-between">
           <div>
             <p className="text-xs font-bold text-neutral-400">
-              오늘의 추천
+              오늘의 대화 제안
             </p>
             <h2 className="mt-1 text-xl font-bold text-neutral-900">
               먼저 캐릭터로 만나보세요
@@ -272,6 +352,11 @@ export default async function HomePage() {
                 preferredGroupSize={recommendation.preferred_group_size}
                 requestStatus={recommendation.requestStatus}
                 requestDirection={recommendation.requestDirection}
+                todayQuestion={recommendationDailyCard?.question}
+                todayTopic={recommendationTodayTopic}
+                commonTopics={recommendationCommonTopics}
+                sharedTimeSlots={recommendationSharedTimeSlots}
+                personaTitle={recommendation.personaTitle}
                 compact
               />
             </div>
@@ -279,7 +364,7 @@ export default async function HomePage() {
         ) : (
           <div className="mt-4 rounded-3xl border border-dashed border-neutral-300 bg-white p-6 text-center">
             <p className="text-sm font-bold text-neutral-700">
-              아직 추천할 공개 캐릭터가 없어요
+              아직 보여드릴 공개 캐릭터가 없어요
             </p>
             <p className="mt-2 text-xs leading-5 text-neutral-500">
               새로운 캐릭터가 들어오면 이곳에서 바로 만날 수 있어요.

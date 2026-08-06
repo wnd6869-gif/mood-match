@@ -31,10 +31,10 @@ export const STYLE_OPTIONS = [
 ] as const;
 
 export const RELATIONSHIP_OPTIONS = [
-  "친구 같은 연애",
-  "표현이 많은 연애",
-  "안정적인 연애",
-  "설레는 연애",
+  "친구 같은 관계",
+  "표현이 편한 관계",
+  "안정적인 관계",
+  "새로운 관계",
 ] as const;
 
 export type FirstImpression = (typeof FIRST_IMPRESSION_OPTIONS)[number];
@@ -295,7 +295,7 @@ export function saveIdealSelection(
       break;
     case "preferredAnimal":
       if (!isPreferredAnimal(value)) {
-        return { ok: false, error: "올바른 동물상 선택값이 아니에요." };
+        return { ok: false, error: "올바른 캐릭터 선택값이 아니에요." };
       }
       nextSelections.preferredAnimal = value;
       break;
@@ -319,7 +319,7 @@ export function saveIdealSelection(
       break;
     case "relationship":
       if (!includesOption(RELATIONSHIP_OPTIONS, value)) {
-        return { ok: false, error: "올바른 연애 방식 선택값이 아니에요." };
+        return { ok: false, error: "올바른 관계 방식 선택값이 아니에요." };
       }
       nextSelections.relationship = value;
       break;

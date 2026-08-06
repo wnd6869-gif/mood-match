@@ -9,6 +9,9 @@ type RequestBody = {
   message?: unknown;
   requestId?: unknown;
   response?: unknown;
+  reasonKind?: unknown;
+  reasonValue?: unknown;
+  replyMessage?: unknown;
 };
 
 const UUID_PATTERN =
@@ -97,6 +100,18 @@ function getRpcErrorResponse(message: string | undefined) {
     );
   }
 
+  if (message === "message_required" || message === "reply_required") {
+    return jsonResponse({ error: "첫 인사와 답장을 한 줄 이상 입력해주세요." }, 400);
+  }
+
+  if (message === "request_expired") {
+    return jsonResponse({ error: "이 대화 요청은 기간이 지나 종료되었어요." }, 409);
+  }
+
+  if (message === "invalid_request_reason" || message === "daily_card_unavailable") {
+    return jsonResponse({ error: "대화를 시작한 이유를 다시 골라주세요." }, 400);
+  }
+
   if (
     message === "request_not_actionable" ||
     message === "invalid_response"
@@ -159,18 +174,37 @@ export async function POST(request: Request) {
     const message =
       typeof body.message === "string" ? body.message.trim() : "";
 
-    if (message.length > 120) {
+    if (!message || message.length > 120) {
       return jsonResponse(
         { error: "첫 인사는 120자 이하로 입력해주세요." },
         400,
       );
     }
 
+    if (
+      typeof body.reasonKind !== "string" ||
+      ![
+        "common_interest",
+        "shared_time",
+        "daily_question",
+        "daily_topic",
+        "character",
+      ].includes(body.reasonKind) ||
+      (body.reasonValue !== undefined &&
+        body.reasonValue !== null &&
+        typeof body.reasonValue !== "string")
+    ) {
+      return jsonResponse({ error: "대화를 시작한 이유를 다시 골라주세요." }, 400);
+    }
+
     const { data, error } = await supabase.rpc(
-      "send_conversation_request",
+      "send_contextual_conversation_request",
       {
         target_user_id: body.targetUserId,
-        intro_message: message || null,
+        intro_message: message,
+        reason_kind: body.reasonKind,
+        reason_value:
+          typeof body.reasonValue === "string" ? body.reasonValue : null,
       },
     );
 
@@ -222,6 +256,23 @@ export async function POST(request: Request) {
         body.response === "accepted"
           ? "대화가 열렸어요."
           : "이번 인사는 넘겼어요.",
+    });
+  }
+
+  if (body.action === "accept_and_reply") {
+    const replyMessage =
+      typeof body.replyMessage === "string" ? body.replyMessage.trim() : "";
+    if (!replyMessage || replyMessage.length > 120) {
+      return jsonResponse({ error: "답장은 1~120자로 입력해주세요." }, 400);
+    }
+    const { data, error } = await supabase.rpc(
+      "accept_conversation_request_with_reply",
+      { request_id: body.requestId, reply_message: replyMessage },
+    );
+    if (error) return getRpcErrorResponse(error.message);
+    return jsonResponse({
+      message: "대화를 열고 답장을 보냈어요.",
+      conversationId: data,
     });
   }
 

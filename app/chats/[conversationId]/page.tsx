@@ -8,7 +8,6 @@ import {
 import {
   getPhotoRevealStatusFromRecord,
 } from "@/lib/photo-reveal";
-import { createProfilePhotoSignedUrl } from "@/lib/supabase/profile-photo";
 import { createClient } from "@/lib/supabase/server";
 import { isCharacterRecipe } from "@/lib/persona-record";
 
@@ -94,13 +93,11 @@ export default async function ChatRoomPage({
       : { data: null };
   const photoRevealStatus =
     getPhotoRevealStatusFromRecord(photoRevealData);
-  const otherPhotoUrl =
-    photoRevealStatus?.revealed === true
-      ? await createProfilePhotoSignedUrl(
-          supabase,
-          photoRevealStatus.otherUserId,
-        )
-      : null;
+  // Do not send a storage signed URL to the page. The route validates current
+  // mutual consent again for every image request, including after a revocation.
+  const otherPhotoUrl = photoRevealStatus?.revealed === true
+    ? `/api/photo-reveal/${conversationId}`
+    : null;
 
   return (
     <ChatRoomView

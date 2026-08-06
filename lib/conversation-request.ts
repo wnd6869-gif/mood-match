@@ -44,10 +44,76 @@ export type ConversationRequestListItem = {
   otherPublicNickname: string;
   otherPersonaTitle: string;
   message: string | null;
+  startReason: ConversationStartReason | null;
+  dailyCardSnapshot: ConversationStartReason | null;
   status: ConversationRequestStatus;
   createdAt: string;
   respondedAt: string | null;
 };
+
+export type ConversationStartReason = {
+  kind:
+    | "common_interest"
+    | "shared_time"
+    | "daily_question"
+    | "daily_topic"
+    | "character";
+  value?: string;
+  question?: string;
+  topic?: string;
+  customTopic?: string;
+  personaTitle?: string;
+};
+
+function parseConversationStartReason(
+  value: unknown,
+): ConversationStartReason | null {
+  if (!value || typeof value !== "object") return null;
+  const record = value as Record<string, unknown>;
+  if (
+    ![
+      "common_interest",
+      "shared_time",
+      "daily_question",
+      "daily_topic",
+      "character",
+    ].includes(String(record.kind))
+  ) {
+    return null;
+  }
+  return {
+    kind: record.kind as ConversationStartReason["kind"],
+    value: typeof record.value === "string" ? record.value : undefined,
+    question: typeof record.question === "string" ? record.question : undefined,
+    topic: typeof record.topic === "string" ? record.topic : undefined,
+    customTopic:
+      typeof record.customTopic === "string" ? record.customTopic : undefined,
+    personaTitle:
+      typeof record.personaTitle === "string" ? record.personaTitle : undefined,
+  };
+}
+
+export function getConversationStartReasonLabel(
+  reason: ConversationStartReason | null,
+) {
+  if (!reason) return null;
+  if (reason.kind === "common_interest" && reason.value) {
+    return `공통 관심사: ${reason.value}`;
+  }
+  if (reason.kind === "shared_time" && reason.value) {
+    return `대화 선호 시간대: ${reason.value}`;
+  }
+  if (reason.kind === "daily_question" && reason.question) {
+    return `오늘 물어봐 주면 좋은 질문: ${reason.question}`;
+  }
+  if (reason.kind === "daily_topic") {
+    return `오늘의 소재: ${reason.customTopic ?? reason.topic ?? ""}`;
+  }
+  if (reason.kind === "character" && reason.personaTitle) {
+    return `${reason.personaTitle} 캐릭터 이야기`;
+  }
+  return "대화를 시작한 이유";
+}
 
 function isRequestStatus(
   value: unknown,
@@ -188,6 +254,8 @@ export function getConversationRequestListItemFromRecord(
         : "캐릭터 정보 없음",
     message:
       typeof record.message === "string" ? record.message : null,
+    startReason: parseConversationStartReason(record.start_reason),
+    dailyCardSnapshot: parseConversationStartReason(record.daily_card_snapshot),
     status: record.status,
     createdAt: record.created_at,
     respondedAt:

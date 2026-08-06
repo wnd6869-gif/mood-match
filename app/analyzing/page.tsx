@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import AnalyzingView from "@/components/analyzing-view";
-import { createProfilePhotoSignedUrl } from "@/lib/supabase/profile-photo";
+import { createOwnProfilePhotoSignedUrl } from "@/lib/supabase/profile-photo";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +20,7 @@ export default async function AnalyzingPage() {
     redirect("/login");
   }
 
-  const photoUrl = await createProfilePhotoSignedUrl(
+  const photoUrl = await createOwnProfilePhotoSignedUrl(
     supabase,
     user.id,
   );

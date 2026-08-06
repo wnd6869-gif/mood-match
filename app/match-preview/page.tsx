@@ -13,10 +13,15 @@ import {
 import { isCharacterRecipe } from "@/lib/persona-record";
 import type { CharacterRecipe } from "@/lib/character-casting";
 import {
-  calculateRecommendationScore,
-  getMatchPreferenceFromRecord,
+  calculateConversationRecommendationScore,
   RECOMMENDATION_MIN_SCORE,
 } from "@/lib/match-preference";
+import {
+  getDailyConversationCardFromRecord,
+  getDailyConversationTopicLabel,
+  getKstDate,
+  type DailyConversationCard,
+} from "@/lib/daily-conversation-card";
 import {
   CONVERSATION_GOAL_OPTIONS,
   CONVERSATION_TOPIC_OPTIONS,
@@ -44,15 +49,8 @@ export default async function MatchPreviewPage() {
     redirect("/login?next=/match-preview");
   }
 
-  const [matchResponse, settingsResponse, profilesResponse] =
+  const [settingsResponse, profilesResponse, ownDailyCardResponse] =
     await Promise.all([
-      supabase
-        .from("match_preferences")
-        .select(
-          "user_id, visual_archetype, preferred_animal, created_at, updated_at",
-        )
-        .eq("user_id", user.id)
-        .maybeSingle(),
       supabase
         .from("profiles")
         .select(PUBLIC_CHAT_PROFILE_SELECT_COLUMNS)
@@ -66,17 +64,20 @@ export default async function MatchPreviewPage() {
         p_one_to_one_only: true,
         p_time_slot: null,
       }),
+      supabase
+        .from("daily_conversation_cards")
+        .select("user_id, card_date, question, topic, custom_topic, skipped")
+        .eq("user_id", user.id)
+        .eq("card_date", getKstDate())
+        .eq("skipped", false)
+        .maybeSingle(),
     ]);
-  const matchPreference = getMatchPreferenceFromRecord(
-    matchResponse.data,
-  );
   const settings = getPublicChatProfileFromRecord(
     settingsResponse.data,
   );
-
-  if (!matchPreference) {
-    redirect("/ideal");
-  }
+  const ownDailyCard = getDailyConversationCardFromRecord(
+    ownDailyCardResponse.data,
+  );
 
   if (
     !settings ||
@@ -107,6 +108,19 @@ export default async function MatchPreviewPage() {
         p_user_ids: profiles.map((profile) => profile.userId),
       })
     : { data: [], error: null };
+  const dailyCardsResponse = profiles.length > 0
+    ? await supabase.rpc("get_visible_daily_conversation_cards", {
+        p_user_ids: profiles.map((profile) => profile.userId),
+      })
+    : { data: [], error: null };
+  const dailyCards = new Map<string, DailyConversationCard>(
+    Array.isArray(dailyCardsResponse.data)
+      ? dailyCardsResponse.data
+          .map(getDailyConversationCardFromRecord)
+          .filter((card): card is DailyConversationCard => card !== null)
+          .map((card) => [card.userId, card])
+      : [],
+  );
   const recipes = new Map(
     Array.isArray(recipeResponse.data)
       ? recipeResponse.data
@@ -136,9 +150,8 @@ export default async function MatchPreviewPage() {
   const recommendations = profilesWithRecipes
     .map((profile) => ({
       profile,
-      score: calculateRecommendationScore({
+      score: calculateConversationRecommendationScore({
         candidate: profile,
-        matchPreference,
         conversationPreferences: {
           conversation_goal: settings.conversation_goal,
           conversation_moods: settings.conversation_moods,
@@ -156,18 +169,18 @@ export default async function MatchPreviewPage() {
   return (
     <AppShell>
       <BackLink
-        href="/ideal"
-        ariaLabel="관심 스타일 설정으로 돌아가기"
-        label="관심 스타일"
+        href="/profile/conversation-preferences"
+        ariaLabel="대화 스타일 설정으로 돌아가기"
+        label="대화 스타일"
       />
-      <StepProgress current={5} total={5} label="실제 추천" />
+      <StepProgress current={5} total={5} label="대화 제안" />
 
       <header className="mt-7">
         <p className="text-sm font-semibold text-coral-600">
-          실제 사용자 추천
+          대화 제안
         </p>
         <h1 className="mt-2 text-3xl font-bold leading-tight tracking-tight text-neutral-900">
-          지금 대화가 잘 맞을
+          지금 편하게 대화할
           <br />
           캐릭터를 찾았어요
         </h1>
@@ -183,7 +196,7 @@ export default async function MatchPreviewPage() {
             내 캐릭터도 다른 사람에게 보여줄까요?
           </p>
           <p className="mt-2 text-sm leading-6 text-neutral-700">
-            공개하면 둘러보기와 맞춤 추천에 나타나고 대화 요청을 받을 수
+            공개하면 둘러보기와 대화 제안에 나타나고 대화 요청을 받을 수
             있어요. 실제 사진은 기본 비공개이며, 상호 동의한 채팅에서만
             공개할 수 있어요.
           </p>
@@ -202,7 +215,7 @@ export default async function MatchPreviewPage() {
           role="alert"
           className="mt-5 rounded-2xl bg-amber-50 px-4 py-3 text-sm leading-5 text-amber-800"
         >
-          실제 추천 사용자를 불러오지 못했어요. 추천 SQL 적용 상태를
+          대화 제안 사용자를 불러오지 못했어요. 추천 SQL 적용 상태를
           확인해주세요.
         </p>
       )}
@@ -230,6 +243,16 @@ export default async function MatchPreviewPage() {
       ) : (
         <div className="mt-7 space-y-5">
           {recommendations.map(({ profile, score }) => {
+            const dailyCard = dailyCards.get(profile.userId) ?? null;
+            const todayTopic = dailyCard
+              ? getDailyConversationTopicLabel(dailyCard)
+              : null;
+            const hasSharedDailyTopic = Boolean(
+              ownDailyCard?.topic &&
+                dailyCard?.topic &&
+                ownDailyCard.topic === dailyCard.topic &&
+                ownDailyCard.topic !== "custom",
+            );
             const goalLabel = findOptionLabel(
               profile.conversation_goal,
               CONVERSATION_GOAL_OPTIONS,
@@ -260,7 +283,7 @@ export default async function MatchPreviewPage() {
                   <div className="min-w-0 p-4">
                     <div className="flex items-center justify-between gap-2">
                       <span className="rounded-full bg-coral-50 px-2.5 py-1 text-xs font-bold text-coral-700">
-                        추천 {score.total}%
+                        대화 취향 참고
                       </span>
                       {profile.ageDisplay && (
                         <span className="text-xs font-semibold text-neutral-400">
@@ -281,23 +304,6 @@ export default async function MatchPreviewPage() {
                 </div>
 
                 <div className="p-5 pt-4">
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="rounded-2xl bg-neutral-50 px-3 py-3">
-                      <p className="text-xs text-neutral-400">
-                        캐릭터 분위기
-                      </p>
-                      <p className="mt-1 text-base font-bold text-neutral-900">
-                        {score.character}%
-                      </p>
-                    </div>
-                    <div className="rounded-2xl bg-neutral-50 px-3 py-3">
-                      <p className="text-xs text-neutral-400">대화 취향</p>
-                      <p className="mt-1 text-base font-bold text-neutral-900">
-                        {score.conversation}%
-                      </p>
-                    </div>
-                  </div>
-
                   <div className="mt-4 flex flex-wrap gap-2">
                     {score.reasons.map((reason) => (
                       <span
@@ -307,11 +313,22 @@ export default async function MatchPreviewPage() {
                         {reason}
                       </span>
                     ))}
+                    {hasSharedDailyTopic && todayTopic && (
+                      <span className="rounded-full bg-coral-50 px-3 py-1.5 text-xs font-semibold text-coral-800">
+                        오늘 {todayTopic} 이야기를 꺼낼 수 있어요
+                      </span>
+                    )}
                   </div>
                   {topicLabels.length > 0 && (
                     <p className="mt-4 text-xs leading-5 text-neutral-500">
                       관심사 · {topicLabels.join(" · ")}
                     </p>
+                  )}
+                  {(dailyCard?.question || todayTopic) && (
+                    <div className="mt-4 rounded-2xl bg-coral-50 px-3 py-3 text-xs leading-5 text-coral-900">
+                      <p className="font-bold">오늘 이 사람에게 물어보기</p>
+                      <p className="mt-1">{dailyCard?.question ?? todayTopic}</p>
+                    </div>
                   )}
 
                   <div className="mt-5">
@@ -321,6 +338,15 @@ export default async function MatchPreviewPage() {
                       preferredGroupSize={profile.preferred_group_size}
                       requestStatus={profile.requestStatus}
                       requestDirection={profile.requestDirection}
+                      todayQuestion={dailyCard?.question}
+                      todayTopic={todayTopic}
+                      commonTopics={profile.conversation_topics.filter((topic) =>
+                        settings.conversation_topics.includes(topic),
+                      )}
+                      sharedTimeSlots={profile.available_time_slots.filter((slot) =>
+                        settings.available_time_slots.includes(slot),
+                      )}
+                      personaTitle={profile.personaTitle}
                     />
                   </div>
                   <Link

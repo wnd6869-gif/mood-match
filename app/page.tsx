@@ -6,6 +6,7 @@ import {
 } from "@/components/landing-auth-actions";
 import LegalFooter from "@/components/legal-footer";
 import type { CharacterRecipe } from "@/lib/character-casting";
+import { SERVICE_CORE_MESSAGE } from "@/lib/service-copy";
 
 type LandingCharacter = {
   name: string;
@@ -119,7 +120,7 @@ export default function LandingPage() {
             대화는 부담 없이.
           </h1>
           <p className="mt-6 max-w-xl text-base leading-7 text-neutral-600 sm:text-lg">
-            AI가 사진의 분위기를 바탕으로 동물 캐릭터를 만들고, 대화 목적과 취향이 맞는 사람을 연결해요.
+            {SERVICE_CORE_MESSAGE}. AI 캐릭터로 먼저 인사하고, 대화 목적과 분위기가 편안한 사람을 천천히 찾아보세요.
           </p>
           <div className="mt-8 max-w-sm"><LandingCtaAuthAction /></div>
           <p className="mt-3 text-xs leading-5 text-neutral-500">
@@ -203,7 +204,7 @@ export default function LandingPage() {
               <div className="flex gap-3">
                 <CharacterAvatar recipe={cat.recipe} variant="avatar" className="size-16 shrink-0 rounded-2xl" />
                 <div className="min-w-0">
-                  <p className="text-xs font-bold text-coral-600">추천 캐릭터</p>
+                  <p className="text-xs font-bold text-coral-600">대화 캐릭터</p>
                   <h3 className="mt-1 font-black">{cat.name}</h3>
                   <p className="mt-1 text-xs text-neutral-500">{cat.topics}</p>
                 </div>

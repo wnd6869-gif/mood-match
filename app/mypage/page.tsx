@@ -185,7 +185,7 @@ export default async function MyPage() {
             내 캐릭터를 공개하고 대화를 시작해보세요
           </p>
           <p className="mt-2 text-sm leading-6 text-neutral-700">
-            공개하면 추천과 둘러보기에서 캐릭터와 기본 ID가 보여요. 실제
+            공개하면 대화 제안과 둘러보기에서 캐릭터와 기본 ID가 보여요. 실제
             사진은 기본 비공개이고, 상호 동의했을 때만 공개돼요.
           </p>
           <Link

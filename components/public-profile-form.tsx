@@ -324,7 +324,7 @@ export default function PublicProfileForm({
               공개 프로필 활성화
             </h2>
             <p className="mt-1 text-xs leading-5 text-neutral-500">
-              비활성화하면 추천 목록과 향후 채팅방에서 제외돼요.
+              비활성화하면 대화 제안 목록과 향후 채팅방에서 제외돼요.
             </p>
           </div>
           <button

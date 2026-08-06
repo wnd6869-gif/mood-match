@@ -22,7 +22,7 @@ const expressions = ["gentle", "bright", "chic", "confident", "playful"] as cons
 const backgrounds = ["minimal-cream", "warm-cafe", "green-park"] as const;
 const effects = ["soft-hearts", "tiny-stars", "floating-leaves", "music-notes", "warm-sparkles"] as const;
 
-/** Korean labels that can be shown in a persona's "나의 동물상" ranking. */
+/** Korean labels that can be shown in a persona's character-candidate list. */
 export const AVATAR_ANIMAL_LABELS: Record<AnimalId, string> = {
   "golden-retriever": "골든리트리버",
   otter: "수달",
