@@ -4,6 +4,13 @@ import { getSupabaseConfig } from "@/lib/supabase/env";
 import { shouldRedirectModeratedUser } from "@/lib/moderation-redirect.mjs";
 
 export async function updateSession(request: NextRequest) {
+  if (
+    process.env.NODE_ENV === "production" &&
+    request.nextUrl.pathname.startsWith("/dev")
+  ) {
+    return new NextResponse(null, { status: 404 });
+  }
+
   const config = getSupabaseConfig();
   let response = NextResponse.next({ request });
 

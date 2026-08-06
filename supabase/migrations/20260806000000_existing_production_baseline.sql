@@ -1,0 +1,3 @@
+-- Mood Match production baseline.
+-- The project predates Supabase CLI migrations. Register this version as
+-- applied only after the legacy schema checklist in migrations/README.md.

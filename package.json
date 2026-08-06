@@ -15,10 +15,12 @@
     "test:avatar-casting": "node scripts/verify-avatar-casting.mjs",
     "test:load-public-route": "node scripts/load-public-route.mjs",
     "test:load-realtime-transport": "node --env-file=.env.local scripts/load-realtime-transport.mjs",
+    "test:operations-guards": "node scripts/verify-operations-guards.mjs",
     "render:pointed-muzzle-fox-qa": "node scripts/render-pointed-muzzle-red-fox-qa.mjs",
     "render:pointed-muzzle-border-collie-qa": "node scripts/render-pointed-muzzle-red-fox-qa.mjs border-collie"
   },
   "dependencies": {
+    "@sentry/nextjs": "^10.46.0",
     "@supabase/ssr": "^0.12.3",
     "@supabase/supabase-js": "^2.110.9",
     "next": "16.2.12",

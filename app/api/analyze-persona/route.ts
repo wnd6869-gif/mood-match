@@ -368,11 +368,17 @@ export async function POST(request: Request) {
     );
 
     if (saveError) {
+      const saveErrorDetails = safeErrorDetails(saveError);
+      const saveErrorRecord = saveError as unknown as Record<string, unknown>;
       logger.error("analyze_persona_persist_failed", {
         route: "/api/analyze-persona",
         userId: user.id,
         requestId: claimLogId,
-        code: saveError.code ?? "unknown",
+        code: saveErrorDetails.code ?? "unknown",
+        constraint:
+          typeof saveErrorRecord.constraint === "string"
+            ? saveErrorRecord.constraint
+            : undefined,
       });
       if (process.env.NODE_ENV === "development") {
         console.error("[persona-analysis] 분석 결과 저장 실패", {

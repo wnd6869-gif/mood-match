@@ -25,8 +25,12 @@ const METRIC_LABELS = [
 
 export default async function AdminDashboardPage() {
   const { supabase } = await requireAdmin();
-  const { data, error } = await supabase.rpc("admin_dashboard");
+  const [{ data, error }, { data: analysisData, error: analysisError }] = await Promise.all([
+    supabase.rpc("admin_dashboard"),
+    supabase.rpc("admin_persona_analysis_metrics"),
+  ]);
   const dashboard = asRecord(data);
+  const analysisMetrics = asRecord(analysisData);
   const metrics = asRecord(dashboard.metrics);
   const recentReports = asRecords(dashboard.recentReports);
   const recentUsers = asRecords(dashboard.recentUsers);
@@ -64,6 +68,36 @@ export default async function AdminDashboardPage() {
           </article>
         ))}
       </div>
+
+      <section className="mt-6 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <div>
+            <h3 className="font-bold">AI 분석 상태 (최근 24시간)</h3>
+            <p className="mt-1 text-xs text-neutral-500">
+              OpenAI 토큰은 성공 저장된 분석 기준 집계입니다.
+            </p>
+          </div>
+          {analysisError && (
+            <p className="text-xs text-amber-700">분석 모니터링 migration 적용이 필요합니다.</p>
+          )}
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {[
+            ["요청", "requested"],
+            ["실패", "failed"],
+            ["실패율", "failureRate"],
+            ["총 토큰", "totalTokens"],
+          ].map(([label, key]) => (
+            <div key={key} className="rounded-xl bg-neutral-50 p-4">
+              <p className="text-xs font-semibold text-neutral-500">{label}</p>
+              <p className="mt-1 text-2xl font-bold">
+                {asNumber(analysisMetrics[key]).toLocaleString("ko-KR")}
+                {key === "failureRate" ? "%" : ""}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <div className="mt-6 grid gap-5 xl:grid-cols-3">
         <AdminListCard title="최근 신고" href="/admin/reports">
