@@ -350,7 +350,13 @@ export async function POST(request: Request) {
       objectPath,
       reroll ? claimLogId : null,
     );
-    const recipe = castCharacter(analysis.castingSignals, castingSeed);
+    const primaryAnimalName = [...analysis.result.animalTypes]
+      .sort((left, right) => right.score - left.score)[0]?.name;
+    const recipe = castCharacter(
+      analysis.castingSignals,
+      castingSeed,
+      primaryAnimalName,
+    );
     // Keep the legacy composition column populated for older readers, but make
     // it a lossless adapter of the persisted avatar-v1 recipe.
     const composition = recipeToComposition(recipe);
