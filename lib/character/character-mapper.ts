@@ -23,7 +23,6 @@ function animalFrom(result: PersonaAnalysisResult): AnimalId {
   const name = result.animalTypes[0]?.name ?? "";
   if (name.includes("러시안") || name.includes("고양이")) return "russian-blue";
   if (name.includes("여우")) return "red-fox";
-  if (name.includes("토끼")) return "white-rabbit";
   if (name.includes("카피바라")) return "capybara";
   if (name.includes("수달")) return "otter";
   return "golden-retriever";
@@ -37,7 +36,6 @@ export function mapAvatarInputToCharacter(
     .sort((left, right) => (right.score ?? 0) - (left.score ?? 0))[0]?.name ?? personaTitle;
   const animal: AnimalId = name.includes("러시안") || name.includes("고양이")
     ? "russian-blue" : name.includes("여우") ? "red-fox"
-    : name.includes("토끼") ? "white-rabbit"
     : name.includes("카피바라") ? "capybara"
     : name.includes("수달") ? "otter" : "golden-retriever";
   const seedText = `${personaTitle}:${animalTypes.map(({ name: item, score }) => `${item}:${score ?? 0}`).join("|")}`;

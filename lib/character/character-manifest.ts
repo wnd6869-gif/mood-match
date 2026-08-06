@@ -152,15 +152,6 @@ export const ANIMAL_MANIFEST: Record<
     displayTransforms: defaultDisplayTransforms(),
     ready: true,
   },
-  "white-rabbit": {
-    label: "흰토끼",
-    base: `${ROOT}/animals/white-rabbit/web/base-v1.webp`,
-    anchors: anchors({
-      faceAccessory: { x: 512, y: 390, scale: 0.86 },
-    }),
-    displayTransforms: defaultDisplayTransforms(),
-    ready: true,
-  },
   capybara: {
     label: "카피바라",
     base: `${ROOT}/animals/capybara/web/base-v1.webp`,
@@ -282,9 +273,5 @@ export const ANIMAL_LAYER_TRANSFORMS: Partial<
   Record<AnimalId, { eyes?: string; mouth?: string; accessories?: string }>
 > = {
   "russian-blue": { mouth: "translateY(5.5%)" },
-  "white-rabbit": {
-    eyes: "translateY(3%) scale(0.9)",
-    accessories: "translateY(3%) scale(0.86)",
-  },
   capybara: { mouth: "translateY(3%)" },
 };

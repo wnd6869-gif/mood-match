@@ -17,7 +17,6 @@ export type AnimalId =
   | "russian-blue"
   | "otter"
   | "red-fox"
-  | "white-rabbit"
   | "capybara"
   | "brown-bear"
   | "welsh-corgi"
