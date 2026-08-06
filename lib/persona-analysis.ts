@@ -42,9 +42,9 @@ export const SAFE_PERSONA_RESULT: PersonaAnalysisResult = {
   personaDescription:
     "사진에서는 차분하고 단정한 인상이 먼저 느껴지고, 편안한 장난기도 은은하게 전해져요.",
   nicknameCandidates: [
-    "차분한 든든한 보더콜리",
-    "조용한 다정한 불곰",
-    "포근한 유쾌한 수달",
+    "차분하고 든든한 보더콜리",
+    "조용하고 다정한 불곰",
+    "포근하고 유쾌한 수달",
   ],
   visualTraits: {
     friendly: 68,

@@ -48,9 +48,9 @@ export type PersonaRecord = {
 };
 
 const LEGACY_ID_ADJECTIVE_PAIRS = [
-  ["차분한", "다정한"],
-  ["포근한", "유쾌한"],
-  ["든든한", "특별한"],
+  ["차분하고", "다정한"],
+  ["포근하고", "유쾌한"],
+  ["든든하고", "특별한"],
 ] as const;
 
 const LEGACY_ID_FALLBACK_ANIMALS = ["수달", "붉은여우", "골든리트리버"] as const;

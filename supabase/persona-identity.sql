@@ -45,7 +45,7 @@ as $$
 declare
   v_existing text;
   v_candidate text;
-  v_base text := '다정한 특별한 친구';
+  v_base text := '다정하고 특별한 친구';
   v_assigned text;
   v_suffix text;
 begin
@@ -82,7 +82,7 @@ begin
       if v_candidate !~ '^[가-힣]{1,8} [가-힣]{1,8} [가-힣]{1,8}$'
         and v_candidate ~ '[가-힣]' then
         v_candidate :=
-          '다정한 특별한 '
+          '다정하고 특별한 '
           || left(
             pg_catalog.regexp_replace(v_candidate, '\s+', '', 'g'),
             8
@@ -91,7 +91,7 @@ begin
 
       if v_candidate ~ '^[가-힣]{1,8} [가-힣]{1,8} [가-힣]{1,8}$'
         and char_length(v_candidate) between 5 and 20 then
-        if v_base = '다정한 특별한 친구' then
+        if v_base = '다정하고 특별한 친구' then
           v_base := v_candidate;
         end if;
 
