@@ -360,7 +360,7 @@ export async function POST(request: Request) {
     // Keep the legacy composition column populated for older readers, but make
     // it a lossless adapter of the persisted avatar-v1 recipe.
     const composition = recipeToComposition(recipe);
-    const saveError = await persistPersonaAnalysis(
+    const { error: saveError, avatarError } = await persistPersonaAnalysis(
       supabase,
       personaFields,
       recipe,
@@ -391,6 +391,16 @@ export async function POST(request: Request) {
         { error: "분석 결과를 저장하지 못했어요. 잠시 후 다시 시도해주세요." },
         500,
       );
+    }
+
+    if (avatarError) {
+      const avatarErrorDetails = safeErrorDetails(avatarError);
+      logger.error("analyze_persona_avatar_metadata_persist_failed", {
+        route: "/api/analyze-persona",
+        userId: user.id,
+        requestId: claimLogId,
+        code: avatarErrorDetails.code ?? "unknown",
+      });
     }
 
     analysisSucceeded = true;
