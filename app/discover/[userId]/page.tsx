@@ -16,9 +16,12 @@ import {
   CONVERSATION_TOPIC_OPTIONS,
   findOptionLabel,
   GROUP_SIZE_OPTIONS,
+  getPublicChatProfileFromRecord,
+  PUBLIC_CHAT_PROFILE_SELECT_COLUMNS,
 } from "@/lib/public-chat-profile";
-import { createProfilePhotoSignedUrl } from "@/lib/supabase/profile-photo";
+import { createOwnProfilePhotoSignedUrl } from "@/lib/supabase/profile-photo";
 import { createClient } from "@/lib/supabase/server";
+import { getDailyConversationCardFromRecord, getDailyConversationTopicLabel } from "@/lib/daily-conversation-card";
 
 export const dynamic = "force-dynamic";
 
@@ -65,17 +68,21 @@ export default async function DiscoverProfilePage({
     redirect("/login");
   }
 
-  const { data, error } = await supabase.rpc(
-    "discover_available_chat_profiles",
-    {
+  const [{ data, error }, ownProfileResponse] = await Promise.all([
+    supabase.rpc("discover_available_chat_profiles", {
       p_target_user_id: userId,
       p_goal: null,
       p_mood: null,
       p_topic: null,
       p_one_to_one_only: false,
       p_time_slot: null,
-    },
-  );
+    }),
+    supabase
+      .from("profiles")
+      .select(PUBLIC_CHAT_PROFILE_SELECT_COLUMNS)
+      .eq("id", user.id)
+      .maybeSingle(),
+  ]);
   const profile = getDiscoverableProfileFromRecord(
     Array.isArray(data) ? data[0] : null,
   );
@@ -116,10 +123,32 @@ export default async function DiscoverProfilePage({
   }
 
   const isOwnProfile = profile.userId === user.id;
-  const photoUrl =
-    profile.photo_visibility !== "persona_only"
-      ? await createProfilePhotoSignedUrl(supabase, profile.userId)
-      : null;
+  const ownProfile = getPublicChatProfileFromRecord(ownProfileResponse.data);
+  const commonTopics = ownProfile
+    ? profile.conversation_topics.filter((topic) =>
+        ownProfile.conversation_topics.includes(topic),
+      )
+    : [];
+  const sharedTimeSlots = ownProfile
+    ? profile.available_time_slots.filter((slot) =>
+        ownProfile.available_time_slots.includes(slot),
+      )
+    : [];
+  const dailyCardResponse = !isOwnProfile
+    ? await supabase.rpc("get_visible_daily_conversation_cards", {
+        p_user_ids: [profile.userId],
+      })
+    : { data: [], error: null };
+  const dailyCard = Array.isArray(dailyCardResponse.data)
+    ? getDailyConversationCardFromRecord(dailyCardResponse.data[0])
+    : null;
+  const dailyTopic = dailyCard ? getDailyConversationTopicLabel(dailyCard) : null;
+  // A public profile never exposes the real photo. The owner may still see
+  // their own upload here; another member must enter a direct chat and obtain
+  // mutual consent before the reveal gateway returns an image.
+  const photoUrl = isOwnProfile
+    ? await createOwnProfilePhotoSignedUrl(supabase, profile.userId)
+    : null;
   const goalLabel = findOptionLabel(
     profile.conversation_goal,
     CONVERSATION_GOAL_OPTIONS,
@@ -198,21 +227,17 @@ export default async function DiscoverProfilePage({
             </p>
           )}
 
-          <div className="mt-5 grid grid-cols-3 gap-2">
-            {profile.animalTypes.slice(0, 3).map((animal) => (
-              <div
-                key={animal.name}
-                className="rounded-2xl bg-neutral-50 px-2 py-3 text-center"
-              >
-                <p className="truncate text-xs font-semibold text-neutral-600">
-                  {animal.name}
-                </p>
-                <p className="mt-1 text-sm font-bold text-neutral-900">
-                  {animal.score}%
-                </p>
-              </div>
-            ))}
-          </div>
+          {dailyCard && (dailyCard.question || dailyTopic) && (
+            <section className="mt-5 rounded-2xl border border-coral-100 bg-coral-50/70 px-4 py-4">
+              <h2 className="text-sm font-bold text-coral-800">오늘 이 사람에게 물어보기</h2>
+              <p className="mt-2 text-sm font-semibold leading-6 text-neutral-800">
+                {dailyCard.question ?? dailyTopic}
+              </p>
+              {dailyCard.question && dailyTopic && (
+                <p className="mt-1 text-xs text-neutral-500">오늘 꺼낼 소재 · {dailyTopic}</p>
+              )}
+            </section>
+          )}
 
           <section className="mt-6 border-t border-neutral-100 pt-5">
             <h2 className="text-xs font-bold text-neutral-400">
@@ -286,6 +311,11 @@ export default async function DiscoverProfilePage({
             preferredGroupSize={profile.preferred_group_size}
             requestStatus={profile.requestStatus}
             requestDirection={profile.requestDirection}
+            todayQuestion={dailyCard?.question}
+            todayTopic={dailyTopic}
+            commonTopics={commonTopics}
+            sharedTimeSlots={sharedTimeSlots}
+            personaTitle={profile.personaTitle}
           />
         )}
         <ActionLink

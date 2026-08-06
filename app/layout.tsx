@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
+import { SERVICE_CORE_MESSAGE } from "@/lib/service-copy";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -9,12 +10,10 @@ const geistSans = Geist({
 
 export const metadata: Metadata = {
   title: "Mood Match | AI 캐릭터 채팅",
-  description:
-    "사진 한 장으로 내 분위기를 담은 AI 캐릭터를 만들고, 다른 사람의 캐릭터를 둘러보며 편하게 대화해보세요.",
+  description: SERVICE_CORE_MESSAGE,
   openGraph: {
     title: "Mood Match | AI 캐릭터 채팅",
-    description:
-      "사진 한 장으로 내 분위기를 담은 AI 캐릭터를 만들고, 다른 사람의 캐릭터를 둘러보며 편하게 대화해보세요.",
+    description: SERVICE_CORE_MESSAGE,
     type: "website",
   },
 };

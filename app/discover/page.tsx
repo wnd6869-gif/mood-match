@@ -10,14 +10,19 @@ import {
   getDiscoverableProfileFromRecord,
   type DiscoverableProfile,
 } from "@/lib/conversation-request";
+import {
+  getDailyConversationCardFromRecord,
+  getDailyConversationTopicLabel,
+  type DailyConversationCard,
+} from "@/lib/daily-conversation-card";
 import { isCharacterRecipe } from "@/lib/persona-record";
 import type { CharacterRecipe } from "@/lib/character-casting";
 import {
-  calculateRecommendationScore,
-  getMatchPreferenceFromRecord,
+  calculateConversationRecommendationScore,
 } from "@/lib/match-preference";
 import {
   getPublicChatProfileFromRecord,
+  hasCompleteConversationPreferences,
   PUBLIC_CHAT_PROFILE_SELECT_COLUMNS,
 } from "@/lib/public-chat-profile";
 import { createClient } from "@/lib/supabase/server";
@@ -36,7 +41,7 @@ type DiscoverSearchParams = {
 };
 
 const TABS: { value: DiscoverTab; label: string }[] = [
-  { value: "recommended", label: "추천" },
+  { value: "recommended", label: "대화 제안" },
   { value: "new", label: "새로 가입" },
   { value: "available", label: "대화 선호 시간대" },
 ];
@@ -96,7 +101,7 @@ export default async function DiscoverPage({
   const hasFilters = Boolean(
     goal || mood || topic || requestedTime || oneToOneOnly,
   );
-  const [profilesResponse, matchResponse, settingsResponse] =
+  const [profilesResponse, settingsResponse] =
     await Promise.all([
       supabase.rpc("discover_available_chat_profiles", {
         p_target_user_id: null,
@@ -107,24 +112,26 @@ export default async function DiscoverPage({
         p_time_slot: timeSlot,
       }),
       supabase
-        .from("match_preferences")
-        .select(
-          "user_id, visual_archetype, preferred_animal, created_at, updated_at",
-        )
-        .eq("user_id", user.id)
-        .maybeSingle(),
-      supabase
         .from("profiles")
         .select(PUBLIC_CHAT_PROFILE_SELECT_COLUMNS)
         .eq("id", user.id)
         .maybeSingle(),
     ]);
-  const matchPreference = getMatchPreferenceFromRecord(
-    matchResponse.data,
-  );
-  const ownSettings = getPublicChatProfileFromRecord(
+  const ownProfileSettings = getPublicChatProfileFromRecord(
     settingsResponse.data,
   );
+  const ownSettings =
+    ownProfileSettings &&
+    hasCompleteConversationPreferences({
+      conversation_goal: ownProfileSettings.conversation_goal,
+      conversation_moods: ownProfileSettings.conversation_moods,
+      conversation_topics: ownProfileSettings.conversation_topics,
+      conversation_pace: ownProfileSettings.conversation_pace,
+      preferred_group_size: ownProfileSettings.preferred_group_size,
+      available_time_slots: ownProfileSettings.available_time_slots,
+    })
+      ? ownProfileSettings
+      : null;
   const profiles = Array.isArray(profilesResponse.data)
     ? profilesResponse.data
         .map(getDiscoverableProfileFromRecord)
@@ -147,6 +154,19 @@ export default async function DiscoverPage({
           .map((row) => [row.user_id, row.character_recipe])
       : [],
   );
+  const dailyCardsResponse = profiles.length > 0
+    ? await supabase.rpc("get_visible_daily_conversation_cards", {
+        p_user_ids: profiles.map((profile) => profile.userId),
+      })
+    : { data: [], error: null };
+  const dailyCards = new Map<string, DailyConversationCard>(
+    Array.isArray(dailyCardsResponse.data)
+      ? dailyCardsResponse.data
+          .map(getDailyConversationCardFromRecord)
+          .filter((card): card is DailyConversationCard => card !== null)
+          .map((card) => [card.userId, card])
+      : [],
+  );
   const profilesWithRecipes: Array<DiscoverableProfile & { characterRecipe: CharacterRecipe | null }> = profiles.map((profile) => {
     const candidateRecipe = recipes.get(profile.userId);
     return {
@@ -157,10 +177,9 @@ export default async function DiscoverPage({
   const scoredProfiles = profilesWithRecipes.map((profile) => ({
     profile,
     score:
-      matchPreference && ownSettings
-        ? calculateRecommendationScore({
+      ownSettings
+        ? calculateConversationRecommendationScore({
             candidate: profile,
-            matchPreference,
             conversationPreferences: {
               conversation_goal: ownSettings.conversation_goal,
               conversation_moods: ownSettings.conversation_moods,
@@ -189,11 +208,25 @@ export default async function DiscoverPage({
       characterRecipe: profile.characterRecipe,
       conversationGoal: profile.conversation_goal,
       conversationTopics: profile.conversation_topics,
+      commonTopics: ownSettings
+        ? profile.conversation_topics.filter((topic) =>
+            ownSettings.conversation_topics.includes(topic),
+          )
+        : [],
+      sharedTimeSlots: ownSettings
+        ? profile.available_time_slots.filter((slot) =>
+            ownSettings.available_time_slots.includes(slot),
+          )
+        : [],
       availableTimeSlots: profile.available_time_slots,
       preferredGroupSize: profile.preferred_group_size,
       requestStatus: profile.requestStatus,
       requestDirection: profile.requestDirection,
       score: score?.total ?? null,
+      dailyQuestion: dailyCards.get(profile.userId)?.question ?? null,
+      dailyTopic: dailyCards.has(profile.userId)
+        ? getDailyConversationTopicLabel(dailyCards.get(profile.userId)!)
+        : null,
     }),
   );
 
@@ -237,10 +270,9 @@ export default async function DiscoverPage({
           hasFilters={hasFilters}
         />
       </div>
-      {tab === "recommended" && matchPreference && ownSettings && (
+      {tab === "recommended" && ownSettings && (
         <p className="mt-3 text-xs leading-5 text-neutral-400">
-          추천 점수는 대화 취향 60%와 캐릭터 분위기 40%를 기준으로
-          계산해요.
+          대화 목적·주제·시간대와 캐릭터 분위기를 함께 참고해 보여드려요.
         </p>
       )}
       {tab === "available" && (
@@ -249,19 +281,19 @@ export default async function DiscoverPage({
           실제 접속 상태를 뜻하지는 않아요.
         </p>
       )}
-      {tab === "recommended" && (!matchPreference || !ownSettings) && (
+      {tab === "recommended" && !ownSettings && (
         <section className="mt-5 rounded-[1.5rem] border border-coral-100 bg-coral-50/70 p-4">
           <p className="text-sm font-bold text-neutral-900">
-            취향을 설정하면 더 잘 맞는 캐릭터를 추천해드려요.
+            대화 스타일을 설정하면 더 편안한 대화 제안을 볼 수 있어요.
           </p>
           <p className="mt-1 text-xs leading-5 text-neutral-600">
-            관심 스타일과 대화 취향을 바탕으로 추천 점수를 계산해요.
+            대화 목적·주제·시간대와 캐릭터 분위기를 함께 참고해요.
           </p>
           <Link
-            href="/ideal"
+            href="/profile/conversation-preferences?next=/discover"
             className="mt-3 inline-flex min-h-10 items-center rounded-xl bg-neutral-900 px-3.5 text-xs font-bold text-white"
           >
-            취향 설정하고 맞춤 추천 받기
+            대화 스타일 설정하기
           </Link>
         </section>
       )}
@@ -309,7 +341,7 @@ export default async function DiscoverPage({
           items={swipeDeckItems}
           showRecommendationScore={tab === "recommended"}
           showSetupHint={
-            tab === "recommended" && (!matchPreference || !ownSettings)
+            tab === "recommended" && !ownSettings
           }
         />
       )}

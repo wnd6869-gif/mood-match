@@ -350,7 +350,13 @@ export async function POST(request: Request) {
       objectPath,
       reroll ? claimLogId : null,
     );
-    const recipe = castCharacter(analysis.castingSignals, castingSeed);
+    const primaryAnimalName = [...analysis.result.animalTypes]
+      .sort((left, right) => right.score - left.score)[0]?.name;
+    const recipe = castCharacter(
+      analysis.castingSignals,
+      castingSeed,
+      primaryAnimalName,
+    );
     // Keep the legacy composition column populated for older readers, but make
     // it a lossless adapter of the persisted avatar-v1 recipe.
     const composition = recipeToComposition(recipe);
@@ -362,11 +368,17 @@ export async function POST(request: Request) {
     );
 
     if (saveError) {
+      const saveErrorDetails = safeErrorDetails(saveError);
+      const saveErrorRecord = saveError as unknown as Record<string, unknown>;
       logger.error("analyze_persona_persist_failed", {
         route: "/api/analyze-persona",
         userId: user.id,
         requestId: claimLogId,
-        code: saveError.code ?? "unknown",
+        code: saveErrorDetails.code ?? "unknown",
+        constraint:
+          typeof saveErrorRecord.constraint === "string"
+            ? saveErrorRecord.constraint
+            : undefined,
       });
       if (process.env.NODE_ENV === "development") {
         console.error("[persona-analysis] 분석 결과 저장 실패", {

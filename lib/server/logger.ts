@@ -1,7 +1,7 @@
 import "server-only";
+import * as Sentry from "@sentry/nextjs";
 
 type Primitive = string | number | boolean | null | undefined;
-
 type LoggerMetadata = Record<string, Primitive>;
 
 function sanitizeMetadata(metadata: LoggerMetadata) {
@@ -27,9 +27,10 @@ function getErrorName(error: unknown) {
 
 export const logger = {
   error(event: string, metadata: LoggerMetadata = {}, error?: unknown) {
+    const safeMetadata = sanitizeMetadata(metadata);
     const payload = {
       event,
-      ...sanitizeMetadata(metadata),
+      ...safeMetadata,
       errorName: getErrorName(error),
       ...(process.env.NODE_ENV === "development" && error
         ? { stack: getErrorStack(error) }
@@ -37,5 +38,20 @@ export const logger = {
     };
 
     console.error("[server-error]", payload);
+
+    // The SDK is a no-op until SENTRY_DSN is configured. Never attach request
+    // bodies, photo URLs, chat text, email addresses, or access tokens here.
+    Sentry.withScope((scope) => {
+      scope.setTag("event", event);
+      Object.entries(safeMetadata).forEach(([key, value]) => {
+        scope.setExtra(key, value);
+      });
+
+      if (error) {
+        Sentry.captureException(error);
+      } else {
+        Sentry.captureMessage(event, "error");
+      }
+    });
   },
 };

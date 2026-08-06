@@ -45,7 +45,7 @@ as $$
 declare
   v_existing text;
   v_candidate text;
-  v_base text := '다정한 특별한 친구';
+  v_base text := '다정하고 특별한 친구';
   v_assigned text;
   v_suffix text;
 begin
@@ -82,7 +82,7 @@ begin
       if v_candidate !~ '^[가-힣]{1,8} [가-힣]{1,8} [가-힣]{1,8}$'
         and v_candidate ~ '[가-힣]' then
         v_candidate :=
-          '다정한 특별한 '
+          '다정하고 특별한 '
           || left(
             pg_catalog.regexp_replace(v_candidate, '\s+', '', 'g'),
             8
@@ -91,7 +91,7 @@ begin
 
       if v_candidate ~ '^[가-힣]{1,8} [가-힣]{1,8} [가-힣]{1,8}$'
         and char_length(v_candidate) between 5 and 20 then
-        if v_base = '다정한 특별한 친구' then
+        if v_base = '다정하고 특별한 친구' then
           v_base := v_candidate;
         end if;
 
@@ -150,6 +150,60 @@ $$;
 revoke all on function public.assign_persona_identity(uuid, jsonb)
 from public, anon, authenticated;
 
+-- A new photo analysis is a new character identity. Keep the initial
+-- assignment stable, but intentionally replace it when the analysis updates
+-- its generated nickname candidates.
+create or replace function public.refresh_persona_identity(
+  target_user_id uuid,
+  identity_candidates jsonb
+)
+returns text
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_previous_identity text;
+  v_next_candidates jsonb;
+begin
+  select public_nickname
+  into v_previous_identity
+  from public.profiles
+  where id = target_user_id
+  for update;
+
+  if not found then
+    raise exception using
+      errcode = 'P0001',
+      message = 'profile_required';
+  end if;
+
+  update public.profiles
+  set public_nickname = null
+  where id = target_user_id;
+
+  select coalesce(
+    pg_catalog.jsonb_agg(candidate.value),
+    '[]'::jsonb
+  )
+  into v_next_candidates
+  from pg_catalog.jsonb_array_elements_text(
+    coalesce(identity_candidates, '[]'::jsonb)
+  ) as candidate(value)
+  where v_previous_identity is null
+    or lower(pg_catalog.regexp_replace(candidate.value, '\s+', '', 'g'))
+      <> lower(pg_catalog.regexp_replace(v_previous_identity, '\s+', '', 'g'));
+
+  return public.assign_persona_identity(
+    target_user_id,
+    v_next_candidates
+  );
+end;
+$$;
+
+revoke all on function public.refresh_persona_identity(uuid, jsonb)
+from public, anon, authenticated;
+
 create or replace function public.assign_persona_identity_after_analysis()
 returns trigger
 language plpgsql
@@ -157,10 +211,18 @@ security definer
 set search_path = ''
 as $$
 begin
-  perform public.assign_persona_identity(
-    new.user_id,
-    new.nickname_candidates
-  );
+  if TG_OP = 'UPDATE' then
+    perform public.refresh_persona_identity(
+      new.user_id,
+      new.nickname_candidates
+    );
+  else
+    perform public.assign_persona_identity(
+      new.user_id,
+      new.nickname_candidates
+    );
+  end if;
+
   return new;
 end;
 $$;

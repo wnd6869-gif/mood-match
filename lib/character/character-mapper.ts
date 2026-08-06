@@ -1,4 +1,9 @@
 import type { PersonaAnalysisResult } from "@/lib/persona-analysis";
+import {
+  AVATAR_ANIMAL_LABELS,
+  AVATAR_CATALOG,
+  normalizeSupportedPersonaAnimalName,
+} from "@/lib/avatar-catalog";
 import { normalizeComposition } from "@/lib/character/character-rules";
 import { avatarSelectionFromComposition } from "@/lib/character/avatar-system";
 import type {
@@ -19,28 +24,44 @@ function pick<T>(values: readonly T[], seed: number, offset: number): T {
   return values[(seed + offset * 2654435761) % values.length];
 }
 
+function animalIdFromName(value: string): AnimalId | null {
+  const normalized = normalizeSupportedPersonaAnimalName(value);
+  const exactMatch = normalized
+    ? AVATAR_CATALOG.find(
+        (item) => AVATAR_ANIMAL_LABELS[item.animalId] === normalized,
+      )
+    : undefined;
+
+  if (exactMatch) return exactMatch.animalId;
+
+  const titleMatch = AVATAR_CATALOG.find(({ animalId }) =>
+    value.includes(AVATAR_ANIMAL_LABELS[animalId]),
+  );
+  return titleMatch?.animalId ?? null;
+}
+
 function animalFrom(result: PersonaAnalysisResult): AnimalId {
-  const name = result.animalTypes[0]?.name ?? "";
-  if (name.includes("러시안") || name.includes("고양이")) return "russian-blue";
-  if (name.includes("여우")) return "red-fox";
-  if (name.includes("토끼")) return "white-rabbit";
-  if (name.includes("카피바라")) return "capybara";
-  if (name.includes("수달")) return "otter";
-  return "golden-retriever";
+  const rankedAnimalName = [...result.animalTypes]
+    .sort((left, right) => right.score - left.score)[0]?.name;
+  return animalIdFromName(rankedAnimalName ?? "") ?? "golden-retriever";
 }
 
 export function mapAvatarInputToCharacter(
   animalTypes: readonly { name: string; score?: number }[],
   personaTitle: string,
 ): CharacterComposition {
-  const name = [...animalTypes]
-    .sort((left, right) => (right.score ?? 0) - (left.score ?? 0))[0]?.name ?? personaTitle;
-  const animal: AnimalId = name.includes("러시안") || name.includes("고양이")
-    ? "russian-blue" : name.includes("여우") ? "red-fox"
-    : name.includes("토끼") ? "white-rabbit"
-    : name.includes("카피바라") ? "capybara"
-    : name.includes("수달") ? "otter" : "golden-retriever";
-  const seedText = `${personaTitle}:${animalTypes.map(({ name: item, score }) => `${item}:${score ?? 0}`).join("|")}`;
+  const rankedAnimalName = [...animalTypes]
+    .sort((left, right) => (right.score ?? 0) - (left.score ?? 0))[0]?.name ?? "";
+  // Legacy personas can be rendered from different data sources: discovery
+  // has animalTypes while chat lists only have personaTitle. Use the shared
+  // title as the stable fallback identity so they never receive different
+  // animal/outfit combinations on different screens.
+  const name = personaTitle.trim() || rankedAnimalName;
+  const animal =
+    animalIdFromName(rankedAnimalName) ??
+    animalIdFromName(name) ??
+    "golden-retriever";
+  const seedText = `legacy:${name || "character"}`;
   const seed = hash(seedText);
   const eyes = pick(["gentle", "bright", "chic", "focused", "cozy", "curious"] as const, seed, 1);
   const mouth = pick(["small-smile", "warm-smile", "big-smile", "playful-smirk", "shy-smile"] as const, seed, 2);

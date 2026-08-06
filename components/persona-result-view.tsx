@@ -20,6 +20,7 @@ type PersonaResultViewProps = {
   personaIdentity: string | null;
   serverComposition: CharacterComposition | null;
   serverRecipe: CharacterRecipe | null;
+  hasCompleteConversationProfile: boolean;
 };
 
 export default function PersonaResultView({
@@ -28,6 +29,7 @@ export default function PersonaResultView({
   personaIdentity,
   serverComposition,
   serverRecipe,
+  hasCompleteConversationProfile,
 }: PersonaResultViewProps) {
   const { personaAnalysis } = useOnboardingDraft();
   const result =
@@ -108,25 +110,36 @@ export default function PersonaResultView({
         )}
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-neutral-950/90 via-neutral-950/45 to-transparent px-6 pb-6 pt-20">
           <p className="text-xs font-bold tracking-[0.15em] text-white/75">
-            MY ANIMAL CHARACTER
+            YOUR CHARACTER IS READY
           </p>
           <h1 className="mt-2 text-3xl font-bold leading-tight tracking-tight">
-            {result.personaTitle}
+            당신의 캐릭터가 완성됐어요
           </h1>
+          <p className="mt-2 text-sm font-semibold text-white/85">
+            {result.personaTitle}
+          </p>
           <p className="mt-2 text-sm leading-6 text-white/80">
             @{personaIdentity ?? result.nicknameCandidates[0]}
           </p>
         </div>
       </section>
 
-      <p className="mt-5 rounded-3xl bg-white px-5 py-4 text-sm leading-6 text-neutral-600 shadow-sm">
-        {result.personaDescription}
-      </p>
+      <section className="mt-5 rounded-3xl bg-white px-5 py-5 shadow-sm">
+        <p className="text-sm font-bold text-neutral-900">당신의 캐릭터가 완성됐어요</p>
+        <p className="mt-2 text-sm leading-6 text-neutral-600">
+          {result.personaDescription} 이 결과는 사진에서 읽은 분위기와 색감을 대화 캐릭터 스타일로 옮긴 참고 결과예요. 실제 성격이나 외모를 판단하지 않아요.
+        </p>
+      </section>
+
+      <section className="mt-4 rounded-3xl border border-coral-100 bg-coral-50/60 px-5 py-4">
+        <p className="text-sm font-bold text-neutral-900">사진은 기본적으로 비공개예요</p>
+        <p className="mt-2 text-sm leading-6 text-neutral-600">업로드한 사진은 캐릭터 생성용이며 다른 사용자에게 자동 공개되지 않습니다. 사진은 대화가 시작된 뒤 서로 동의할 때만 해당 채팅방에서 공개됩니다.</p>
+      </section>
 
       <div className="mt-4 space-y-4">
         <article className="rounded-3xl border border-neutral-200/80 bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-base font-bold text-neutral-900">나의 동물상</h2>
+            <h2 className="text-base font-bold text-neutral-900">나의 대화 캐릭터 후보</h2>
             <span className="rounded-full bg-coral-50 px-3 py-1 text-xs font-semibold text-coral-700">
               TOP 3
             </span>
@@ -144,7 +157,7 @@ export default function PersonaResultView({
                 </div>
                 <div
                   role="progressbar"
-                  aria-label={`${animal.name} 동물상 비율`}
+                  aria-label={`${animal.name} 캐릭터 후보 비중`}
                   aria-valuemin={0}
                   aria-valuemax={100}
                   aria-valuenow={animal.score}
@@ -184,7 +197,7 @@ export default function PersonaResultView({
             @{personaIdentity ?? result.nicknameCandidates[0]}
           </h2>
           <p className="mt-3 text-sm leading-6 text-neutral-600">
-            두 가지 분위기와 대표 동물상을 조합해 자동으로 정했어요.
+            사진에서 느껴지는 분위기와 대표 캐릭터를 조합해 자동으로 정했어요.
             다른 계정과 겹치지 않도록 확인하며, 공개 프로필에서도 같은
             ID를 사용해요.
           </p>
@@ -193,10 +206,16 @@ export default function PersonaResultView({
 
       <div className="mt-6 space-y-3">
         <ActionLink
-          href="/ideal"
-          ariaLabel="관심 스타일과 대화 취향 설정으로 이동하기"
+          href={
+            hasCompleteConversationProfile
+              ? "/profile/preview"
+              : "/profile/conversation-preferences?next=/profile/preview"
+          }
+          ariaLabel="대화 프로필 설정으로 이동하기"
         >
-          관심 스타일 설정하고 추천받기
+          {hasCompleteConversationProfile
+            ? "내 공개 프로필 미리보기"
+            : "대화 프로필 완성하기"}
         </ActionLink>
         <ReanalyzeButton />
         <ActionLink

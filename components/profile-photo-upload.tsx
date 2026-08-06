@@ -170,7 +170,11 @@ export default function ProfilePhotoUpload({
     }
 
     if (!processedPhoto) {
+      // This path represents an already stored photo (for example after a
+      // refresh or returning to /upload). Clicking the explicit analysis
+      // action must not silently reuse a prior persona cache.
       prepareForNewPersonaAnalysis();
+      window.sessionStorage.setItem(CHARACTER_REROLL_SESSION_KEY, "true");
       router.push("/analyzing");
       return;
     }
@@ -304,12 +308,12 @@ export default function ProfilePhotoUpload({
 
     prepareForNewPersonaAnalysis();
 
-    if (shouldForceReanalysis) {
-      window.sessionStorage.setItem(
-        CHARACTER_REROLL_SESSION_KEY,
-        "true",
-      );
-    }
+    // A photo selected in this form is always a new analysis input.  Do not
+    // rely on `hasExistingPersona` here: the server-rendered value can be
+    // stale after a persona was created in another tab or during this visit.
+    // Without this marker `/api/analyze-persona` legitimately returns its
+    // cached persona, making a newly uploaded photo look ignored.
+    window.sessionStorage.setItem(CHARACTER_REROLL_SESSION_KEY, "true");
 
     setStatusMessage("업로드가 완료됐어요. 분석 화면으로 이동할게요.");
     router.push("/analyzing");

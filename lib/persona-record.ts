@@ -1,7 +1,16 @@
 import {
   parsePersonaAnalysisResult,
+  SAFE_PERSONA_RESULT,
   type PersonaAnalysisResult,
 } from "@/lib/persona-analysis";
+import {
+  deriveVisualTraitsFromAnimalTypes,
+  parseVisualTraits,
+} from "@/lib/animal-archetypes";
+import {
+  normalizeSupportedPersonaAnimalName,
+  SUPPORTED_PERSONA_ANIMAL_NAMES,
+} from "@/lib/avatar-catalog";
 import { mapAnalysisToCharacter } from "@/lib/character/character-mapper";
 import type {
   AvatarSelection,
@@ -39,12 +48,12 @@ export type PersonaRecord = {
 };
 
 const LEGACY_ID_ADJECTIVE_PAIRS = [
-  ["차분한", "다정한"],
-  ["포근한", "유쾌한"],
-  ["든든한", "특별한"],
+  ["차분하고", "다정한"],
+  ["포근하고", "유쾌한"],
+  ["든든하고", "특별한"],
 ] as const;
 
-const LEGACY_ID_FALLBACK_ANIMALS = ["수달", "여우", "강아지"] as const;
+const LEGACY_ID_FALLBACK_ANIMALS = ["수달", "붉은여우", "골든리트리버"] as const;
 
 function createLegacyNicknameCandidates(animalTypes: unknown) {
   const animals = Array.isArray(animalTypes) ? animalTypes : [];
@@ -64,6 +73,78 @@ function createLegacyNicknameCandidates(animalTypes: unknown) {
 
     return `${adjectives[0]} ${adjectives[1]} ${animalName}`;
   });
+}
+
+function getLegacyAnimalNames(value: unknown) {
+  const names = Array.isArray(value)
+    ? value.flatMap((item) => {
+      if (typeof item === "string") return [item];
+      if (!item || typeof item !== "object") return [];
+      const name = (item as Record<string, unknown>).name;
+      return typeof name === "string" ? [name] : [];
+    })
+    : [];
+  const unique = Array.from(
+    new Set(
+      names.flatMap((name) => {
+        const supported = normalizeSupportedPersonaAnimalName(name);
+        return supported ? [supported] : [];
+      }),
+    ),
+  );
+
+  for (const fallback of SUPPORTED_PERSONA_ANIMAL_NAMES) {
+    if (unique.length === 3) break;
+    if (!unique.includes(fallback)) unique.push(fallback);
+  }
+
+  return unique.slice(0, 3);
+}
+
+/**
+ * Old persona rows can predate the strict avatar-v1 schema. Recover their
+ * display data instead of blocking a user from an already-created character.
+ * New OpenAI responses remain subject to the strict analysis validator.
+ */
+function recoverLegacyPersonaResult(
+  record: Record<string, unknown>,
+): PersonaAnalysisResult {
+  const animalTypes = getLegacyAnimalNames(record.animal_types).map(
+    (name, index) => ({ name, score: [45, 35, 20][index] }),
+  );
+  const storedKeywords = Array.isArray(record.mood_keywords)
+    ? record.mood_keywords.filter(
+      (keyword): keyword is string =>
+        typeof keyword === "string" && keyword.trim().length > 0,
+    )
+    : [];
+  const moodKeywords = Array.from(
+    new Set([
+      ...storedKeywords.map((keyword) => keyword.trim()),
+      ...SAFE_PERSONA_RESULT.moodKeywords,
+    ]),
+  ).slice(0, 5);
+  const personaTitle =
+    typeof record.persona_title === "string" && record.persona_title.trim()
+      ? record.persona_title.trim().slice(0, 40)
+      : `차분한 ${animalTypes[0]?.name ?? "수달"}형`;
+  const personaDescription =
+    typeof record.persona_description === "string" && record.persona_description.trim()
+      ? record.persona_description.trim().slice(0, 240)
+      : SAFE_PERSONA_RESULT.personaDescription;
+
+  return {
+    animalTypes,
+    moodKeywords,
+    personaTitle,
+    personaDescription,
+    nicknameCandidates: createLegacyNicknameCandidates(
+      animalTypes.map(({ name }) => ({ name })),
+    ),
+    visualTraits:
+      parseVisualTraits(record.visual_traits) ??
+      deriveVisualTraitsFromAnimalTypes(animalTypes),
+  };
 }
 
 export function getPersonaResultFromRecord(
@@ -88,12 +169,14 @@ export function getPersonaResultFromRecord(
     return parsedResult;
   }
 
-  return parsePersonaAnalysisResult({
+  const parsedLegacyResult = parsePersonaAnalysisResult({
     ...storedResult,
     nicknameCandidates: createLegacyNicknameCandidates(
       record.animal_types,
     ),
   });
+
+  return parsedLegacyResult ?? recoverLegacyPersonaResult(record);
 }
 
 function isAvatarSelection(value: unknown): value is AvatarSelection {

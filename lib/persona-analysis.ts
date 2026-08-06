@@ -3,6 +3,7 @@ import {
   parseVisualTraits,
   type VisualTraits,
 } from "@/lib/animal-archetypes";
+import { normalizeSupportedPersonaAnimalName } from "@/lib/avatar-catalog";
 
 export type AnimalTypeScore = {
   name: string;
@@ -26,8 +27,8 @@ export const FORCE_REANALYSIS_SESSION_KEY = CHARACTER_REROLL_SESSION_KEY;
 
 export const SAFE_PERSONA_RESULT: PersonaAnalysisResult = {
   animalTypes: [
-    { name: "셰퍼드", score: 45 },
-    { name: "늑대", score: 30 },
+    { name: "보더콜리", score: 45 },
+    { name: "불곰", score: 30 },
     { name: "수달", score: 25 },
   ],
   moodKeywords: [
@@ -37,13 +38,13 @@ export const SAFE_PERSONA_RESULT: PersonaAnalysisResult = {
     "깔끔함",
     "은근한 장난기",
   ],
-  personaTitle: "차분한 셰퍼드형",
+  personaTitle: "차분한 보더콜리형",
   personaDescription:
     "사진에서는 차분하고 단정한 인상이 먼저 느껴지고, 편안한 장난기도 은은하게 전해져요.",
   nicknameCandidates: [
-    "차분한 든든한 셰퍼드",
-    "조용한 다정한 늑대",
-    "포근한 유쾌한 수달",
+    "차분하고 든든한 보더콜리",
+    "조용하고 다정한 불곰",
+    "포근하고 유쾌한 수달",
   ],
   visualTraits: {
     friendly: 68,
@@ -117,7 +118,13 @@ export function parsePersonaAnalysisResult(
       return null;
     }
 
-    animalTypes.push({ name: animal.name.trim(), score: animal.score });
+    const name = normalizeSupportedPersonaAnimalName(animal.name);
+
+    if (!name) {
+      return null;
+    }
+
+    animalTypes.push({ name, score: animal.score });
   }
 
   if (

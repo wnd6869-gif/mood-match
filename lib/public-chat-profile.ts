@@ -312,12 +312,12 @@ export function hasCompleteConversationPreferences(
     Boolean(value.conversation_goal) &&
     value.conversation_moods.length >= 1 &&
     value.conversation_moods.length <= 4 &&
-    value.conversation_topics.length >= 1 &&
-    value.conversation_topics.length <= 6 &&
+    value.conversation_topics.length >= 3 &&
+    value.conversation_topics.length <= 5 &&
     Boolean(value.conversation_pace) &&
     Boolean(value.preferred_group_size) &&
     value.available_time_slots.length >= 1 &&
-    value.available_time_slots.length <= 4
+    value.available_time_slots.length <= 3
   );
 }
 

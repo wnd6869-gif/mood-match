@@ -1,4 +1,5 @@
 import { PHOTO_ELIGIBILITY_REASON_CODES } from "@/lib/photo-eligibility";
+import { SUPPORTED_PERSONA_ANIMAL_NAMES } from "@/lib/avatar-catalog";
 
 export const PERSONA_RESULT_SCHEMA = {
   type: "object",
@@ -41,7 +42,7 @@ export const PERSONA_RESULT_SCHEMA = {
       items: {
         type: "object",
         properties: {
-          name: { type: "string" },
+          name: { type: "string", enum: SUPPORTED_PERSONA_ANIMAL_NAMES },
           score: { type: "integer", minimum: 0, maximum: 100 },
         },
         required: ["name", "score"],

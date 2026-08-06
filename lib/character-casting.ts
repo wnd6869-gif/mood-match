@@ -1,5 +1,12 @@
 import type { AvatarSelection, CharacterComposition } from "@/lib/character/character-types";
-import { AVATAR_CATALOG, type AvatarBackgroundId, type AvatarCatalogItem, type AvatarEffectId } from "@/lib/avatar-catalog";
+import {
+  AVATAR_ANIMAL_LABELS,
+  AVATAR_CATALOG,
+  normalizeSupportedPersonaAnimalName,
+  type AvatarBackgroundId,
+  type AvatarCatalogItem,
+  type AvatarEffectId,
+} from "@/lib/avatar-catalog";
 
 export type CastingExpression = "soft" | "smiling" | "neutral" | "focused" | "playful";
 export type PhotoCastingSignals = {
@@ -66,9 +73,23 @@ function effectFor(signals: PhotoCastingSignals, seed: string): AvatarEffectId |
   return undefined;
 }
 
-export function castCharacter(signalsInput: unknown, castingSeed: string): CharacterRecipe {
+export function castCharacter(
+  signalsInput: unknown,
+  castingSeed: string,
+  preferredAnimalName?: string,
+): CharacterRecipe {
   const signals = parsePhotoCastingSignals(signalsInput);
-  const ranked = AVATAR_CATALOG.map((item) => ({ item, score: score(item, signals) })).sort((a, b) => b.score - a.score);
+  const normalizedAnimalName = preferredAnimalName
+    ? normalizeSupportedPersonaAnimalName(preferredAnimalName)
+    : null;
+  const eligibleCatalog = normalizedAnimalName
+    ? AVATAR_CATALOG.filter(
+        (item) => AVATAR_ANIMAL_LABELS[item.animalId] === normalizedAnimalName,
+      )
+    : AVATAR_CATALOG;
+  const ranked = eligibleCatalog
+    .map((item) => ({ item, score: score(item, signals) }))
+    .sort((a, b) => b.score - a.score);
   const top = ranked[0];
   const close = ranked.filter((candidate) => top.score - candidate.score < 4.5).slice(0, 4);
   const selected = close.length > 1 ? close[Math.floor(seeded(castingSeed, "animal") * close.length)] : top;

@@ -8,6 +8,11 @@ import {
   type PersonaRecord,
 } from "@/lib/persona-record";
 import { createClient } from "@/lib/supabase/server";
+import {
+  getPublicChatProfileFromRecord,
+  hasCompleteConversationPreferences,
+  PUBLIC_CHAT_PROFILE_SELECT_COLUMNS,
+} from "@/lib/public-chat-profile";
 
 export const dynamic = "force-dynamic";
 
@@ -34,7 +39,7 @@ export default async function ResultPage() {
       .maybeSingle(),
     supabase
       .from("profiles")
-      .select("public_nickname")
+      .select(PUBLIC_CHAT_PROFILE_SELECT_COLUMNS)
       .eq("id", user.id)
       .maybeSingle(),
   ]);
@@ -45,6 +50,18 @@ export default async function ResultPage() {
     data as PersonaRecord | null,
   );
   const serverRecipe = getCharacterRecipeFromRecord(data as PersonaRecord | null);
+  const conversationProfile = getPublicChatProfileFromRecord(profileData);
+  const hasCompleteConversationProfile = Boolean(
+    conversationProfile &&
+      hasCompleteConversationPreferences({
+        conversation_goal: conversationProfile.conversation_goal,
+        conversation_moods: conversationProfile.conversation_moods,
+        conversation_topics: conversationProfile.conversation_topics,
+        conversation_pace: conversationProfile.conversation_pace,
+        preferred_group_size: conversationProfile.preferred_group_size,
+        available_time_slots: conversationProfile.available_time_slots,
+      }),
+  );
 
   return (
     <PersonaResultView
@@ -53,11 +70,9 @@ export default async function ResultPage() {
       serverComposition={serverComposition}
       serverRecipe={serverRecipe}
       personaIdentity={
-        profileData &&
-        typeof profileData.public_nickname === "string"
-          ? profileData.public_nickname
-          : null
+        conversationProfile?.public_nickname ?? null
       }
+      hasCompleteConversationProfile={hasCompleteConversationProfile}
     />
   );
 }

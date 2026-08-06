@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import ProfilePhotoUpload from "@/components/profile-photo-upload";
-import { createProfilePhotoSignedUrl } from "@/lib/supabase/profile-photo";
+import { createOwnProfilePhotoSignedUrl } from "@/lib/supabase/profile-photo";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -30,7 +30,7 @@ export default async function UploadPage() {
       .select("id")
       .eq("id", user.id)
       .maybeSingle(),
-    createProfilePhotoSignedUrl(supabase, user.id),
+    createOwnProfilePhotoSignedUrl(supabase, user.id),
     supabase
       .from("personas")
       .select("user_id")

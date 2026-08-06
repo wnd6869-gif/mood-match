@@ -3,7 +3,6 @@ import { jsonNoStore } from "@/lib/api/json";
 import { getChatMessageFromRecord, type ChatMessage } from "@/lib/chat";
 import { getPhotoRevealStatusFromRecord } from "@/lib/photo-reveal";
 import { isReportReason } from "@/lib/safety";
-import { createProfilePhotoSignedUrl } from "@/lib/supabase/profile-photo";
 import type { createClient } from "@/lib/supabase/server";
 
 type Supabase = NonNullable<Awaited<ReturnType<typeof createClient>>>;
@@ -166,7 +165,12 @@ async function handlePhoto({ supabase, body }: HandlerContext) {
   if (error) return rpcError(error.message);
   const status = getPhotoRevealStatusFromRecord(data);
   if (!status) return jsonNoStore({ error: "사진 공개 상태를 확인하지 못했어요." }, 500);
-  const photoUrl = status.revealed ? await createProfilePhotoSignedUrl(supabase, status.otherUserId) : null;
+  // This is an authenticated gateway, not a Supabase signed URL. It checks
+  // mutual consent again at image-request time so a revoked consent hides the
+  // photo immediately for subsequent loads.
+  const photoUrl = status.revealed
+    ? `/api/photo-reveal/${body.conversationId}`
+    : null;
   return jsonNoStore({ status, photoUrl });
 }
 
