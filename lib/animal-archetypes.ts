@@ -104,7 +104,16 @@ export const VISUAL_ARCHETYPE_OPTIONS = [
 ] satisfies readonly VisualArchetype[];
 
 export const ANIMAL_ARCHETYPE_MAP = {
+  골든리트리버: ["friendly_warm", "bright_playful"],
   수달: ["friendly_warm", "bright_playful"],
+  불곰: ["reliable_strong", "friendly_warm"],
+  웰시코기: ["friendly_warm", "bright_playful"],
+  러시안블루: ["calm_mysterious", "smart_stylish"],
+  랙돌: ["cute_cozy", "friendly_warm"],
+  스코티쉬폴드: ["cute_cozy", "bright_playful"],
+  시바견: ["reliable_strong", "calm_mysterious"],
+  붉은여우: ["smart_stylish", "calm_mysterious"],
+  보더콜리: ["reliable_strong", "smart_stylish"],
   햄스터: ["cute_cozy"],
   강아지: ["friendly_warm", "reliable_strong"],
   고양이: ["calm_mysterious", "smart_stylish"],

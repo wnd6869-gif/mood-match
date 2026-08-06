@@ -22,6 +22,21 @@ const expressions = ["gentle", "bright", "chic", "confident", "playful"] as cons
 const backgrounds = ["minimal-cream", "warm-cafe", "green-park"] as const;
 const effects = ["soft-hearts", "tiny-stars", "floating-leaves", "music-notes", "warm-sparkles"] as const;
 
+/** Korean labels that can be shown in a persona's "나의 동물상" ranking. */
+export const AVATAR_ANIMAL_LABELS: Record<AnimalId, string> = {
+  "golden-retriever": "골든리트리버",
+  otter: "수달",
+  "brown-bear": "불곰",
+  capybara: "카피바라",
+  "welsh-corgi": "웰시코기",
+  "russian-blue": "러시안블루",
+  ragdoll: "랙돌",
+  "scottish-fold": "스코티쉬폴드",
+  "shiba-inu": "시바견",
+  "red-fox": "붉은여우",
+  "border-collie": "보더콜리",
+};
+
 const traits = (warmth: number, calm: number, confidence: number, playfulness: number, chic: number, focus: number) => ({ warmth, calm, confidence, playfulness, chic, focus });
 const affinity = (warm: number, cool: number, clean: number, cozy: number, natural: number, urban: number, soft: number, polished: number, energetic: number) => ({ warm, cool, clean, cozy, natural, urban, soft, polished, energetic });
 
@@ -41,5 +56,51 @@ export const AVATAR_CATALOG: readonly AvatarCatalogItem[] = [
   { animalId: "red-fox", outfitBaseId: "red-fox-olive-hoodie", baseAssetPath: "/character-assets/animals/red-fox/olive-hoodie/red-fox.olive-hoodie-base.png", faceFamily: "pointed-muzzle", faceRigVersion: "pointed-muzzle-v1", animalTraits: traits(45, 40, 85, 55, 100, 60), visualAffinity: affinity(55, 45, 75, 35, 75, 85, 40, 90, 55), allowedExpressions: expressions, allowedBackgrounds: backgrounds, allowedEffects: effects, glassesEligible: true },
   { animalId: "border-collie", outfitBaseId: "border-collie-charcoal-jacket", baseAssetPath: "/character-assets/animals/border-collie/charcoal-jacket/border-collie.charcoal-jacket-base.png", faceFamily: "pointed-muzzle", faceRigVersion: "pointed-muzzle-v1", animalTraits: traits(45, 55, 85, 40, 75, 100), visualAffinity: affinity(35, 55, 85, 35, 40, 80, 35, 100, 60), allowedExpressions: expressions, allowedBackgrounds: backgrounds, allowedEffects: effects, glassesEligible: true },
 ] as const;
+
+/**
+ * Only these animals have a completed, user-visible avatar base. Keep the
+ * persona analysis output constrained to this list so its Top 3 can always
+ * be rendered by the character system.
+ */
+export const SUPPORTED_PERSONA_ANIMAL_NAMES = Object.freeze(
+  Array.from(
+    new Set(AVATAR_CATALOG.map(({ animalId }) => AVATAR_ANIMAL_LABELS[animalId])),
+  ),
+);
+
+const LEGACY_PERSONA_ANIMAL_ALIASES: Readonly<Record<string, string>> = {
+  "골든 리트리버": "골든리트리버",
+  리트리버: "골든리트리버",
+  강아지: "골든리트리버",
+  개: "골든리트리버",
+  셰퍼드: "보더콜리",
+  늑대: "보더콜리",
+  진돗개: "시바견",
+  코기: "웰시코기",
+  곰: "불곰",
+  고양이: "러시안블루",
+  여우: "붉은여우",
+  토끼: "웰시코기",
+  햄스터: "스코티쉬폴드",
+  사슴: "붉은여우",
+  펭귄: "러시안블루",
+  라쿤: "수달",
+  미어캣: "수달",
+  부엉이: "러시안블루",
+  알파카: "카피바라",
+};
+
+/** Converts legacy generic labels to a currently renderable animal label. */
+export function normalizeSupportedPersonaAnimalName(
+  value: string,
+): string | null {
+  const normalized = value.trim();
+
+  if (SUPPORTED_PERSONA_ANIMAL_NAMES.includes(normalized)) {
+    return normalized;
+  }
+
+  return LEGACY_PERSONA_ANIMAL_ALIASES[normalized] ?? null;
+}
 
 export const AVATAR_CATALOG_BY_BASE = Object.freeze(Object.fromEntries(AVATAR_CATALOG.map((item) => [item.outfitBaseId, item])) as Record<string, AvatarCatalogItem>);

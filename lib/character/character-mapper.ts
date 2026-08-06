@@ -32,13 +32,18 @@ export function mapAvatarInputToCharacter(
   animalTypes: readonly { name: string; score?: number }[],
   personaTitle: string,
 ): CharacterComposition {
-  const name = [...animalTypes]
-    .sort((left, right) => (right.score ?? 0) - (left.score ?? 0))[0]?.name ?? personaTitle;
+  const rankedAnimalName = [...animalTypes]
+    .sort((left, right) => (right.score ?? 0) - (left.score ?? 0))[0]?.name ?? "";
+  // Legacy personas can be rendered from different data sources: discovery
+  // has animalTypes while chat lists only have personaTitle. Use the shared
+  // title as the stable fallback identity so they never receive different
+  // animal/outfit combinations on different screens.
+  const name = personaTitle.trim() || rankedAnimalName;
   const animal: AnimalId = name.includes("러시안") || name.includes("고양이")
     ? "russian-blue" : name.includes("여우") ? "red-fox"
     : name.includes("카피바라") ? "capybara"
     : name.includes("수달") ? "otter" : "golden-retriever";
-  const seedText = `${personaTitle}:${animalTypes.map(({ name: item, score }) => `${item}:${score ?? 0}`).join("|")}`;
+  const seedText = `legacy:${name || "character"}`;
   const seed = hash(seedText);
   const eyes = pick(["gentle", "bright", "chic", "focused", "cozy", "curious"] as const, seed, 1);
   const mouth = pick(["small-smile", "warm-smile", "big-smile", "playful-smirk", "shy-smile"] as const, seed, 2);
