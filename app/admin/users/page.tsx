@@ -1,5 +1,8 @@
 import Link from "next/link";
-import { UserModerationActions } from "@/components/admin-actions";
+import {
+  PersonaAdminActions,
+  UserModerationActions,
+} from "@/components/admin-actions";
 import {
   ADMIN_ROLE_LABELS,
   asNumber,
@@ -254,14 +257,22 @@ export default async function AdminUsersPage({
                 reports={asRecords(detail.submittedReports)}
               />
             </div>
-            <UserModerationActions
-              targetUserId={asString(detailUser.id)}
-              currentStatus={detailStatus}
-              isPublic={detailUser.isPublic === true}
-              actorRole={role}
-              targetAdminRole={targetAdminRole}
-              isSelf={asString(detailUser.id) === currentUserId}
-            />
+            <div className="space-y-4">
+              <UserModerationActions
+                targetUserId={asString(detailUser.id)}
+                currentStatus={detailStatus}
+                isPublic={detailUser.isPublic === true}
+                actorRole={role}
+                targetAdminRole={targetAdminRole}
+                isSelf={asString(detailUser.id) === currentUserId}
+              />
+              <PersonaAdminActions
+                targetUserId={asString(detailUser.id)}
+                actorRole={role}
+                targetAdminRole={targetAdminRole}
+                isSelf={asString(detailUser.id) === currentUserId}
+              />
+            </div>
           </div>
         </section>
       )}

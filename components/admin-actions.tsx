@@ -229,6 +229,103 @@ export function UserModerationActions({
   );
 }
 
+export function PersonaAdminActions({
+  targetUserId,
+  actorRole,
+  targetAdminRole,
+  isSelf,
+}: {
+  targetUserId: string;
+  actorRole: AdminRole;
+  targetAdminRole: AdminRole | null;
+  isSelf: boolean;
+}) {
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const canAct =
+    !isSelf &&
+    (!targetAdminRole ||
+      ROLE_RANK[actorRole] > ROLE_RANK[targetAdminRole]);
+
+  async function runAction(
+    action: "clearPersonaIdentity" | "grantPersonaReanalysis",
+    confirmation: string,
+  ) {
+    if (isSubmitting || !canAct || !window.confirm(confirmation)) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setFeedback(null);
+
+    try {
+      const data = await callAdminApi({ action, targetUserId });
+      setFeedback(data?.message ?? "관리자 작업을 완료했어요.");
+      router.refresh();
+    } catch (error) {
+      setFeedback(
+        error instanceof Error
+          ? error.message
+          : "관리자 작업을 처리하지 못했어요.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  return (
+    <section className="rounded-2xl border border-amber-200 bg-white p-5">
+      <h3 className="text-base font-bold text-neutral-900">캐릭터 관리</h3>
+      <p className="mt-2 text-sm leading-6 text-neutral-500">
+        AI ID 삭제는 공개 프로필의 ID를 비우며, 다음 분석 완료 시 새 ID가
+        배정됩니다. 재분석 기회는 오늘 소진한 재분석 횟수 1회를 복구합니다.
+      </p>
+
+      {!canAct && (
+        <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          자기 자신 또는 같거나 높은 등급의 관리자는 변경할 수 없어요.
+        </p>
+      )}
+
+      {feedback && (
+        <p role="status" className="mt-3 rounded-xl bg-neutral-100 px-3 py-2 text-sm text-neutral-700">
+          {feedback}
+        </p>
+      )}
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <button
+          type="button"
+          disabled={!canAct || isSubmitting}
+          onClick={() =>
+            void runAction(
+              "grantPersonaReanalysis",
+              "이 사용자에게 사진 재분석 1회를 부여할까요?",
+            )
+          }
+          className="min-h-11 cursor-pointer rounded-xl bg-neutral-900 px-4 text-sm font-semibold text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:bg-neutral-300"
+        >
+          {isSubmitting ? "처리 중..." : "사진 재분석 1회 부여"}
+        </button>
+        <button
+          type="button"
+          disabled={!canAct || isSubmitting}
+          onClick={() =>
+            void runAction(
+              "clearPersonaIdentity",
+              "이 사용자의 AI ID를 삭제할까요? 다음 분석 완료 시 새 ID가 배정됩니다.",
+            )
+          }
+          className="min-h-11 cursor-pointer rounded-xl border border-amber-300 px-4 text-sm font-semibold text-amber-800 transition-colors hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          AI ID 삭제
+        </button>
+      </div>
+    </section>
+  );
+}
+
 export function ReportAdminActions({
   reportId,
   currentStatus,

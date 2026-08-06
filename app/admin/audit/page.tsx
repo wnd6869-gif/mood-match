@@ -12,6 +12,8 @@ const ACTION_LABELS: Record<string, string> = {
   report_status_changed: "신고 상태 변경",
   public_profile_disabled: "공개 프로필 비활성화",
   admin_note_changed: "관리자 메모 변경",
+  persona_identity_cleared: "AI ID 삭제",
+  persona_reanalysis_granted: "사진 재분석 기회 부여",
 };
 
 export default async function AdminAuditPage() {

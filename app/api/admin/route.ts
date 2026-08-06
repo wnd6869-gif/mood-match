@@ -60,7 +60,8 @@ function rpcErrorResponse(message: string | undefined) {
     message === "invalid_report_status" ||
     message === "moderation_reason_required" ||
     message === "invalid_suspension" ||
-    message === "admin_note_too_long"
+    message === "admin_note_too_long" ||
+    message === "invalid_admin_persona_action"
   ) {
     return jsonResponse(
       { error: "입력한 조치 내용을 다시 확인해주세요." },
@@ -183,6 +184,43 @@ export async function POST(request: Request) {
     }
 
     return jsonResponse({ message: "공개 프로필을 비활성화했어요." });
+  }
+
+  if (
+    body.action === "clearPersonaIdentity" ||
+    body.action === "grantPersonaReanalysis"
+  ) {
+    if (!isUuid(body.targetUserId)) {
+      return jsonResponse(
+        { error: "대상 사용자 정보가 올바르지 않아요." },
+        400,
+      );
+    }
+
+    const rpcName =
+      body.action === "clearPersonaIdentity"
+        ? "admin_clear_persona_identity"
+        : "admin_grant_persona_reanalysis";
+    const { data, error } = await admin.supabase.rpc(rpcName, {
+      target_user_id: body.targetUserId,
+    });
+
+    if (error) {
+      return rpcErrorResponse(error.message);
+    }
+
+    if (body.action === "clearPersonaIdentity") {
+      return jsonResponse({
+        message: "AI ID를 삭제했어요. 다음 분석 완료 시 새 ID가 배정됩니다.",
+      });
+    }
+
+    return jsonResponse({
+      message:
+        data === true
+          ? "사진 재분석 1회를 부여했어요."
+          : "현재도 사진 재분석을 할 수 있는 상태예요.",
+    });
   }
 
   if (body.action === "updateReportStatus") {
