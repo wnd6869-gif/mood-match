@@ -42,6 +42,7 @@ type DiscoverSwipeDeckProps = {
   items: DiscoverSwipeDeckItem[];
   showRecommendationScore: boolean;
   showSetupHint: boolean;
+  nextHref?: string | null;
 };
 
 function nextIndex(index: number, count: number) {
@@ -52,6 +53,7 @@ export default function DiscoverSwipeDeck({
   items,
   showRecommendationScore,
   showSetupHint,
+  nextHref = null,
 }: DiscoverSwipeDeckProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
@@ -117,6 +119,14 @@ export default function DiscoverSwipeDeck({
         >
           처음부터 다시 보기
         </button>
+        {nextHref && (
+          <Link
+            href={nextHref}
+            className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-neutral-900 px-4 text-sm font-bold text-white"
+          >
+            다음 캐릭터 보기
+          </Link>
+        )}
       </section>
     );
   }

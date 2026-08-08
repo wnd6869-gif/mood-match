@@ -82,6 +82,9 @@ export default async function HomePage() {
       p_topic: null,
       p_one_to_one_only: false,
       p_time_slot: null,
+      p_limit: 12,
+      p_cursor_updated_at: null,
+      p_cursor_user_id: null,
     }),
     supabase
       .from("daily_conversation_cards")
@@ -131,6 +134,36 @@ export default async function HomePage() {
         )
         .slice(0, 3)
     : [];
+  const conversationUserIds = conversations
+    .filter((conversation) => conversation.conversationType === "direct")
+    .map((conversation) => conversation.otherUserId)
+    .filter((userId): userId is string => Boolean(userId));
+  const conversationRecipesResponse = conversationUserIds.length > 0
+    ? await supabase.rpc("get_visible_avatar_recipes", {
+        p_user_ids: conversationUserIds,
+      })
+    : { data: [], error: null };
+  const conversationRecipes = new Map(
+    Array.isArray(conversationRecipesResponse.data)
+      ? conversationRecipesResponse.data
+          .filter(
+            (row): row is { user_id: string; character_recipe: unknown } =>
+              Boolean(
+                row &&
+                  typeof row === "object" &&
+                  "user_id" in row &&
+                  typeof row.user_id === "string",
+              ),
+          )
+          .map((row) => [row.user_id, row.character_recipe])
+      : [],
+  );
+  const getConversationRecipe = (otherUserId: string | null | undefined) => {
+    const candidateRecipe = otherUserId
+      ? conversationRecipes.get(otherUserId)
+      : undefined;
+    return isCharacterRecipe(candidateRecipe) ? candidateRecipe : undefined;
+  };
   const recommendation = Array.isArray(recommendationsResponse.data)
     ? recommendationsResponse.data
         .map(getDiscoverableProfileFromRecord)
@@ -396,6 +429,8 @@ export default async function HomePage() {
                 {conversation.conversationType === "direct" ? (
                   <CharacterAvatar
                     personaTitle={conversation.otherPersonaTitle}
+                    recipe={getConversationRecipe(conversation.otherUserId)}
+                    variant="avatar-small"
                     className="size-12 shrink-0 rounded-2xl"
                   />
                 ) : (

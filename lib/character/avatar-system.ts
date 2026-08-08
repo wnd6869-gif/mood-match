@@ -110,7 +110,7 @@ export const AVATAR_BACKGROUNDS: Record<AvatarBackgroundId, string> = {
   "warm-cafe": `${MVP_ROOT}/backgrounds/warm-cafe.png`,
 };
 export const ROUND_GLASSES = `${MVP_ROOT}/accessories/round-glasses.png`;
-export const WARM_SPARKLES = `${ROOT}/foreground-effects/original/warm-sparkles-v1.png`;
+export const WARM_SPARKLES = `${ROOT}/foreground-effects/web/warm-sparkles-v1.webp`;
 
 function deepFreeze<T>(value: T): T {
   if (value && typeof value === "object") {

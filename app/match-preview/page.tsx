@@ -63,6 +63,9 @@ export default async function MatchPreviewPage() {
         p_topic: null,
         p_one_to_one_only: true,
         p_time_slot: null,
+        p_limit: 24,
+        p_cursor_updated_at: null,
+        p_cursor_user_id: null,
       }),
       supabase
         .from("daily_conversation_cards")

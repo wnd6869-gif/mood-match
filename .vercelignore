@@ -1,0 +1,7 @@
+# Approval and authoring files stay in the repository but are not shipped as
+# public runtime assets. Runtime paths use the web/ files and approved bases.
+public/character-assets/**/qa/**
+public/character-assets/**/original/**
+public/character-assets/**/**-source.*
+public/character-assets/source-sheets/**
+public/character-parts/concepts/**

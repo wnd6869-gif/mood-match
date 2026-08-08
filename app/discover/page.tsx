@@ -38,6 +38,8 @@ type DiscoverSearchParams = {
   topic?: string | string[];
   time?: string | string[];
   oneToOne?: string | string[];
+  cursorUpdatedAt?: string | string[];
+  cursorUserId?: string | string[];
 };
 
 const TABS: { value: DiscoverTab; label: string }[] = [
@@ -98,6 +100,8 @@ export default async function DiscoverPage({
   const timeSlot =
     requestedTime ?? (tab === "available" ? getCurrentTimeSlot() : null);
   const oneToOneOnly = firstValue(query.oneToOne) === "true";
+  const cursorUpdatedAt = firstValue(query.cursorUpdatedAt) || null;
+  const cursorUserId = firstValue(query.cursorUserId) || null;
   const hasFilters = Boolean(
     goal || mood || topic || requestedTime || oneToOneOnly,
   );
@@ -110,6 +114,9 @@ export default async function DiscoverPage({
         p_topic: topic,
         p_one_to_one_only: oneToOneOnly,
         p_time_slot: timeSlot,
+        p_limit: 24,
+        p_cursor_updated_at: cursorUpdatedAt,
+        p_cursor_user_id: cursorUserId,
       }),
       supabase
         .from("profiles")
@@ -140,6 +147,32 @@ export default async function DiscoverPage({
             profile !== null,
         )
     : [];
+  const pageRows = Array.isArray(profilesResponse.data)
+    ? profilesResponse.data
+    : [];
+  const finalRow = pageRows[pageRows.length - 1];
+  const nextCursor =
+    finalRow && typeof finalRow === "object"
+      ? (() => {
+          const row = finalRow as Record<string, unknown>;
+          return typeof row.profile_updated_at === "string" &&
+            typeof row.user_id === "string"
+            ? { updatedAt: row.profile_updated_at, userId: row.user_id }
+            : null;
+        })()
+      : null;
+  const nextSearch = new URLSearchParams();
+  if (tab !== "recommended") nextSearch.set("tab", tab);
+  if (goal) nextSearch.set("goal", goal);
+  if (mood) nextSearch.set("mood", mood);
+  if (topic) nextSearch.set("topic", topic);
+  if (requestedTime) nextSearch.set("time", requestedTime);
+  if (oneToOneOnly) nextSearch.set("oneToOne", "true");
+  if (nextCursor) {
+    nextSearch.set("cursorUpdatedAt", nextCursor.updatedAt);
+    nextSearch.set("cursorUserId", nextCursor.userId);
+  }
+  const nextHref = nextCursor ? `/discover?${nextSearch.toString()}` : null;
   // The RPC is added by avatar-recipes.sql. On projects that have not applied
   // it yet cards keep their existing composition fallback instead of failing.
   const recipeResponse = profiles.length > 0
@@ -343,6 +376,7 @@ export default async function DiscoverPage({
           showSetupHint={
             tab === "recommended" && !ownSettings
           }
+          nextHref={nextHref}
         />
       )}
 

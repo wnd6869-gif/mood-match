@@ -10,6 +10,7 @@ import type { CharacterDisplayVariant } from "@/lib/character/character-types";
 import { mapAvatarInputToCharacter } from "@/lib/character/character-mapper";
 import AvatarRenderer from "@/components/avatar-renderer";
 import type { CharacterRecipe } from "@/lib/character-casting";
+import { getAvatarThumbnailUrl } from "@/lib/avatar-thumbnail";
 
 type CharacterAvatarProps = {
   animalTypes?: readonly { name: string; score?: number }[];
@@ -38,6 +39,22 @@ export default function CharacterAvatar({
 }: CharacterAvatarProps) {
   if (recipe) {
     const size = variant === "avatar-small" ? 40 : variant === "avatar" ? 64 : variant === "card" ? 128 : 256;
+    if (variant !== "full") {
+      const thumbnailSize = variant === "avatar-small" || variant === "avatar" ? 64 : 256;
+      return (
+        <div className={`relative isolate overflow-hidden ${className}`}>
+          <Image
+            src={getAvatarThumbnailUrl(recipe, variant, thumbnailSize)}
+            alt={alt ?? `${personaTitle || "AI"} animal character`}
+            fill
+            priority={priority}
+            unoptimized
+            sizes={thumbnailSize === 64 ? "64px" : "(max-width: 640px) 100vw, 256px"}
+            className={`object-cover ${imageClassName}`}
+          />
+        </div>
+      );
+    }
     return <AvatarRenderer recipe={recipe} size={size} shape="square" priority={priority} className={className} alt={alt ?? `${personaTitle || "AI"} 동물 캐릭터`} />;
   }
   if (composition) {
