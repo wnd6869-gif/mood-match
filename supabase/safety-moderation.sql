@@ -614,11 +614,36 @@ language plpgsql
 security definer
 set search_path = ''
 as $$
+declare
+  v_authenticated_user_id uuid := (select auth.uid());
 begin
-  if new.sender_id <> (select auth.uid()) then
-    raise exception using
-      errcode = 'P0001',
-      message = 'invalid_message_sender';
+  if new.sender_id <> v_authenticated_user_id then
+    if not exists (
+      select 1
+      from public.conversations as conversation
+      join public.conversation_requests as request
+        on request.id = conversation.created_from_request_id
+      where conversation.id = new.conversation_id
+        and request.status = 'accepted'
+        and request.sender_id = new.sender_id
+        and request.receiver_id = v_authenticated_user_id
+        and (
+          (
+            new.message_type = 'text'
+            and new.body = request.message
+            and not exists (
+              select 1
+              from public.messages as existing_message
+              where existing_message.conversation_id = new.conversation_id
+            )
+          )
+          or new.message_type = 'system'
+        )
+    ) then
+      raise exception using
+        errcode = 'P0001',
+        message = 'invalid_message_sender';
+    end if;
   end if;
 
   if not public.is_user_operational(new.sender_id) then
