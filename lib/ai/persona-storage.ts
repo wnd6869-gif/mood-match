@@ -44,6 +44,29 @@ function toCorePersonaFields(personaFields: Record<string, unknown>) {
   };
 }
 
+function toRecoveryPersonaFields(personaFields: Record<string, unknown>) {
+  // PostgreSQL evaluates CHECK constraints against the complete row during an
+  // UPSERT update. A legacy avatar recipe can therefore block an otherwise
+  // valid new analysis even though the recipe is not part of this write.
+  // Clear only derived renderer metadata; it is regenerated immediately after
+  // the core analysis is safely persisted below.
+  return {
+    ...toCorePersonaFields(personaFields),
+    visual_traits: null,
+    model_name: null,
+    input_tokens: null,
+    output_tokens: null,
+    total_tokens: null,
+    analysis_source: "openai",
+    character_composition: null,
+    character_asset_version: null,
+    avatar_selection: null,
+    character_recipe: null,
+    avatar_system_version: null,
+    avatar_updated_at: null,
+  };
+}
+
 export async function persistPersonaAnalysis(
   supabase: Supabase,
   personaFields: Record<string, unknown>,
@@ -77,6 +100,13 @@ export async function persistPersonaAnalysis(
   ) {
     ({ error } = await supabase.from("personas").upsert(
       toCorePersonaFields(personaFields),
+      { onConflict: "user_id" },
+    ));
+  }
+
+  if (isCheckConstraintViolation(error)) {
+    ({ error } = await supabase.from("personas").upsert(
+      toRecoveryPersonaFields(personaFields),
       { onConflict: "user_id" },
     ));
   }
