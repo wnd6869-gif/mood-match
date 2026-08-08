@@ -1,5 +1,5 @@
--- Reassign the canonical AI ID whenever a successful new photo analysis
--- stores a different nickname_candidates value. Run after persona-identity.sql.
+-- A public profile cannot temporarily have a null public_nickname. Replace
+-- persona IDs atomically so a fresh photo analysis works for public accounts.
 
 create or replace function public.refresh_persona_identity(
   target_user_id uuid,
@@ -23,14 +23,9 @@ begin
   for update;
 
   if not found then
-    raise exception using
-      errcode = 'P0001',
-      message = 'profile_required';
+    raise exception using errcode = 'P0001', message = 'profile_required';
   end if;
 
-  -- A public profile must always retain an ID. Never clear it as an
-  -- intermediate step: the profiles_public_requires_nickname constraint
-  -- correctly rejects that transient state.
   if pg_catalog.jsonb_typeof(identity_candidates) = 'array' then
     for v_candidate in
       select btrim(candidate.value)
@@ -53,16 +48,12 @@ begin
             return v_assigned;
           end if;
         exception
-          when unique_violation or check_violation then
-            null;
+          when unique_violation or check_violation then null;
         end;
       end if;
     end loop;
   end if;
 
-  -- Keep the current readable ID as the base only when every generated
-  -- candidate collides or fails validation. The suffix keeps the reroll
-  -- deterministic and the row is never temporarily invalid.
   for v_suffix in
     select substr(pg_catalog.md5(target_user_id::text || suffix_attempt::text), 1, 5)
     from pg_catalog.generate_series(0, 9) as suffix_attempt
@@ -80,52 +71,15 @@ begin
         return v_assigned;
       end if;
     exception
-      when unique_violation or check_violation then
-        null;
+      when unique_violation or check_violation then null;
     end;
   end loop;
 
-  raise exception using
-    errcode = 'P0001',
-    message = 'identity_assignment_failed';
+  raise exception using errcode = 'P0001', message = 'identity_assignment_failed';
 end;
 $$;
 
 revoke all on function public.refresh_persona_identity(uuid, jsonb)
 from public, anon, authenticated;
-
-create or replace function public.assign_persona_identity_after_analysis()
-returns trigger
-language plpgsql
-security definer
-set search_path = ''
-as $$
-begin
-  if TG_OP = 'UPDATE' then
-    perform public.refresh_persona_identity(
-      new.user_id,
-      new.nickname_candidates
-    );
-  else
-    perform public.assign_persona_identity(
-      new.user_id,
-      new.nickname_candidates
-    );
-  end if;
-
-  return new;
-end;
-$$;
-
-revoke all on function public.assign_persona_identity_after_analysis()
-from public, anon, authenticated;
-
-drop trigger if exists assign_persona_identity_after_analysis
-on public.personas;
-create trigger assign_persona_identity_after_analysis
-after insert or update of nickname_candidates
-on public.personas
-for each row
-execute function public.assign_persona_identity_after_analysis();
 
 notify pgrst, 'reload schema';
