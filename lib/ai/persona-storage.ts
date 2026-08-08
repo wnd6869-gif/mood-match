@@ -24,6 +24,26 @@ function isCheckConstraintViolation(error: { code?: string } | null) {
   return error?.code === "23514";
 }
 
+function isOptionalPersonaFieldCompatibilityError(error: { code?: string } | null) {
+  // 42703 is PostgreSQL's undefined_column error. PGRST204 is returned when
+  // PostgREST's schema cache does not know one of the optional columns yet.
+  // In both cases, retrying with the stable analysis fields keeps a completed
+  // OpenAI result from being discarded during a staged database rollout.
+  return error?.code === "42703" || error?.code === "PGRST204";
+}
+
+function toCorePersonaFields(personaFields: Record<string, unknown>) {
+  return {
+    user_id: personaFields.user_id,
+    photo_path: personaFields.photo_path,
+    animal_types: personaFields.animal_types,
+    mood_keywords: personaFields.mood_keywords,
+    persona_title: personaFields.persona_title,
+    persona_description: personaFields.persona_description,
+    nickname_candidates: personaFields.nickname_candidates,
+  };
+}
+
 export async function persistPersonaAnalysis(
   supabase: Supabase,
   personaFields: Record<string, unknown>,
@@ -43,6 +63,20 @@ export async function persistPersonaAnalysis(
   if (isCheckConstraintViolation(error)) {
     ({ error } = await supabase.from("personas").upsert(
       { ...personaFields, visual_traits: null },
+      { onConflict: "user_id" },
+    ));
+  }
+
+  // The analysis result itself only depends on the stable fields below.
+  // Optional model telemetry and display traits may be introduced after a
+  // deployment, so use this safe fallback for a partially migrated database.
+  // Never apply it to authorization/RLS errors: those must remain visible.
+  if (
+    isCheckConstraintViolation(error) ||
+    isOptionalPersonaFieldCompatibilityError(error)
+  ) {
+    ({ error } = await supabase.from("personas").upsert(
+      toCorePersonaFields(personaFields),
       { onConflict: "user_id" },
     ));
   }

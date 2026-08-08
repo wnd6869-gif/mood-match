@@ -19,7 +19,6 @@ import {
   getPublicChatProfileFromRecord,
   PUBLIC_CHAT_PROFILE_SELECT_COLUMNS,
 } from "@/lib/public-chat-profile";
-import { createOwnProfilePhotoSignedUrl } from "@/lib/supabase/profile-photo";
 import { createClient } from "@/lib/supabase/server";
 import { getDailyConversationCardFromRecord, getDailyConversationTopicLabel } from "@/lib/daily-conversation-card";
 
@@ -143,12 +142,10 @@ export default async function DiscoverProfilePage({
     ? getDailyConversationCardFromRecord(dailyCardResponse.data[0])
     : null;
   const dailyTopic = dailyCard ? getDailyConversationTopicLabel(dailyCard) : null;
-  // A public profile never exposes the real photo. The owner may still see
-  // their own upload here; another member must enter a direct chat and obtain
-  // mutual consent before the reveal gateway returns an image.
-  const photoUrl = isOwnProfile
-    ? await createOwnProfilePhotoSignedUrl(supabase, profile.userId)
-    : null;
+  // Detail profiles do not request any real-photo URL. Real photos are only
+  // available through the direct-chat mutual-consent gateway, including for
+  // the owner (who manages the upload from My, not this public detail view).
+  const photoUrl = null;
   const goalLabel = findOptionLabel(
     profile.conversation_goal,
     CONVERSATION_GOAL_OPTIONS,
